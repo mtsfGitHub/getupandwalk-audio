@@ -59,7 +59,8 @@ voci:
 
 pause:
   a_capo: 1.2               # a ogni a capo e tra una battuta e l'altra
-  due_punti: 0.6            # dopo i due punti
+  due_punti: 1.0            # dopo i due punti
+  punto_e_virgola: 1.0      # dopo il punto e virgola
 
 musica:
   volume: 0.6               # 0 = niente musica, 1 = piena
@@ -121,7 +122,7 @@ scaletta:
       - F: "{commento}"
         velocita: 0.92
         pausa_a_capo: 3
-        pausa_punto: 1.5
+        pausa_punto: 2
       - pausa: 10
       - per_ogni_domanda:
           - M|F: "{domanda}"

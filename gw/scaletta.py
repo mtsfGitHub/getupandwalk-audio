@@ -60,7 +60,7 @@ def speakable(t):
 
 def _tokens(text, cfg, nl_pause=None, dot_pause=None):
     """Testo → pezzi da leggere e pause (a capo, [pausa], due punti, brevi citazioni con altro passo)."""
-    nl, colon = cfg["pause"]["a_capo"], cfg["pause"]["due_punti"]
+    nl, colon = cfg["pause"]["a_capo"], (cfg["pause"]["due_punti"], cfg["pause"].get("punto_e_virgola", 0.0))
     if nl_pause is not None:
         nl = float(nl_pause)
     out = []
@@ -87,7 +87,8 @@ def _refine(part, colon, dot_pause=None):
                 if k < len(sentences) - 1:
                     out.append(("pause", float(dot_pause)))
             return out
-    pieces = re.split(r"(?<=:)\s+", part.strip())
+    colon, semi = colon if isinstance(colon, tuple) else (colon, 0.0)
+    pieces = re.split(r"(?<=[:;])\s+", part.strip())
     for i, piece in enumerate(pieces):
         last = 0
         for m in QUOTE_RE.finditer(piece):
@@ -101,7 +102,7 @@ def _refine(part, colon, dot_pause=None):
         if piece[last:].strip():
             out.append(("say", piece[last:].strip(), 1.0))
         if i < len(pieces) - 1 and piece.strip():
-            out.append(("pause", colon))
+            out.append(("pause", semi if piece.rstrip().endswith(";") else colon))
     return out
 
 

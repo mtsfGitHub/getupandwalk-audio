@@ -79,6 +79,7 @@ scaletta:
     fondo: accordo
     elementi:
       - M: "Una citazione di {citazione_fonte_letta}"
+      - pausa: 5
       - F: "{citazione}"
       - musica: 8
 

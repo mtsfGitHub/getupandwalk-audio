@@ -117,13 +117,14 @@ def build_events(model, values):
             if "musica" in it:
                 events.append(Event("music", secs=float(it["musica"]), section=section))
                 continue
-            who = "M" if "M" in it else "F" if "F" in it else None
+            who = "MF" if "MF" in it else "M" if "M" in it else "F" if "F" in it else None
             if not who:
                 continue
             text = fill(it[who], extra).strip()
             if not text or re.search(r"\{\w+\}", text):
                 continue
-            voice = voices["struttura"] if who == "M" else voices["contenuti"]
+            voice = {"M": voices["struttura"], "F": voices["contenuti"],
+                     "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
             speed = base * float(it.get("velocita", 1.0))
             for tok in _tokens(text, model):
                 if tok[0] == "pause":

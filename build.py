@@ -69,7 +69,7 @@ def main():
             current = ev.section
             print(f"\n== {current}")
         if ev.kind == "speak":
-            who = "M" if ev.voice == model["voci"]["struttura"] else "F"
+            who = "MF" if "|" in ev.voice else "M" if ev.voice == model["voci"]["struttura"] else "F"
             print(f"  [{who} x{ev.speed:.2f}] {ev.text[:90]}{'…' if len(ev.text) > 90 else ''}")
         elif ev.kind != "gap":
             print(f"  <{ev.kind} {ev.secs:g} s>")

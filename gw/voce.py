@@ -148,6 +148,12 @@ class TestEngine:
 
 
 class Voices:
+    def say_both(self, text, v1, v2, speed):
+        """Le due voci insieme, come in coro: la più veloce si adatta alla più lenta."""
+        a, b = self.say(text, v1, speed), self.say(text, v2, speed)
+        n = max(len(a), len(b))
+        return (_stretch(a, n) + _stretch(b, n)) * 0.62
+
     def __init__(self, test=False, fallback="im_nicola"):
         self.test = test
         self.engines = {}
@@ -174,6 +180,19 @@ class Voices:
             print(f"ATTENZIONE: {e}. Uso la voce di riserva ({self.fallback}).")
             self.broken[kind] = str(e)
             return self.say(text, self.fallback, speed)
+
+
+def _stretch(a, length):
+    """Allunga o accorcia un pezzo di voce senza cambiarne il tono (ffmpeg atempo)."""
+    import subprocess
+    if len(a) == 0 or abs(len(a) - length) < RATE * 0.03:
+        return np.pad(a, (0, max(0, length - len(a))))[:length]
+    factor = min(2.0, max(0.5, len(a) / length))
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-f", "f32le", "-ar", str(RATE), "-ac", "1", "-i", "-",
+                          "-filter:a", f"atempo={factor:.4f}", "-f", "f32le", "-"],
+                         input=a.astype(np.float32).tobytes(), check=True, capture_output=True).stdout
+    b = np.frombuffer(raw, dtype=np.float32)
+    return np.pad(b, (0, max(0, length - len(b))))[:length]
 
 
 def _trim(a, thr=0.004):

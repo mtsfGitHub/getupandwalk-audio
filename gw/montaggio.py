@@ -16,7 +16,8 @@ def render(events, voice, model, log=print):
         if ev.kind == "speak":
             key = (ev.text, ev.voice, round(ev.speed, 3))
             if key not in cache:
-                cache[key] = voice.say(ev.text, ev.voice, ev.speed)
+                cache[key] = (voice.say_both(ev.text, *ev.voice.split("|"), ev.speed) if "|" in ev.voice
+                              else voice.say(ev.text, ev.voice, ev.speed))
             a = cache[key]
             pieces.append(a); levels.append(np.full(len(a), bed, dtype=np.float32))
         else:

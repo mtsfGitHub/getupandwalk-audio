@@ -1,12 +1,16 @@
-"""Le voci: Kokoro (modello libero, gira sul server di GitHub) oppure toni di prova per i test."""
+"""Le voci. Nel modello si scrivono così:
+    im_nicola  oppure  kokoro:im_nicola     → Kokoro (anche voci di altre lingue, lette con la pronuncia italiana)
+    piper:it_IT-paola-medium                → Piper (voci addestrate su registrazioni italiane)
+    prova                                   → toni al posto delle parole, per provare il montaggio
+"""
 import numpy as np
 
 RATE = 24000
 
 
-class KokoroVoice:
+class KokoroEngine:
     def __init__(self):
-        from kokoro import KPipeline  # import here: il modello pesa e serve solo sul server
+        from kokoro import KPipeline  # pesante: si carica solo se serve
         self.pipe = KPipeline(lang_code="i", repo_id="hexgrad/Kokoro-82M")
 
     def say(self, text, voice, speed):
@@ -19,20 +23,66 @@ class KokoroVoice:
                 continue
             a = audio.detach().cpu().numpy() if hasattr(audio, "detach") else np.asarray(audio)
             parts.append(a.astype(np.float32).reshape(-1))
-        if not parts:
+        return np.concatenate(parts) if parts else np.zeros(0, dtype=np.float32)
+
+
+class PiperEngine:
+    def __init__(self):
+        self.voices = {}
+
+    def _load(self, name):
+        if name not in self.voices:
+            from huggingface_hub import hf_hub_download
+            from piper import PiperVoice
+            lang_region, speaker, quality = name.split("-")
+            folder = f"{lang_region.split('_')[0]}/{lang_region}/{speaker}/{quality}"
+            model = hf_hub_download("rhasspy/piper-voices", f"{folder}/{name}.onnx")
+            hf_hub_download("rhasspy/piper-voices", f"{folder}/{name}.onnx.json")
+            self.voices[name] = PiperVoice.load(model)
+        return self.voices[name]
+
+    def say(self, text, voice, speed):
+        from piper import SynthesisConfig
+        from scipy.signal import resample_poly
+        v = self._load(voice)
+        chunks, rate = [], RATE
+        for ch in v.synthesize(text, syn_config=SynthesisConfig(length_scale=1.0 / speed)):
+            chunks.append(ch.audio_float_array.astype(np.float32))
+            rate = ch.sample_rate
+        if not chunks:
             return np.zeros(0, dtype=np.float32)
-        return _trim(np.concatenate(parts))
+        a = np.concatenate(chunks)
+        if rate != RATE:
+            from math import gcd
+            g = gcd(RATE, rate)
+            a = resample_poly(a, RATE // g, rate // g).astype(np.float32)
+        return a * 0.8
 
 
-class TestVoice:
-    """Un tono per ogni parola: serve solo a provare il montaggio senza scaricare il modello."""
-
+class TestEngine:
     def say(self, text, voice, speed):
         words = max(1, len(text.split()))
         n = int(RATE * words * 0.38 / speed)
         t = np.arange(n) / RATE
         f = 150 if "m_" in voice else 230
         return (0.3 * np.sin(2 * np.pi * f * t) * (0.6 + 0.4 * np.sin(2 * np.pi * 2.5 * t))).astype(np.float32)
+
+
+class Voices:
+    def __init__(self, test=False):
+        self.test = test
+        self.engines = {}
+
+    def _engine(self, kind):
+        if self.test:
+            kind = "prova"
+        if kind not in self.engines:
+            self.engines[kind] = {"kokoro": KokoroEngine, "piper": PiperEngine, "prova": TestEngine}[kind]()
+        return self.engines[kind]
+
+    def say(self, text, voice, speed):
+        kind, _, name = voice.partition(":") if ":" in voice else ("kokoro", "", voice)
+        return _trim(self._engine(kind).say(text, name, speed))
 
 
 def _trim(a, thr=0.004):
@@ -44,4 +94,4 @@ def _trim(a, thr=0.004):
 
 
 def make_voice(engine):
-    return TestVoice() if engine == "prova" else KokoroVoice()
+    return Voices(test=(engine == "prova"))

@@ -61,10 +61,23 @@ class PiperEngine:
         return a * 0.8
 
 
+def _italian_ssml(tc, escaped_text):
+    """Come quella di edge-tts, ma dichiara l'italiano: le voci "multilingue" (es. Giuseppe) altrimenti
+    leggono in inglese le frasi corte o fatte di soli nomi."""
+    if isinstance(escaped_text, bytes):
+        escaped_text = escaped_text.decode("utf-8")
+    return ("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='it-IT'>"
+            f"<voice name='{tc.voice}'><lang xml:lang='it-IT'>"
+            f"<prosody pitch='{tc.pitch}' rate='{tc.rate}' volume='{tc.volume}'>{escaped_text}</prosody>"
+            "</lang></voice></speak>")
+
+
 class EdgeEngine:
     def __init__(self):
         self.available = None
         self.resolved = {}
+        self.force_italian = True
+        self._orig_ssml = None
 
     def _resolve(self, voice):
         """Accetta anche nomi approssimativi (it-IT-GiuseppeNeural → la voce di Giuseppe che esiste davvero)."""
@@ -92,10 +105,15 @@ class EdgeEngine:
         import time
 
         import edge_tts
+        import edge_tts.communicate as ec
+        if self._orig_ssml is None:
+            self._orig_ssml = ec.mkssml
         voice = self._resolve(voice)
         rate = f"{round((speed - 1) * 100):+d}%"
         last = None
         for attempt in range(3):
+            use_it = self.force_italian and "Multilingual" in voice
+            ec.mkssml = _italian_ssml if use_it else self._orig_ssml
             try:
                 buf = bytearray()
 
@@ -113,6 +131,9 @@ class EdgeEngine:
                 return np.frombuffer(raw, dtype=np.float32).copy()
             except Exception as e:  # rete, servizio cambiato, voce sparita…
                 last = e
+                if use_it:  # il servizio non accetta la lingua dichiarata: si torna al modo normale
+                    print(f"Lingua italiana forzata non accettata ({e}); continuo senza.")
+                    self.force_italian = False
                 time.sleep(3 * (attempt + 1))
         raise RuntimeError(f"le voci di Edge non rispondono ({last})")
 

@@ -73,9 +73,13 @@ jobs:
         run: |
           git config user.name "audio-del-giorno"
           git config user.email "actions@users.noreply.github.com"
+          D=$(cat out/data.txt)
+          mkdir -p /tmp/sito && cp docs/episodes.json /tmp/sito/ && cp "docs/posts/$D.json" /tmp/sito/post.json
+          git checkout -- docs && git clean -fdq docs
+          git pull --rebase origin main
+          python ripubblica.py "$D" /tmp/sito
           git add docs
-          git commit -m "Audio del $(cat out/data.txt)" || echo "Niente da aggiornare"
-          git pull --rebase
+          git commit -m "Audio del $D" || echo "Niente da aggiornare"
           git push
 
       - name: Avvisa per mail se l'audio non è stato creato

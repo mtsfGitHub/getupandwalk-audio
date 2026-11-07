@@ -47,9 +47,11 @@ def speakable(t):
     return re.sub(r"\s+", " ", t).strip()
 
 
-def _tokens(text, cfg):
+def _tokens(text, cfg, nl_pause=None):
     """Testo → pezzi da leggere e pause (a capo, [pausa], due punti, brevi citazioni con altro passo)."""
     nl, colon = cfg["pause"]["a_capo"], cfg["pause"]["due_punti"]
+    if nl_pause is not None:
+        nl = float(nl_pause)
     out = []
     lines = [l.strip() for l in str(text).split("\n") if l.strip()]
     for n, line in enumerate(lines):
@@ -150,7 +152,7 @@ def build_events(model, values):
                 voice = {"M": voices["struttura"], "F": voices["contenuti"],
                          "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
             speed = base * float(it.get("velocita", 1.0))
-            for tok in _tokens(text, model):
+            for tok in _tokens(text, model, it.get("pausa_a_capo")):
                 if tok[0] == "pause":
                     events.append(Event("gap", secs=tok[1], section=section, bed=bed))
                 else:

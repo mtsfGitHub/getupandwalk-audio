@@ -62,6 +62,11 @@ def main():
     print(f"Liturgia ({origine}): {liturgia}")
 
     values = fill_values(post, liturgia)
+    fix = Path(f"correzioni/{day:%Y-%m-%d}.yaml")
+    if fix.exists():                       # correzioni a mano per quel giorno (dal pannello)
+        corr = yaml.safe_load(fix.read_text("utf-8")) or {}
+        values.update(corr)
+        print("Correzioni del giorno: " + ", ".join(corr))
     events = build_events(model, values)
     current = None
     for ev in events:

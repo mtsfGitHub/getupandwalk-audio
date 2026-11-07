@@ -52,6 +52,9 @@ def export(day):
     model = yaml.safe_load(Path("modello.yaml").read_text("utf-8"))
     post = load_post(day)
     values = fill_values(post, computed(post.day))
+    fix = Path(f"correzioni/{day}.yaml")
+    if fix.exists():
+        values.update(yaml.safe_load(fix.read_text("utf-8")) or {})
     fill = lambda t, extra=None: re.sub(r"\{(\w+)\}", lambda m: str(dict(values, **(extra or {})).get(m.group(1), m.group(0))), str(t))
     sections = []
     for sec in model["scaletta"]:
@@ -85,6 +88,8 @@ def export(day):
                         "cls": cls, "show": text.rstrip(".") != sec["sezione"], "rateMul": float(el.get("velocita", 1))}
             if "fondo" in el:
                 item["fondo"] = el["fondo"]
+            if "pausa_a_capo" in el:
+                item["nlp"] = el["pausa_a_capo"]
             if item.get("kind") == "say" and who.startswith("coro"):
                 item["coro"] = who
             if item.get("kind") == "say" and alt:
@@ -103,7 +108,7 @@ def export(day):
         sections.append(out)
     key = f"{post.title}|{post.ref}".lower()
     prog = {"key": key, "edited": True, "sections": sections}
-    return {"raw": raw_text(post), "prog": prog, "base": prog}
+    return {"raw": raw_text(post), "prog": prog, "base": prog, "day": day}
 
 
 class Block(str):
@@ -161,6 +166,13 @@ def apply(path):
     text = Path("modello.yaml").read_text("utf-8")
     head = text[:text.index("\nscaletta:") + 1]
     Path("modello.yaml").write_text(head + write_scaletta(scaletta), "utf-8")
+    if CORRECTIONS:
+        day = doc.get("day") or "oggi"
+        Path("correzioni").mkdir(exist_ok=True)
+        Path(f"correzioni/{day}.yaml").write_text(
+            "# Correzioni fatte a mano nel pannello, valgono solo per questo giorno\n"
+            + yaml.dump(CORRECTIONS, allow_unicode=True, sort_keys=False, width=10000), "utf-8")
+        print(f"Correzioni del giorno salvate in correzioni/{day}.yaml: " + ", ".join(CORRECTIONS))
     for n in notes:
         print("Nota:", n)
 
@@ -208,6 +220,19 @@ def write_scaletta(scaletta):
     return "\n".join(out) + "\n"
 
 
+CORRECTIONS = {}
+
+
+def _extract(tpl, text):
+    """Dal testo corretto nel pannello ricava i valori dei segnaposto (es. {citazione})."""
+    names = re.findall(r"\{(\w+)\}", tpl)
+    if not names or "domanda" in names:
+        return None
+    pattern = "^" + re.sub(r"\\\{(\w+)\\\}", r"(?P<\1>.+?)", re.escape(tpl)) + "$"
+    m = re.match(pattern, text.strip(), re.S)
+    return {k: re.sub(r"[ \t]{2,}", " ", v).strip() for k, v in m.groupdict().items()} if m else None
+
+
 def convert(it, notes):
     kind = it.get("kind")
     if kind in ("pause", "music"):
@@ -223,13 +248,19 @@ def convert(it, notes):
         return None
     if tpl and re.search(r"\{\w+\}", tpl):
         if text != it.get("orig"):
-            notes.append(f"testo del giorno modificato e non riportato nel modello: {text[:60]}…")
+            found = _extract(tpl, text)
+            if found:
+                CORRECTIONS.update(found)
+            else:
+                notes.append(f"testo del giorno modificato ma non riconosciuto: {text[:60]}…")
         value = tpl
     else:
         value = text
     el = {who: value}
     if abs(float(it.get("rateMul", 1)) - 1) > 0.001:
         el["velocita"] = round(float(it["rateMul"]), 2)
+    if it.get("nlp") is not None:
+        el["pausa_a_capo"] = it["nlp"]
     if it.get("fondo"):
         el["fondo"] = it["fondo"]
     return el

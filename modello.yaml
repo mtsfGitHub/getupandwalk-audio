@@ -2,8 +2,8 @@
 # Si può modificare direttamente da GitHub (icona della matita): la mattina dopo l'audio segue il nuovo modello.
 #
 # Ogni sezione ha un elenco di elementi:
-#   M: "testo"          → lo legge la voce della struttura (vedi "voci" qui sotto)
-#   F: "testo"          → lo legge la voce dei contenuti (ora Nicola)
+#   M: "testo"          → lo legge la voce della struttura (maschile, vedi "voci" qui sotto)
+#   F: "testo"          → lo legge la voce dei contenuti (femminile)
 #   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
 #   pausa: 10           → secondi di pausa, con la musica
 #   musica: 8           → secondi di sola musica
@@ -19,8 +19,9 @@
 #   (citazione, vangelo, commento, domande).
 
 voci:
-  struttura: im_nicola      # per ora una sola voce; per tornare a due voci metti qui un'altra voce (es. if_sara)
-  contenuti: im_nicola      # voce maschile italiana di Kokoro (citazione, Vangelo, commento, domande, preghiere)
+  struttura: edge:it-IT-DiegoNeural      # voce maschile di Edge (titoli, annunci, frasi di raccordo)
+  contenuti: edge:it-IT-ElsaNeural       # voce femminile di Edge (citazione, Vangelo, commento, domande, preghiere)
+  riserva: im_nicola                     # se le voci di Edge non rispondono: Nicola (Kokoro), e arriva una mail
   velocita: 1.0             # velocità generale
 
 pause:

@@ -58,7 +58,7 @@ def main():
             print(f"  <{ev.kind} {ev.secs:g} s>")
 
     print("\nGenero le voci…")
-    voice = make_voice(args.voce)
+    voice = make_voice(args.voce, model["voci"].get("riserva", "im_nicola"))
     audio, secs = render(events, voice, model)
     tag = f"{day:%Y-%m-%d}"
     filename = f"getupandwalk-{tag}.mp3"
@@ -68,6 +68,12 @@ def main():
     print(f"MP3: {mp3} ({secs / 60:.1f} minuti, {mp3.stat().st_size / 1e6:.1f} MB)")
 
     (out / "data.txt").write_text(tag)
+    if voice.broken:
+        (out / "avviso.md").write_text(
+            f"L'audio del {day:%d/%m/%Y} è uscito con la voce di riserva ({voice.fallback}), "
+            f"perché le voci scelte non hanno funzionato:\n\n"
+            + "\n".join(f"- {k}: {v}" for k, v in voice.broken.items())
+            + "\n\nSe succede più giorni di fila, il servizio potrebbe essere cambiato: scrivilo a Claude.\n")
     (out / "titolo.txt").write_text(f"{post.title} · {day:%d/%m/%Y}")
     (out / "note.md").write_text(f"{liturgia}\n\nCommento di {post.ref}, a cura di {post.author}\n\n{post.url}\n")
 

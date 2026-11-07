@@ -1,6 +1,8 @@
 """Le voci. Nel modello si scrivono così:
     im_nicola  oppure  kokoro:im_nicola     → Kokoro (anche voci di altre lingue, lette con la pronuncia italiana)
     piper:it_IT-paola-medium                → Piper (voci addestrate su registrazioni italiane)
+    edge:it-IT-ElsaNeural                   → le voci di Microsoft Edge (servizio non ufficiale: se non risponde
+                                              si usa la voce di riserva e si apre un avviso)
     prova                                   → toni al posto delle parole, per provare il montaggio
 """
 import numpy as np
@@ -59,6 +61,37 @@ class PiperEngine:
         return a * 0.8
 
 
+class EdgeEngine:
+    def say(self, text, voice, speed):
+        import asyncio
+        import subprocess
+        import time
+
+        import edge_tts
+        rate = f"{round((speed - 1) * 100):+d}%"
+        last = None
+        for attempt in range(3):
+            try:
+                buf = bytearray()
+
+                async def run():
+                    com = edge_tts.Communicate(text, voice, rate=rate)
+                    async for ch in com.stream():
+                        if ch["type"] == "audio":
+                            buf.extend(ch["data"])
+
+                asyncio.run(run())
+                if not buf:
+                    raise RuntimeError("nessun audio ricevuto")
+                raw = subprocess.run(["ffmpeg", "-v", "error", "-i", "-", "-ac", "1", "-ar", str(RATE), "-f", "f32le", "-"],
+                                     input=bytes(buf), check=True, capture_output=True).stdout
+                return np.frombuffer(raw, dtype=np.float32).copy()
+            except Exception as e:  # rete, servizio cambiato, voce sparita…
+                last = e
+                time.sleep(3 * (attempt + 1))
+        raise RuntimeError(f"le voci di Edge non rispondono ({last})")
+
+
 class TestEngine:
     def say(self, text, voice, speed):
         words = max(1, len(text.split()))
@@ -69,20 +102,32 @@ class TestEngine:
 
 
 class Voices:
-    def __init__(self, test=False):
+    def __init__(self, test=False, fallback="im_nicola"):
         self.test = test
         self.engines = {}
+        self.fallback = fallback
+        self.broken = {}      # motore → errore, se ha smesso di funzionare in questa esecuzione
 
     def _engine(self, kind):
         if self.test:
             kind = "prova"
         if kind not in self.engines:
-            self.engines[kind] = {"kokoro": KokoroEngine, "piper": PiperEngine, "prova": TestEngine}[kind]()
+            self.engines[kind] = {"kokoro": KokoroEngine, "piper": PiperEngine, "edge": EdgeEngine,
+                                  "prova": TestEngine}[kind]()
         return self.engines[kind]
 
     def say(self, text, voice, speed):
         kind, _, name = voice.partition(":") if ":" in voice else ("kokoro", "", voice)
-        return _trim(self._engine(kind).say(text, name, speed))
+        if kind in self.broken:
+            return self.say(text, self.fallback, speed)
+        try:
+            return _trim(self._engine(kind).say(text, name, speed))
+        except Exception as e:
+            if voice == self.fallback:
+                raise
+            print(f"ATTENZIONE: {e}. Uso la voce di riserva ({self.fallback}).")
+            self.broken[kind] = str(e)
+            return self.say(text, self.fallback, speed)
 
 
 def _trim(a, thr=0.004):
@@ -93,5 +138,5 @@ def _trim(a, thr=0.004):
     return a[max(0, idx[0] - pad): idx[-1] + pad]
 
 
-def make_voice(engine):
-    return Voices(test=(engine == "prova"))
+def make_voice(engine, fallback="im_nicola"):
+    return Voices(test=(engine == "prova"), fallback=fallback)

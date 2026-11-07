@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: audio-del-giorno
@@ -61,6 +62,13 @@ jobs:
             gh release create "$D" out/*.mp3 --title "$(cat out/titolo.txt)" --notes-file out/note.md
           fi
 
+      - name: Avvisa per mail se è stata usata la voce di riserva
+        if: hashFiles('out/avviso.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --title "Audio del $(cat out/data.txt) con la voce di riserva" --body-file out/avviso.md
+
       - name: Aggiorna la pagina e il feed
         run: |
           git config user.name "audio-del-giorno"
@@ -69,3 +77,12 @@ jobs:
           git commit -m "Audio del $(cat out/data.txt)" || echo "Niente da aggiornare"
           git pull --rebase
           git push
+
+      - name: Avvisa per mail se l'audio non è stato creato
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --title "L'audio del giorno non è stato creato ($(date +%d/%m/%Y))" --body "Qualcosa non ha funzionato. Dettagli: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Se succede più giorni di fila, scrivilo a Claude."

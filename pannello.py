@@ -142,6 +142,10 @@ def apply(path):
                 if done_group:
                     continue
                 done_group = True
+                qs = sorted((x for x in items if x.get("grp") == "domande" and x.get("kind") == "say"
+                             and "{domanda}" in (x.get("tpl") or "")), key=lambda x: x.get("qi", 0))
+                if any((x.get("text") or "").strip() != x.get("orig") for x in qs):
+                    CORRECTIONS["domande"] = [(x.get("text") or "").strip() for x in qs]
                 first = [x for x in items if x.get("grp") == "domande" and x.get("qi") == 0]
                 second = [x for x in items if x.get("grp") == "domande" and x.get("qi") == 1]
                 sub = []
@@ -247,7 +251,7 @@ def convert(it, notes):
     if not text:
         return None
     if tpl and re.search(r"\{\w+\}", tpl):
-        if text != it.get("orig"):
+        if text != it.get("orig") and "{domanda}" not in tpl:
             found = _extract(tpl, text)
             if found:
                 CORRECTIONS.update(found)

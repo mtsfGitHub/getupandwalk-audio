@@ -11,7 +11,8 @@ from .musica import RATE
 # livello di ogni musica: da sola (musica), nelle pause, sotto la voce; e quanto lentamente sfuma (secondi)
 LEVELS = {"campane": {"music": 1.0, "pause": 0.55, "under": 0.38, "fade": 1.6},
           "accordo": {"music": 1.0, "pause": 0.8, "under": 0.32, "fade": 1.4},
-          "liuto": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4}}
+          "liuto": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4},
+          "giorno": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4}}
 
 
 def render(events, voice, model, log=print):
@@ -54,7 +55,7 @@ def render(events, voice, model, log=print):
         if not len(used):
             continue
         music = np.zeros(len(speech), dtype=np.float32)
-        t = track(name, (used[-1] + 1) / RATE + 2)
+        t = track(name, (used[-1] + 1) / RATE + 2, model.get("_giorno"))
         music[:min(len(t), len(music))] = t[:len(music)]
         mix += music * level * vol * 0.45
     peak = max(1e-9, float(np.max(np.abs(mix))))

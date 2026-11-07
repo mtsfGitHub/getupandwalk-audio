@@ -100,7 +100,12 @@ def held_chord(seconds, seed=5):
     return (_reverb(out, 4.5, rng, wet=0.55) * 0.75).astype(np.float32)
 
 
-def track(name, seconds):
+def track(name, seconds, day=None):
+    if name == "giorno":
+        # fino al 7 novembre 2026 c'era la pavana: quegli audio restano come erano
+        if day is None or str(day) <= "2026-11-07":
+            return pavane(seconds)
+        return daily(seconds, day)
     f = Path(f"musica/{name}.mp3")
     if f.exists():
         return load_track(f, seconds)
@@ -111,3 +116,130 @@ def track(name, seconds):
     if name == "accordo":
         return held_chord(seconds)
     return pavane(seconds)
+
+
+# ---- una musica nuova ogni giorno ------------------------------------------------------------
+# Tonalità, giro di accordi, strumento, andamento e melodia cambiano con la data:
+# ogni giorno un brano diverso, ma sempre dello stesso carattere raccolto.
+KEYS = {"re minore": (62, "min"), "la minore": (57, "min"), "mi minore": (64, "min"), "sol minore": (55, "min"),
+        "sol maggiore": (55, "maj"), "fa maggiore": (53, "maj"), "do maggiore": (60, "maj"), "si♭ maggiore": (58, "maj")}
+SCALES = {"min": [0, 2, 3, 5, 7, 8, 10], "maj": [0, 2, 4, 5, 7, 9, 11]}
+PROGRESSIONS = {   # gradi della scala (0 = primo grado)
+    "min": [[0, 6, 5, 4], [0, 3, 6, 2], [0, 4, 0, 6, 2, 6, 0, 4], [2, 6, 0, 4], [0, 5, 3, 4], [0, 3, 0, 4]],
+    "maj": [[0, 4, 5, 3], [0, 5, 3, 4], [0, 3, 4, 0], [0, 2, 3, 4], [5, 3, 0, 4], [0, 3, 1, 4]],
+}
+INSTRUMENTS = {     # (smorzamento corda bassa, corda alta, chiarezza del pizzico, ottava della melodia)
+    "liuto": (0.99925, 0.9984, 0.55, 0),
+    "arpa": (0.9996, 0.9992, 0.75, 12),
+    "chitarra": (0.9994, 0.9986, 0.45, 0),
+}
+
+
+def _chord(root_midi, mode, degree):
+    sc = SCALES[mode]
+    notes = [root_midi + sc[(degree + k) % 7] + 12 * ((degree + k) // 7) for k in (0, 2, 4)]
+    return notes
+
+
+def daily_info(day):
+    import datetime as dt
+    d = dt.date.fromisoformat(day) if isinstance(day, str) else day
+    rng = np.random.default_rng(d.toordinal() * 7919)
+    key = list(KEYS)[rng.integers(len(KEYS))]
+    root, mode = KEYS[key]
+    prog = PROGRESSIONS[mode][rng.integers(len(PROGRESSIONS[mode]))]
+    inst = list(INSTRUMENTS)[rng.integers(len(INSTRUMENTS))]
+    beat = float(rng.uniform(0.78, 0.95))
+    pattern = int(rng.integers(3))
+    return {"key": key, "root": root, "mode": mode, "prog": prog, "inst": inst, "beat": beat,
+            "pattern": pattern, "seed": d.toordinal()}
+
+
+def daily(seconds, day):
+    from .musica import _hz
+    info = daily_info(day)
+    rng = np.random.default_rng(info["seed"])
+    low_rho, high_rho, bright, mel_oct = INSTRUMENTS[info["inst"]]
+    total = int((seconds + 6) * RATE)
+    buf = np.zeros(total, dtype=np.float32)
+    cache = {}
+
+    def string(m):
+        if m not in cache:
+            f = _hz(m)
+            big = RATE * 2
+            n_per = max(2, int(big / f - 0.5))
+            dur = 4.5 if m < 52 else 3.4
+            length = int(big * dur)
+            y = np.zeros(length + n_per + 1)
+            noise = rng.uniform(-1, 1, n_per)
+            acc, lp = 0.0, np.zeros(n_per)
+            for i in range(n_per):
+                acc = acc * (1 - bright) + noise[i] * bright
+                lp[i] = acc
+            pp = max(1, int(n_per * 0.2))
+            lp[pp:] -= lp[:-pp].copy()
+            y[:n_per] = lp
+            rho = low_rho if m < 52 else high_rho
+            i = n_per
+            while i < length:
+                j = min(i + n_per, length)
+                prev2 = y[i - n_per - 1:j - n_per - 1] if i - n_per - 1 >= 0 else np.concatenate(([0.0], y[:j - n_per - 1]))
+                y[i:j] = rho * 0.5 * (y[i - n_per:j - n_per] + prev2)
+                i = j
+            y = y[:length]
+            actual = big / (n_per + 0.5)
+            out_len = int(length / big * RATE * actual / f)
+            out = np.interp(np.linspace(0, length - 1, out_len), np.arange(length), y)
+            out /= max(1e-9, np.max(np.abs(out)))
+            fade = int(0.3 * RATE)
+            out[-fade:] *= np.linspace(1, 0, fade)
+            cache[m] = out.astype(np.float32)
+        return cache[m]
+
+    def pluck(m, t, vel):
+        s = string(m)
+        start = int((t + rng.uniform(-0.012, 0.012)) * RATE)
+        if 0 <= start < total:
+            end = min(total, start + len(s))
+            buf[start:end] += s[:end - start] * vel * 0.35
+
+    B = info["beat"]
+    t, bar = 0.1, 0
+    prev_mel = None
+    while t < seconds + 2:
+        degree = info["prog"][bar % len(info["prog"])]
+        chord = _chord(info["root"], info["mode"], degree)
+        bass = chord[0] - 12 if chord[0] - 12 >= 40 else chord[0]
+        inner = [n for n in chord]
+        v = 0.85 + rng.uniform(0, 0.3)
+        pluck(bass, t, 0.55 * v)
+        pat = info["pattern"]
+        if pat == 0:      # arpeggio lento, sale e scende
+            seq = [inner[0], inner[1], inner[2], inner[1]] * 2
+            for k, n in enumerate(seq):
+                pluck(n, t + B * 0.5 * k, 0.26 if k else 0.32)
+        elif pat == 1:    # accordo e due rintocchi
+            for k, n in enumerate(inner):
+                pluck(n, t + 0.03 * (k + 1), 0.3 * v)
+            pluck(inner[1], t + B * 2, 0.24); pluck(inner[2], t + B * 3, 0.22)
+        else:             # basso, poi accordi spezzati in terzine larghe
+            for k, n in enumerate([inner[0], inner[2], inner[1], inner[2], inner[0], inner[1]]):
+                pluck(n, t + B * (2 / 3) * k, 0.24)
+        # melodia: note dell'accordo, di grado vicino alla nota precedente
+        cands = sorted({n + 12 + mel_oct for n in chord} | {n + 24 + mel_oct for n in chord})
+        cands = [c for c in cands if 64 <= c <= 84] or cands
+        if prev_mel is None:
+            m1 = cands[len(cands) // 2]
+        else:
+            m1 = min(cands, key=lambda c: abs(c - prev_mel) + rng.uniform(0, 3))
+        pluck(m1, t + 0.09, 0.48 * v)
+        if rng.uniform() < 0.7:
+            m2 = min(cands, key=lambda c: abs(c - m1 - rng.choice([-3, -2, 2, 3])) + rng.uniform(0, 1))
+            pluck(m2, t + B * 2, 0.42 * v)
+            prev_mel = m2
+        else:
+            prev_mel = m1
+        t += B * 4
+        bar += 1
+    return (_reverb(buf.astype(np.float64), 3.2, rng, wet=0.4) * 0.8).astype(np.float32)

@@ -82,6 +82,12 @@ def main():
 
     print("\nGenero le voci…")
     voice = make_voice(args.voce, model["voci"].get("riserva", "im_nicola"))
+    model["_giorno"] = f"{day:%Y-%m-%d}"
+    if any(s.get("fondo") == "giorno" for s in model["scaletta"]) or model["musica"].get("fondo") == "giorno":
+        from gw.fondi import daily_info
+        if f"{day:%Y-%m-%d}" > "2026-11-07":
+            i = daily_info(day)
+            print(f"Musica del giorno: {i['inst']} in {i['key']}, giro {i['prog']}")
     audio, secs = render(events, voice, model)
     tag = f"{day:%Y-%m-%d}"
     filename = f"getupandwalk-{tag}.mp3"

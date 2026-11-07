@@ -58,7 +58,8 @@ def export(day):
         cond = sec.get("se")
         if cond and not values.get(cond):
             continue
-        out = {"id": uid(), "label": sec["sezione"], "ref": "", "se": cond or "", "items": []}
+        out = {"id": uid(), "label": sec["sezione"], "ref": "", "se": cond or "", "fondo": sec.get("fondo", ""),
+               "items": []}
         if sec["sezione"] == "Entro nel testo":
             out["ref"] = post.ref
 
@@ -79,6 +80,8 @@ def export(day):
                 cls = "gospel" if "{vangelo}" in tpl else "quote" if "{citazione}" in tpl else ""
                 item = {"id": uid(), "kind": "say", "voice": VOICE[who], "text": text, "tpl": tpl, "orig": text,
                         "cls": cls, "show": text.rstrip(".") != sec["sezione"], "rateMul": float(el.get("velocita", 1))}
+            if "fondo" in el:
+                item["fondo"] = el["fondo"]
             if grp:
                 item["grp"], item["qi"] = grp, qi
             out["items"].append(item)
@@ -119,6 +122,8 @@ def apply(path):
                   "citazione" if "{citazione" in tpls else "domande" if any(i.get("grp") for i in items) else "")
         if se:
             out["se"] = se
+        if sec.get("fondo"):
+            out["fondo"] = sec["fondo"]
         els, done_group = [], False
         for it in items:
             if it.get("grp") == "domande":
@@ -136,19 +141,61 @@ def apply(path):
 
     text = Path("modello.yaml").read_text("utf-8")
     head = text[:text.index("\nscaletta:") + 1]
-    yaml.add_representer(Block, _block)
-    body = yaml.dump({"scaletta": scaletta}, allow_unicode=True, sort_keys=False, width=10000, indent=2)
-    Path("modello.yaml").write_text(head + body, "utf-8")
+    Path("modello.yaml").write_text(head + write_scaletta(scaletta), "utf-8")
     for n in notes:
         print("Nota:", n)
 
 
+def _q(v):
+    return '"' + str(v).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _num(v):
+    return f"{v:g}" if isinstance(v, float) else str(v)
+
+
+def _element(el, ind):
+    """Un elemento nello stesso stile del modello scritto a mano."""
+    lines, first = [], True
+    for k, v in el.items():
+        lead = ind + ("- " if first else "  ")
+        first = False
+        if k == "per_ogni_domanda":
+            lines.append(f"{lead}per_ogni_domanda:")
+            for sub in v:
+                lines += _element(sub, ind + "    ")
+        elif isinstance(v, (int, float)):
+            lines.append(f"{lead}{k}: {_num(v)}")
+        elif "\n" in str(v):
+            lines.append(f"{lead}{k}: |-")
+            lines += [ind + "    " + l for l in str(v).split("\n")]
+        else:
+            lines.append(f"{lead}{k}: {_q(v) if k in ('M', 'F', 'MF') else v}")
+    return lines
+
+
+def write_scaletta(scaletta):
+    out = ["scaletta:"]
+    for i, sec in enumerate(scaletta):
+        if i:
+            out.append("")
+        out.append(f"  - sezione: {sec['sezione']}")
+        for k in ("se", "fondo"):
+            if sec.get(k):
+                out.append(f"    {k}: {sec[k]}")
+        out.append("    elementi:")
+        for el in sec["elementi"]:
+            out += _element(el, "      ")
+    return "\n".join(out) + "\n"
+
+
 def convert(it, notes):
     kind = it.get("kind")
-    if kind == "pause":
-        return {"pausa": round(float(it.get("secs", 0)), 1)}
-    if kind == "music":
-        return {"musica": round(float(it.get("secs", 0)), 1)}
+    if kind in ("pause", "music"):
+        el = {"pausa" if kind == "pause" else "musica": round(float(it.get("secs", 0)), 1)}
+        if it.get("fondo"):
+            el["fondo"] = it["fondo"]
+        return el
     if kind != "say":
         return None
     who = WHO.get(it.get("voice"), "F")
@@ -161,9 +208,11 @@ def convert(it, notes):
         value = tpl
     else:
         value = text
-    el = {who: Block(value) if "\n" in value else value}
+    el = {who: value}
     if abs(float(it.get("rateMul", 1)) - 1) > 0.001:
         el["velocita"] = round(float(it["rateMul"]), 2)
+    if it.get("fondo"):
+        el["fondo"] = it["fondo"]
     return el
 
 

@@ -17,6 +17,7 @@ class Event:
     voice: str = ""
     speed: float = 1.0
     section: str = ""
+    bed: str = "accordo"     # quale musica di fondo: campane, accordo, liuto, nessuna
 
 
 def speakable(t):
@@ -100,22 +101,24 @@ def build_events(model, values):
     base = float(voices.get("velocita", 1.0))
     nl = float(model["pause"]["a_capo"])
     events = []
+    default_bed = model["musica"].get("fondo", "accordo")
 
     def fill(text, extra=None):
         vals = dict(values, **(extra or {}))
         return re.sub(r"\{(\w+)\}", lambda m: str(vals.get(m.group(1), m.group(0))), str(text))
 
-    def add_items(items, section, extra=None):
+    def add_items(items, section, sec_bed, extra=None):
         for it in items:
             if "per_ogni_domanda" in it:
                 for q in values["domande"]:
-                    add_items(it["per_ogni_domanda"], section, {"domanda": q})
+                    add_items(it["per_ogni_domanda"], section, sec_bed, {"domanda": q})
                 continue
+            bed = it.get("fondo", sec_bed)
             if "pausa" in it:
-                events.append(Event("pause", secs=float(it["pausa"]), section=section))
+                events.append(Event("pause", secs=float(it["pausa"]), section=section, bed=bed))
                 continue
             if "musica" in it:
-                events.append(Event("music", secs=float(it["musica"]), section=section))
+                events.append(Event("music", secs=float(it["musica"]), section=section, bed=bed))
                 continue
             who = "MF" if "MF" in it else "M" if "M" in it else "F" if "F" in it else None
             if not who:
@@ -128,18 +131,19 @@ def build_events(model, values):
             speed = base * float(it.get("velocita", 1.0))
             for tok in _tokens(text, model):
                 if tok[0] == "pause":
-                    events.append(Event("gap", secs=tok[1], section=section))
+                    events.append(Event("gap", secs=tok[1], section=section, bed=bed))
                 else:
                     t = speakable(tok[1])
                     if t:
-                        events.append(Event("speak", text=t, voice=voice, speed=speed * tok[2], section=section))
-            events.append(Event("gap", secs=max(0.45, nl), section=section))
+                        events.append(Event("speak", text=t, voice=voice, speed=speed * tok[2], section=section,
+                                            bed=bed))
+            events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed))
 
     for sec in model["scaletta"]:
         cond = sec.get("se")
         if cond and not values.get(CONDITIONS.get(cond, cond)):
             continue
-        add_items(sec.get("elementi", []), sec["sezione"])
+        add_items(sec.get("elementi", []), sec["sezione"], sec.get("fondo", default_bed))
 
     # niente silenzio doppio prima di una pausa o di un momento di musica
     cleaned = []

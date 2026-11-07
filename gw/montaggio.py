@@ -5,12 +5,18 @@ from pathlib import Path
 import numpy as np
 from scipy.signal import lfilter
 
-from .musica import RATE, load_track, pavane
+from .fondi import track
+from .musica import RATE
+
+# livello di ogni musica: da sola (musica), nelle pause, sotto la voce; e quanto lentamente sfuma (secondi)
+LEVELS = {"campane": {"music": 1.0, "pause": 0.55, "under": 0.38, "fade": 1.6},
+          "accordo": {"music": 1.0, "pause": 0.8, "under": 0.32, "fade": 1.4},
+          "liuto": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 0.45}}
 
 
 def render(events, voice, model, log=print):
-    pieces, levels = [], []          # audio della voce e livello della musica per ogni pezzo
-    bed = 0.28 if model["musica"].get("sotto_la_voce", True) else 0.0
+    pieces, beds = [], []            # audio della voce; per ogni pezzo: (musica di fondo, livello)
+    under = model["musica"].get("sotto_la_voce", True)
     cache = {}
     for i, ev in enumerate(events):
         if ev.kind == "speak":
@@ -19,27 +25,34 @@ def render(events, voice, model, log=print):
                 cache[key] = (voice.say_both(ev.text, *ev.voice.split("|"), ev.speed) if "|" in ev.voice
                               else voice.say(ev.text, ev.voice, ev.speed))
             a = cache[key]
-            pieces.append(a); levels.append(np.full(len(a), bed, dtype=np.float32))
+            pieces.append(a)
+            kind = "under"
         else:
-            n = int(ev.secs * RATE)
-            pieces.append(np.zeros(n, dtype=np.float32))
-            lvl = {"music": 1.0, "pause": 0.75, "gap": bed}[ev.kind]
-            levels.append(np.full(n, lvl, dtype=np.float32))
+            a = np.zeros(int(ev.secs * RATE), dtype=np.float32)
+            pieces.append(a)
+            kind = {"music": "music", "pause": "pause", "gap": "under"}[ev.kind]
+        lv = LEVELS.get(ev.bed)
+        beds.append((ev.bed, len(a), 0.0 if not lv or (kind == "under" and not under) else lv[kind]))
         if ev.kind == "speak" and i % 20 == 0:
             log(f"  voce: {i + 1}/{len(events)}")
     tail = int(3.5 * RATE)
-    pieces.append(np.zeros(tail, dtype=np.float32)); levels.append(np.zeros(tail, dtype=np.float32))
+    pieces.append(np.zeros(tail, dtype=np.float32)); beds.append(("nessuna", tail, 0.0))
     speech = np.concatenate(pieces)
-    level = np.concatenate(levels)
-    # transizioni morbide della musica (circa un secondo)
-    a = 1 - np.exp(-1 / (0.45 * RATE))
-    level = lfilter([a], [1, -(1 - a)], level, zi=[level[0]])[0].astype(np.float32)
     secs = len(speech) / RATE
-    track = Path("musica/brano.mp3")
-    music = load_track(track, secs) if track.exists() else pavane(secs)
-    music = music[:len(speech)]
     vol = float(model["musica"].get("volume", 0.6))
-    mix = speech + music * level * vol * 0.45
+    mix = speech.copy()
+    for name in sorted({b[0] for b in beds if b[0] in LEVELS}):
+        level = np.concatenate([np.full(n, lvl if b == name else 0.0, dtype=np.float32) for b, n, lvl in beds])
+        tau = LEVELS[name]["fade"]
+        a = 1 - np.exp(-1 / (tau * RATE))       # entrate e uscite sfumate
+        level = lfilter([a], [1, -(1 - a)], level, zi=[level[0]])[0].astype(np.float32)
+        used = np.nonzero(level > 1e-4)[0]
+        if not len(used):
+            continue
+        music = np.zeros(len(speech), dtype=np.float32)
+        t = track(name, (used[-1] + 1) / RATE + 2)
+        music[:min(len(t), len(music))] = t[:len(music)]
+        mix += music * level * vol * 0.45
     peak = max(1e-9, float(np.max(np.abs(mix))))
     if peak > 0.98:
         mix *= 0.98 / peak

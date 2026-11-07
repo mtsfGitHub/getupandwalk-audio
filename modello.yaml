@@ -107,7 +107,7 @@ scaletta:
         fondo: nessuna
       - F: "{vangelo}"
         velocita: 0.92
-        pausa_a_capo: 3
+        pausa_a_capo: 2.5
         pausa_punto: 2
         fondo: nessuna
       - pausa: 10
@@ -141,7 +141,7 @@ scaletta:
       - pausa: 5
       - M: "{vangelo}"
         velocita: 0.82
-        pausa_a_capo: 3
+        pausa_a_capo: 2.5
         pausa_punto: 2
         fondo: nessuna
       - pausa: 11

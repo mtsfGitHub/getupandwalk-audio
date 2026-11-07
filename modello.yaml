@@ -13,7 +13,7 @@
 #   [pausa] = 2 secondi di silenzio, [pausa 4] = 4 secondi; andare a capo = piccola pausa.
 #   Le parti tra graffe si riempiono ogni giorno dal post:
 #   {giorno} {liturgia} {titolo} {autore} {evangelista} {vangelo} {commento}
-#   {citazione} {citazione_fonte} {domanda} {mi_preparo_post} {immagino_post} {ringrazio_post}
+#   {citazione} {citazione_fonte} {citazione_fonte_letta} {domanda} {mi_preparo_post} {immagino_post} {ringrazio_post}
 #
 # "se:" fa saltare la sezione quando quel giorno il post non ha quella parte
 #   (citazione, vangelo, commento, domande).
@@ -42,7 +42,7 @@ scaletta:
   - sezione: Citazione
     se: citazione
     elementi:
-      - M: "{citazione_fonte}"
+      - M: "Una citazione di {citazione_fonte_letta}"
       - F: "{citazione}"
       - musica: 8
 

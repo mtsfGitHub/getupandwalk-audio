@@ -67,9 +67,9 @@ def _italian_ssml(tc, escaped_text):
     if isinstance(escaped_text, bytes):
         escaped_text = escaped_text.decode("utf-8")
     return ("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='it-IT'>"
-            f"<voice name='{tc.voice}'><lang xml:lang='it-IT'>"
+            f"<voice name='{tc.voice}'>"
             f"<prosody pitch='{tc.pitch}' rate='{tc.rate}' volume='{tc.volume}'>{escaped_text}</prosody>"
-            "</lang></voice></speak>")
+            "</voice></speak>")
 
 
 class EdgeEngine:

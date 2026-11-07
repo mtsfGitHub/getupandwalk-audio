@@ -84,6 +84,8 @@ def fill_values(post, liturgia):
         "domande": [p.replace("\n", " ") for p in dom.paras] if dom else [],
         "citazione": "\n".join(post.quote_lines),
         "citazione_fonte": src,
+        # "Giovanni Pascoli, San Lorenzo." → "Giovanni Pascoli, da San Lorenzo."
+        "citazione_fonte_letta": re.sub(r",\s*(?!da\b)", ", da ", src, count=1) if "," in src else src,
         "mi_preparo_post": sec_text("prep"),
         "immagino_post": sec_text("immagino"),
         "ringrazio_post": sec_text("ringrazio"),

@@ -108,6 +108,7 @@ scaletta:
       - F: "{vangelo}"
         velocita: 0.92
         pausa_a_capo: 3
+        pausa_punto: 2
         fondo: nessuna
       - pausa: 10
         fondo: giorno
@@ -141,6 +142,7 @@ scaletta:
       - M: "{vangelo}"
         velocita: 0.82
         pausa_a_capo: 3
+        pausa_punto: 2
         fondo: nessuna
       - pausa: 11
         sfumatura_entrata: 9

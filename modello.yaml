@@ -134,9 +134,11 @@ scaletta:
       - pausa: 40
       - M: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
         velocita: 0.92
+      - F: "Padre nostro, che sei nei cieli,"
+        velocita: 0.92
+      - MF: "sia santificato il tuo nome,"
+        velocita: 0.92
       - coro_piccolo: |-
-          Padre nostro, che sei nei cieli,
-          sia santificato il tuo nome,
           venga il tuo regno,
           sia fatta la tua volontà, come in cielo così in terra.
         velocita: 0.92

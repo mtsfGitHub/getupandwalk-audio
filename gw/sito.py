@@ -122,7 +122,7 @@ footer{{font-size:12px;color:var(--muted)}}
     </div>
   </section>
   {"<section><h2>Tutti i giorni</h2><ul>" + items + "</ul></section>" if rest else ""}
-  <footer>Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Lettura con voci digitali<span id="voci" hidden></span>.</footer>
+  <footer>Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci generate al computer<span id="voci" hidden></span>.</footer>
 </div>
 <script>
 const $=id=>document.getElementById(id);

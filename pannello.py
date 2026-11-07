@@ -70,10 +70,13 @@ def export(day):
             elif "musica" in el:
                 item = {"id": uid(), "kind": "music", "secs": el["musica"]}
             else:
-                who = next((k for k in ("coro_grande", "coro_piccolo", "MF", "M", "F") if k in el), None)
+                who = next((k for k in ("coro_grande", "coro_piccolo", "M|F", "F|M", "MF", "M", "F") if k in el), None)
                 if not who:
                     return
                 tpl = str(el[who])
+                alt = who if "|" in who else ""
+                if alt:
+                    who = alt.split("|")[(extra or {}).get("_n", 0) % 2]
                 text = fill(tpl, extra).strip()
                 if not text or re.search(r"\{\w+\}", text):
                     return
@@ -84,6 +87,8 @@ def export(day):
                 item["fondo"] = el["fondo"]
             if item.get("kind") == "say" and who.startswith("coro"):
                 item["coro"] = who
+            if item.get("kind") == "say" and alt:
+                item["alt"] = alt
             if grp:
                 item["grp"], item["qi"] = grp, qi
             out["items"].append(item)
@@ -92,7 +97,7 @@ def export(day):
             if "per_ogni_domanda" in el:
                 for qi, q in enumerate(values["domande"]):
                     for sub in el["per_ogni_domanda"]:
-                        add(sub, {"domanda": q}, "domande", qi)
+                        add(sub, {"domanda": q, "_n": qi}, "domande", qi)
             else:
                 add(el)
         sections.append(out)
@@ -133,7 +138,19 @@ def apply(path):
                     continue
                 done_group = True
                 first = [x for x in items if x.get("grp") == "domande" and x.get("qi") == 0]
-                els.append({"per_ogni_domanda": [convert(x, notes) for x in first if convert(x, notes)]})
+                second = [x for x in items if x.get("grp") == "domande" and x.get("qi") == 1]
+                sub = []
+                for j, x in enumerate(first):
+                    el = convert(x, notes)
+                    if not el:
+                        continue
+                    y = second[j] if j < len(second) else None
+                    k = next((k for k in ("M", "F") if k in el), None)
+                    if k and y is not None and y.get("kind") == "say" and y.get("voice") != x.get("voice") \
+                            and y.get("voice") in ("struct", "content"):
+                        el = {(k + "|" + ("F" if k == "M" else "M")): el.pop(k), **el}
+                    sub.append(el)
+                els.append({"per_ogni_domanda": sub})
                 continue
             el = convert(it, notes)
             if el:
@@ -172,7 +189,7 @@ def _element(el, ind):
             lines.append(f"{lead}{k}: |-")
             lines += [ind + "    " + l for l in str(v).split("\n")]
         else:
-            lines.append(f"{lead}{k}: {_q(v) if k in ('M', 'F', 'MF') else v}")
+            lines.append(f"{lead}{k}: {v if k == 'fondo' else _q(v)}")
     return lines
 
 

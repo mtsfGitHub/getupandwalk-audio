@@ -5,6 +5,7 @@
 #   M: "testo"          → lo legge la voce della struttura (maschile, vedi "voci" qui sotto)
 #   F: "testo"          → lo legge la voce dei contenuti (femminile)
 #   MF: "testo"         → le due voci insieme, in coro (ogni riga va a tempo)
+#   M|F: "testo"        → (dentro per_ogni_domanda) le voci si alternano: la prima M, la seconda F, …
 #   coro_piccolo / coro_grande: "testo" → le voci elencate qui sotto in "voci", tutte insieme
 #   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
 #   pausa: 10           → secondi di pausa, con la musica
@@ -95,37 +96,35 @@ scaletta:
       - pausa: 4
       - M: "Ascolta questo passaggio dal Vangelo secondo san {evangelista}."
         fondo: nessuna
+      - pausa: 3
+        fondo: nessuna
       - F: "{vangelo}"
         velocita: 0.92
         fondo: nessuna
-      - pausa: 3
+      - pausa: 10
         fondo: liuto
 
   - sezione: Mi lascio ispirare
     se: commento
     elementi:
       - M: "Mi lascio ispirare."
+      - pausa: 5
       - F: "{commento}"
         velocita: 0.92
-      - pausa: 3
-
-  - sezione: Rifletto sulle domande
-    se: domande
-    elementi:
-      - M: "Rifletto sulle domande."
+      - pausa: 10
       - per_ogni_domanda:
-          - F: "{domanda}"
+          - M|F: "{domanda}"
             velocita: 0.82
           - pausa: 10
 
   - sezione: Riascolto il Vangelo
     se: vangelo
     elementi:
-      - M: |-
+      - F: |-
           Nel riascoltare il Vangelo, provo a visualizzare la scena, il luogo in cui avviene, i personaggi principali, le parole che si scambiano, il tono delle voci, i gesti. E lascio affiorare il mio sentire, senza censure, senza giudizi.
           Quale parola o frase cattura la mia attenzione in modo particolare?
         velocita: 0.92
-      - F: "{vangelo}"
+      - M: "{vangelo}"
         velocita: 0.92
         fondo: nessuna
       - pausa: 3

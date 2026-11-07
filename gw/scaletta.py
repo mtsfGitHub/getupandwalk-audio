@@ -110,8 +110,8 @@ def build_events(model, values):
     def add_items(items, section, sec_bed, extra=None):
         for it in items:
             if "per_ogni_domanda" in it:
-                for q in values["domande"]:
-                    add_items(it["per_ogni_domanda"], section, sec_bed, {"domanda": q})
+                for qi, q in enumerate(values["domande"]):
+                    add_items(it["per_ogni_domanda"], section, sec_bed, {"domanda": q, "_n": qi})
                 continue
             bed = it.get("fondo", sec_bed)
             if "pausa" in it:
@@ -120,10 +120,12 @@ def build_events(model, values):
             if "musica" in it:
                 events.append(Event("music", secs=float(it["musica"]), section=section, bed=bed))
                 continue
-            who = next((k for k in ("coro_grande", "coro_piccolo", "MF", "M", "F") if k in it), None)
+            who = next((k for k in ("coro_grande", "coro_piccolo", "M|F", "F|M", "MF", "M", "F") if k in it), None)
             if not who:
                 continue
             text = fill(it[who], extra).strip()
+            if "|" in who:                      # voci alternate: una domanda ciascuno
+                who = who.split("|")[(extra or {}).get("_n", 0) % 2]
             if not text or re.search(r"\{\w+\}", text):
                 continue
             if who.startswith("coro"):

@@ -108,6 +108,7 @@ scaletta:
     se: commento
     elementi:
       - M: "Mi lascio ispirare."
+        velocita: 0.82
       - pausa: 5
       - F: "{commento}"
         velocita: 0.92

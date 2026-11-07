@@ -20,6 +20,23 @@ from gw.scaletta import build_events, fill_values
 from gw.voce import make_voice
 
 
+NAMES = {"it-IT-DiegoNeural": "Diego", "it-IT-ElsaNeural": "Elsa", "it-IT-IsabellaNeural": "Isabella",
+         "it-IT-GiuseppeNeural": "Giuseppe", "im_nicola": "Nicola", "if_sara": "Sara"}
+
+
+def voices_label(model, voice):
+    specs = [model["voci"]["struttura"], model["voci"]["contenuti"]]
+    if any(s.split(":")[0] in voice.broken for s in specs if ":" in s):
+        specs = [voice.fallback]
+    names = []
+    for s in specs:
+        n = NAMES.get(s.split(":")[-1], s.split(":")[-1])
+        if n not in names:
+            names.append(n)
+    engine = "Microsoft Edge" if specs[0].startswith("edge:") else "Kokoro" if ":" not in specs[0] or specs[0].startswith("kokoro:") else specs[0].split(":")[0].capitalize()
+    return " e ".join(names) + f", {engine}"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default="")
@@ -82,7 +99,7 @@ def main():
             "date": tag, "title": post.title, "ref": post.ref, "author": post.author,
             "image": post.image, "caption": post.caption, "liturgia": liturgia[:1].upper() + liturgia[1:],
             "post": post.url, "audio": sito.asset_url(tag, filename),
-            "seconds": round(secs), "bytes": mp3.stat().st_size,
+            "seconds": round(secs), "bytes": mp3.stat().st_size, "voci": voices_label(model, voice),
         })
         print(f"Pagina aggiornata: {sito.SITE_URL}")
 

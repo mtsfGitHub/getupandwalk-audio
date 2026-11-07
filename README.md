@@ -12,7 +12,8 @@ lo trasforma in una preghiera audio e la pubblica:
 1. Legge il post del giorno e ne ricava citazione, Vangelo, commento e domande.
 2. Prende il giorno liturgico dalla pagina della CEI (se non risponde, lo calcola).
 3. Monta tutto secondo **`modello.yaml`**: chi parla, cosa dice, le pause, la musica.
-4. Fa leggere i testi alle voci italiane di Kokoro (Nicola per la struttura, Sara per i contenuti).
+4. Fa leggere i testi alle voci italiane di Microsoft Edge (Diego per la struttura, Elsa per i contenuti).
+   Se il servizio non risponde usa Nicola (Kokoro) e GitHub ti manda una mail.
 5. Aggiunge la musica: un liuto sintetico. Per usare un brano vero, caricalo come `musica/brano.mp3`.
 
 ## Cambiare la preghiera

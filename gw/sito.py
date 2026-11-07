@@ -50,11 +50,16 @@ def write_page(eps):
     if not eps:
         return
     top, rest = eps[0], eps[1:]
+    def data(x):
+        fields = {"src": x["audio"], "title": x["title"], "date": _date_label(x["date"]), "lit": x.get("liturgia", ""),
+                  "by": f'Commento di {x.get("ref", "")}, a cura di {x.get("author", "")}', "img": x.get("image", ""),
+                  "cap": x.get("caption", ""), "post": x["post"], "voci": x.get("voci", "")}
+        return " ".join(f'data-{k}="{e(v)}"' for k, v in fields.items())
     items = "\n".join(
-        f'<li><button type="button" class="ep" data-src="{e(x["audio"])}" data-title="{e(x["title"])}">'
+        f'<li><button type="button" class="ep" {data(x)}>'
         f'<span class="d">{e(_date_label(x["date"]))}</span><span class="t">{e(x["title"])}</span>'
-        f'<span class="m">{_mmss(x["seconds"])}</span></button></li>' for x in rest)
-    img = f'<img src="{e(top["image"])}" alt="{e(top.get("caption") or top["title"])}">' if top.get("image") else ""
+        f'<span class="m">{_mmss(x["seconds"])}</span></button></li>' for x in eps)
+    img = f'<img id="img" src="{e(top.get("image", ""))}" alt="{e(top.get("caption") or top["title"])}"{"" if top.get("image") else " hidden"}>'
     page = f"""<!doctype html>
 <html lang="it">
 <head>
@@ -90,6 +95,7 @@ ul{{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}}
 .ep{{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;text-align:left;border:0;border-bottom:1px solid var(--line);
 background:none;color:inherit;font:inherit;padding:12px 4px;cursor:pointer}}
 .ep:hover{{background:var(--surface)}}
+.ep.on .t{{color:var(--gold)}}
 .ep .d{{color:var(--muted);font-size:13px;min-width:13ch}}
 .ep .t{{font-family:var(--fr)}}
 .ep .m{{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}}
@@ -101,28 +107,37 @@ footer{{font-size:12px;color:var(--muted)}}
 <div class="wrap">
   <div class="eyebrow">Get up and Walk · in ascolto</div>
   <section class="today">
-    <div>{img}<div class="cap">{e(top.get("caption", ""))}</div></div>
+    <div>{img}<div class="cap" id="cap">{e(top.get("caption", ""))}</div></div>
     <div class="info">
-      <div class="date">{e(_date_label(top["date"]))}</div>
-      <div class="lit">{e(top.get("liturgia", ""))}</div>
+      <div class="date" id="date">{e(_date_label(top["date"]))}</div>
+      <div class="lit" id="lit">{e(top.get("liturgia", ""))}</div>
       <h1 id="title">{e(top["title"])}</h1>
-      <div class="by">Commento di {e(top.get("ref", ""))}, a cura di {e(top.get("author", ""))}</div>
+      <div class="by" id="by">Commento di {e(top.get("ref", ""))}, a cura di {e(top.get("author", ""))}</div>
       <audio id="player" controls preload="none" src="{e(top["audio"])}"></audio>
       <div class="actions">
-        <a href="{e(top["audio"])}">Scarica l'MP3</a>
-        <a href="{e(top["post"])}" target="_blank" rel="noopener">Leggi il post</a>
+        <a id="dl" href="{e(top["audio"])}">Scarica l'MP3</a>
+        <a id="post" href="{e(top["post"])}" target="_blank" rel="noopener">Leggi il post</a>
         <a href="feed.xml">Feed podcast</a>
       </div>
     </div>
   </section>
-  {"<section><h2>Giorni precedenti</h2><ul>" + items + "</ul></section>" if rest else ""}
-  <footer>Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Liturgia: CEI · Voci sintetiche Kokoro.</footer>
+  {"<section><h2>Tutti i giorni</h2><ul>" + items + "</ul></section>" if rest else ""}
+  <footer>Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci sintetiche<span id="voci">{e(" (" + top["voci"] + ")") if top.get("voci") else ""}</span>.</footer>
 </div>
 <script>
-document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>{{
-  const p=document.getElementById('player');p.src=b.dataset.src;p.play().catch(()=>{{}});
-  document.getElementById('title').textContent=b.dataset.title;window.scrollTo({{top:0,behavior:'smooth'}});
-}}));
+const $=id=>document.getElementById(id);
+function show(b,play){{
+  const d=b.dataset;
+  ['title','date','lit','by','cap'].forEach(k=>$(k).textContent=d[k]);
+  $('voci').textContent=d.voci?' ('+d.voci+')':'';
+  const img=$('img');if(img){{img.hidden=!d.img;if(d.img){{img.src=d.img;img.alt=d.cap||d.title}}}}
+  $('dl').href=d.src;$('post').href=d.post;
+  document.querySelectorAll('.ep').forEach(x=>x.classList.toggle('on',x===b));
+  const p=$('player');if(p.getAttribute('src')!==d.src){{p.src=d.src}}
+  if(play){{p.play().catch(()=>{{}});window.scrollTo({{top:0,behavior:'smooth'}})}}
+}}
+document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>show(b,true)));
+const first=document.querySelector('.ep');if(first)first.classList.add('on');
 </script>
 </body>
 </html>

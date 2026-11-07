@@ -90,7 +90,8 @@ def export(day):
                 item["fondo"] = el["fondo"]
             if "pausa_a_capo" in el:
                 item["nlp"] = el["pausa_a_capo"]
-            for k, f in (("pausa_punto", "dotp"), ("volume_musica", "mvol"), ("sfumatura", "ramp")):
+            for k, f in (("pausa_punto", "dotp"), ("volume_musica", "mvol"), ("sfumatura", "ramp"),
+                         ("sfumatura_entrata", "rin"), ("sfumatura_uscita", "rout")):
                 if k in el:
                     item[f] = el[k]
             if item.get("kind") == "say" and who.startswith("coro"):
@@ -248,6 +249,10 @@ def convert(it, notes):
             el["volume_musica"] = it["mvol"]
         if it.get("ramp") is not None:
             el["sfumatura"] = it["ramp"]
+        if it.get("rin") is not None:
+            el["sfumatura_entrata"] = it["rin"]
+        if it.get("rout") is not None:
+            el["sfumatura_uscita"] = it["rout"]
         if it.get("fondo"):
             el["fondo"] = it["fondo"]
         return el

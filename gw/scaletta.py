@@ -27,7 +27,8 @@ class Event:
     section: str = ""
     bed: str = "accordo"     # quale musica di fondo: campane, accordo, liuto, giorno, nessuna
     vol: float = 1.0         # volume della musica in questo momento (0.5 = metà)
-    ramp: float = 0.0        # secondi per arrivarci e per uscirne, sfumando
+    ramp: float = 0.0        # secondi per arrivarci, sfumando
+    ramp_out: float = 0.0    # secondi per uscirne, sfumando
 
 
 MESI = "gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre"
@@ -150,12 +151,12 @@ def build_events(model, values):
                     add_items(it["per_ogni_domanda"], section, sec_bed, {"domanda": q, "_n": qi})
                 continue
             bed = it.get("fondo", sec_bed)
-            vol, ramp = float(it.get("volume_musica", 1.0)), float(it.get("sfumatura", 0.0))
-            if "pausa" in it:
-                events.append(Event("pause", secs=float(it["pausa"]), section=section, bed=bed, vol=vol, ramp=ramp))
-                continue
-            if "musica" in it:
-                events.append(Event("music", secs=float(it["musica"]), section=section, bed=bed, vol=vol, ramp=ramp))
+            vol = float(it.get("volume_musica", 1.0))
+            r_in = float(it.get("sfumatura_entrata", it.get("sfumatura", 0.0)))
+            r_out = float(it.get("sfumatura_uscita", it.get("sfumatura", 0.0)))
+            if "pausa" in it or "musica" in it:
+                kind, secs = ("pause", it["pausa"]) if "pausa" in it else ("music", it["musica"])
+                events.append(Event(kind, secs=float(secs), section=section, bed=bed, vol=vol, ramp=r_in, ramp_out=r_out))
                 continue
             who = next((k for k in ("coro_grande", "coro_piccolo", "M|F", "F|M", "MF", "M", "F") if k in it), None)
             if not who:

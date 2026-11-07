@@ -14,6 +14,7 @@
 #   pausa_punto: 1.5    → (accanto a M o F) secondi di respiro dopo ogni punto, anche dentro il paragrafo
 #   volume_musica: 0.5  → (accanto a pausa o musica) volume della musica in quel momento
 #   sfumatura: 8        → (accanto a pausa o musica) secondi per abbassare e rialzare la musica
+#   sfumatura_entrata / sfumatura_uscita → come sopra, ma solo in entrata o solo in uscita
 #   fondo: nessuna      → (accanto a un elemento o a una sezione) quale musica di fondo:
 #                         campane, accordo, liuto (la pavana), giorno (una musica nuova ogni giorno) oppure nessuna
 #   per_ogni_domanda:   → ripete gli elementi indicati per ogni domanda del post
@@ -108,6 +109,7 @@ scaletta:
         fondo: nessuna
       - pausa: 10
         fondo: giorno
+        sfumatura_entrata: 9
 
   - sezione: Mi lascio ispirare
     se: commento
@@ -139,6 +141,7 @@ scaletta:
         pausa_a_capo: 3
         fondo: nessuna
       - pausa: 11
+        sfumatura_entrata: 9
 
   - sezione: Ringrazio
     elementi:

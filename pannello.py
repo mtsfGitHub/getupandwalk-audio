@@ -1,0 +1,174 @@
+"""Collegamento con il pannello di controllo (l'app in Claude).
+
+  python pannello.py esporta 2026-11-07 > pannello.json
+      La scaletta del giorno, costruita dal modello, nel formato del pannello.
+  python pannello.py applica pannello.json
+      Riporta nel modello (modello.yaml) le modifiche fatte nel pannello.
+"""
+import json
+import re
+import sys
+import uuid
+from pathlib import Path
+
+import yaml
+
+from gw.liturgia import MONTHS, computed
+from gw.post import Post, Section
+from gw.scaletta import fill_values
+
+VOICE = {"M": "struct", "F": "content", "MF": "both"}
+WHO = {v: k for k, v in VOICE.items()}
+
+
+def uid():
+    return uuid.uuid4().hex[:7]
+
+
+def load_post(day):
+    d = json.loads(Path(f"docs/posts/{day}.json").read_text("utf-8"))
+    from datetime import date
+    post = Post(day=date.fromisoformat(d["day"]), url=d["url"])
+    for k in ("title", "ref", "author", "image", "caption", "quote_lines", "quote_source"):
+        setattr(post, k, d[k])
+    post.sections = [Section(**s) for s in d["sections"]]
+    return post
+
+
+def raw_text(post):
+    lines = [f"{post.day.day} {MONTHS[post.day.month - 1]} {post.day.year}", post.title,
+             f"commento di {post.ref}, a cura di {post.author}"]
+    if post.caption:
+        lines.append(post.caption)
+    if post.quote_lines:
+        lines += post.quote_lines + [post.quote_source]
+    for s in post.sections:
+        lines.append(f"{s.label} ({s.ref})" if s.ref else s.label)
+        lines += [p for p in s.paras]
+    return "\n".join(lines)
+
+
+def export(day):
+    model = yaml.safe_load(Path("modello.yaml").read_text("utf-8"))
+    post = load_post(day)
+    values = fill_values(post, computed(post.day))
+    fill = lambda t, extra=None: re.sub(r"\{(\w+)\}", lambda m: str(dict(values, **(extra or {})).get(m.group(1), m.group(0))), str(t))
+    sections = []
+    for sec in model["scaletta"]:
+        cond = sec.get("se")
+        if cond and not values.get(cond):
+            continue
+        out = {"id": uid(), "label": sec["sezione"], "ref": "", "se": cond or "", "items": []}
+        if sec["sezione"] == "Entro nel testo":
+            out["ref"] = post.ref
+
+        def add(el, extra=None, grp=None, qi=None):
+            item = None
+            if "pausa" in el:
+                item = {"id": uid(), "kind": "pause", "secs": el["pausa"]}
+            elif "musica" in el:
+                item = {"id": uid(), "kind": "music", "secs": el["musica"]}
+            else:
+                who = next((k for k in ("MF", "M", "F") if k in el), None)
+                if not who:
+                    return
+                tpl = str(el[who])
+                text = fill(tpl, extra).strip()
+                if not text or re.search(r"\{\w+\}", text):
+                    return
+                cls = "gospel" if "{vangelo}" in tpl else "quote" if "{citazione}" in tpl else ""
+                item = {"id": uid(), "kind": "say", "voice": VOICE[who], "text": text, "tpl": tpl, "orig": text,
+                        "cls": cls, "show": text.rstrip(".") != sec["sezione"], "rateMul": float(el.get("velocita", 1))}
+            if grp:
+                item["grp"], item["qi"] = grp, qi
+            out["items"].append(item)
+
+        for el in sec.get("elementi", []):
+            if "per_ogni_domanda" in el:
+                for qi, q in enumerate(values["domande"]):
+                    for sub in el["per_ogni_domanda"]:
+                        add(sub, {"domanda": q}, "domande", qi)
+            else:
+                add(el)
+        sections.append(out)
+    key = f"{post.title}|{post.ref}".lower()
+    prog = {"key": key, "edited": True, "sections": sections}
+    return {"raw": raw_text(post), "prog": prog, "base": prog}
+
+
+class Block(str):
+    pass
+
+
+def _block(dumper, data):
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+
+
+def apply(path):
+    doc = json.loads(Path(path).read_text("utf-8"))
+    doc = doc.get("data", doc)
+    prog = doc["prog"]
+    notes, scaletta = [], []
+    for sec in prog["sections"]:
+        out = {"sezione": sec.get("label") or "Senza titolo"}
+        se = sec.get("se") or ""
+        items = sec.get("items", [])
+        if not se:
+            tpls = " ".join(i.get("tpl", "") for i in items)
+            se = ("vangelo" if "{vangelo}" in tpls else "commento" if "{commento}" in tpls else
+                  "citazione" if "{citazione" in tpls else "domande" if any(i.get("grp") for i in items) else "")
+        if se:
+            out["se"] = se
+        els, done_group = [], False
+        for it in items:
+            if it.get("grp") == "domande":
+                if done_group:
+                    continue
+                done_group = True
+                first = [x for x in items if x.get("grp") == "domande" and x.get("qi") == 0]
+                els.append({"per_ogni_domanda": [convert(x, notes) for x in first if convert(x, notes)]})
+                continue
+            el = convert(it, notes)
+            if el:
+                els.append(el)
+        out["elementi"] = els
+        scaletta.append(out)
+
+    text = Path("modello.yaml").read_text("utf-8")
+    head = text[:text.index("\nscaletta:") + 1]
+    yaml.add_representer(Block, _block)
+    body = yaml.dump({"scaletta": scaletta}, allow_unicode=True, sort_keys=False, width=10000, indent=2)
+    Path("modello.yaml").write_text(head + body, "utf-8")
+    for n in notes:
+        print("Nota:", n)
+
+
+def convert(it, notes):
+    kind = it.get("kind")
+    if kind == "pause":
+        return {"pausa": round(float(it.get("secs", 0)), 1)}
+    if kind == "music":
+        return {"musica": round(float(it.get("secs", 0)), 1)}
+    if kind != "say":
+        return None
+    who = WHO.get(it.get("voice"), "F")
+    tpl, text = it.get("tpl"), (it.get("text") or "").strip()
+    if not text:
+        return None
+    if tpl and re.search(r"\{\w+\}", tpl):
+        if text != it.get("orig"):
+            notes.append(f"testo del giorno modificato e non riportato nel modello: {text[:60]}…")
+        value = tpl
+    else:
+        value = text
+    el = {who: Block(value) if "\n" in value else value}
+    if abs(float(it.get("rateMul", 1)) - 1) > 0.001:
+        el["velocita"] = round(float(it["rateMul"]), 2)
+    return el
+
+
+if __name__ == "__main__":
+    if sys.argv[1] == "esporta":
+        print(json.dumps(export(sys.argv[2]), ensure_ascii=False))
+    elif sys.argv[1] == "applica":
+        apply(sys.argv[2])

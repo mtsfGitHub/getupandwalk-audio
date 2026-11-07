@@ -72,6 +72,32 @@ def _italian_ssml(tc, escaped_text):
             "</voice></speak>")
 
 
+CARRIER = "Ecco una breve frase, detta in lingua italiana:"
+
+
+def _norm(w):
+    import re
+    return re.sub(r"[^\w]", "", w.lower())
+
+
+def _phrase_start(words, text):
+    """Secondi in cui inizia la frase vera, dopo la frase di appoggio (dai tempi delle parole di Edge)."""
+    carrier = [_norm(w) for w in CARRIER.split() if _norm(w)]
+    first = next((_norm(w) for w in text.split() if _norm(w)), "")
+    seen = 0
+    for offset, w in words:
+        nw = _norm(w)
+        if not nw:
+            continue
+        if seen >= len(carrier) and nw == first:
+            return offset / 1e7
+        if seen < len(carrier) and nw == carrier[seen]:
+            seen += 1
+        elif seen >= len(carrier) - 1 and nw == first:
+            return offset / 1e7
+    return None
+
+
 class EdgeEngine:
     def __init__(self):
         self.available = None
@@ -110,25 +136,40 @@ class EdgeEngine:
             self._orig_ssml = ec.mkssml
         voice = self._resolve(voice)
         rate = f"{round((speed - 1) * 100):+d}%"
-        last = None
-        for attempt in range(3):
+        last, plain = None, False
+        for attempt in range(4):
             use_it = self.force_italian and "Multilingual" in voice
             ec.mkssml = _italian_ssml if use_it else self._orig_ssml
+            # Le voci "multilingue" (Giuseppe) sulle frasi brevi scelgono l'inglese: la frase viene detta
+            # dentro una frase italiana più lunga e poi si tiene solo il pezzo giusto.
+            short = not plain and "Multilingual" in voice and len(text.split()) <= 10
+            send = f"{CARRIER} {text}" if short else text
             try:
-                buf = bytearray()
+                buf, words = bytearray(), []
 
                 async def run():
-                    com = edge_tts.Communicate(text, voice, rate=rate)
+                    com = edge_tts.Communicate(send, voice, rate=rate,
+                                               boundary="WordBoundary" if short else "SentenceBoundary")
                     async for ch in com.stream():
                         if ch["type"] == "audio":
                             buf.extend(ch["data"])
+                        elif ch["type"] == "WordBoundary":
+                            words.append((ch["offset"], ch["text"]))
 
                 asyncio.run(run())
                 if not buf:
                     raise RuntimeError("nessun audio ricevuto")
                 raw = subprocess.run(["ffmpeg", "-v", "error", "-i", "-", "-ac", "1", "-ar", str(RATE), "-f", "f32le", "-"],
                                      input=bytes(buf), check=True, capture_output=True).stdout
-                return np.frombuffer(raw, dtype=np.float32).copy()
+                a = np.frombuffer(raw, dtype=np.float32).copy()
+                if short:
+                    start = _phrase_start(words, text)
+                    if start is None:
+                        print(f"Non trovo dove inizia «{text}»: la leggo da sola.")
+                        plain = True
+                        continue
+                    a = a[max(0, int((start - 0.03) * RATE)):]
+                return a
             except Exception as e:  # rete, servizio cambiato, voce sparita…
                 last = e
                 if use_it:  # il servizio non accetta la lingua dichiarata: si torna al modo normale

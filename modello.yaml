@@ -20,7 +20,7 @@
 #   (citazione, vangelo, commento, domande).
 
 voci:
-  struttura: edge:it-IT-DiegoNeural      # voce maschile di Edge, solo italiano (Giuseppe è multilingue e sulle frasi brevi passa all'inglese)
+  struttura: edge:it-IT-GiuseppeNeural   # voce maschile di Edge (tutte le parti maschili); alternativa solo italiana: edge:it-IT-DiegoNeural
   contenuti: edge:it-IT-IsabellaNeural   # voce femminile di Edge (citazione, Vangelo, commento, domande, preghiere); alternativa: edge:it-IT-ElsaNeural
   riserva: im_nicola                     # se le voci di Edge non rispondono: Nicola (Kokoro), e arriva una mail
   velocita: 1.0             # velocità generale

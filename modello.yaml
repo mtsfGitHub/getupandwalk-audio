@@ -57,7 +57,7 @@ pause:
 musica:
   volume: 0.6               # 0 = niente musica, 1 = piena
   sotto_la_voce: true       # musica bassa anche mentre la voce legge
-  fondo: accordo            # musica di fondo se la sezione non dice altro: campane, accordo, liuto, nessuna
+  fondo: liuto              # musica di fondo se la sezione non dice altro: campane, accordo, liuto, nessuna
 
 scaletta:
   - sezione: Apertura
@@ -69,12 +69,14 @@ scaletta:
 
   - sezione: Citazione
     se: citazione
+    fondo: accordo
     elementi:
       - M: "Una citazione di {citazione_fonte_letta}"
       - F: "{citazione}"
       - musica: 8
 
   - sezione: Mi preparo
+    fondo: accordo
     elementi:
       - M: "Mi preparo."
       - pausa: 4
@@ -87,6 +89,7 @@ scaletta:
 
   - sezione: Entro nel testo
     se: vangelo
+    fondo: accordo
     elementi:
       - M: "Entro nel testo."
       - pausa: 4
@@ -96,6 +99,7 @@ scaletta:
         velocita: 0.92
         fondo: nessuna
       - pausa: 3
+        fondo: liuto
 
   - sezione: Mi lascio ispirare
     se: commento

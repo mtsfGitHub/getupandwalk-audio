@@ -2,8 +2,8 @@
 # Si può modificare direttamente da GitHub (icona della matita): la mattina dopo l'audio segue il nuovo modello.
 #
 # Ogni sezione ha un elenco di elementi:
-#   M: "testo"          → lo legge la voce maschile (la struttura)
-#   F: "testo"          → lo legge la voce femminile (i contenuti)
+#   M: "testo"          → lo legge la voce della struttura (ora Sara, vedi "voci" qui sotto)
+#   F: "testo"          → lo legge la voce dei contenuti (ora Nicola)
 #   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
 #   pausa: 10           → secondi di pausa, con la musica
 #   musica: 8           → secondi di sola musica
@@ -19,8 +19,8 @@
 #   (citazione, vangelo, commento, domande).
 
 voci:
-  struttura: im_nicola      # voce maschile italiana di Kokoro
-  contenuti: if_sara        # voce femminile italiana di Kokoro
+  struttura: if_sara        # voce femminile italiana di Kokoro (titoli, annunci, frasi di raccordo)
+  contenuti: im_nicola      # voce maschile italiana di Kokoro (citazione, Vangelo, commento, domande, preghiere)
   velocita: 1.0             # velocità generale
 
 pause:

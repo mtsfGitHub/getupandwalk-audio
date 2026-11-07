@@ -1,0 +1,7 @@
+kokoro==0.9.4
+soundfile
+numpy
+scipy
+requests
+beautifulsoup4
+pyyaml

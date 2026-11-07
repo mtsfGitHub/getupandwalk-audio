@@ -146,11 +146,28 @@ def computed(d):
     return f"{ORD[w]} domenica del tempo ordinario" if dow == 0 else f"{dn} della {ORD[w]} settimana del tempo ordinario"
 
 
+CAPS = [("tempo ordinario", "Tempo Ordinario"), ("tempo di natale", "Tempo di Natale"), ("avvento", "Avvento"),
+        ("quaresima", "Quaresima"), ("pasqua", "Pasqua"), ("natale", "Natale"), ("pentecoste", "Pentecoste"),
+        ("ceneri", "Ceneri"), ("palme", "Palme"), ("signore", "Signore"), ("santissima trinità", "Santissima Trinità"),
+        ("santissimo corpo e sangue di cristo", "Santissimo Corpo e Sangue di Cristo"), ("cristo", "Cristo"),
+        ("re dell'universo", "Re dell'Universo"), ("tutti i santi", "Tutti i Santi"), ("epifania", "Epifania"),
+        ("ascensione", "Ascensione"), ("battesimo", "Battesimo"), ("santa famiglia", "Santa Famiglia"),
+        ("sacratissimo cuore di gesù", "Sacratissimo Cuore di Gesù"), ("gesù", "Gesù"), ("maria", "Maria"),
+        ("giuseppe", "Giuseppe"), ("beata vergine", "Beata Vergine"), ("immacolata concezione", "Immacolata Concezione")]
+
+
+def capitalized(t):
+    """Le maiuscole liturgiche: «settimana del Tempo Ordinario», «domenica di Avvento»…"""
+    for low, cap in CAPS:
+        t = re.sub(r"\b" + re.escape(low) + r"\b", cap, t, flags=re.I)
+    return t
+
+
 def liturgical_day(d):
     try:
         found = from_cei(d)
         if found:
-            return found, "CEI"
+            return capitalized(found), "CEI"
     except requests.RequestException:
         pass
-    return computed(d), "calcolato"
+    return capitalized(computed(d)), "calcolato"

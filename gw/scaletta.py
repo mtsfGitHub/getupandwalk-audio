@@ -5,7 +5,15 @@ from dataclasses import dataclass
 from .liturgia import day_name
 
 BOOKS = {"Mt": "Matteo", "Mc": "Marco", "Lc": "Luca", "Gv": "Giovanni"}
-PAUSE_RE = re.compile(r"\[\s*pausa(?:\s+(\d+(?:[.,]\d+)?))?\s*(?:s|sec|secondi)?\s*\]", re.I)
+PAUSE_RE = re.compile(r"\[\s*pausa(?:\s+(\d+(?:[.,]\d+)?|breve|media|lunga))?\s*(?:s|sec|secondi)?\s*\]", re.I)
+PAUSE_WORDS = {"breve": 1.0, "media": 2.0, "lunga": 3.5}
+
+
+def _pause_secs(m):
+    v = (m.group(1) or "").lower()
+    if not v:
+        return 2.0
+    return PAUSE_WORDS.get(v) or float(v.replace(",", "."))
 QUOTE_RE = re.compile(r"(«[^»]{1,80}»|“[^”]{1,80}”|\"[^\"]{1,80}\"|‘[^’]{1,80}’)([.,;:!?]*)")
 
 
@@ -17,7 +25,9 @@ class Event:
     voice: str = ""
     speed: float = 1.0
     section: str = ""
-    bed: str = "accordo"     # quale musica di fondo: campane, accordo, liuto, nessuna
+    bed: str = "accordo"     # quale musica di fondo: campane, accordo, liuto, giorno, nessuna
+    vol: float = 1.0         # volume della musica in questo momento (0.5 = metà)
+    ramp: float = 0.0        # secondi per arrivarci e per uscirne, sfumando
 
 
 MESI = "gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre"
@@ -47,7 +57,7 @@ def speakable(t):
     return re.sub(r"\s+", " ", t).strip()
 
 
-def _tokens(text, cfg, nl_pause=None):
+def _tokens(text, cfg, nl_pause=None, dot_pause=None):
     """Testo → pezzi da leggere e pause (a capo, [pausa], due punti, brevi citazioni con altro passo)."""
     nl, colon = cfg["pause"]["a_capo"], cfg["pause"]["due_punti"]
     if nl_pause is not None:
@@ -59,15 +69,23 @@ def _tokens(text, cfg, nl_pause=None):
             out.append(("pause", nl))
         last = 0
         for m in PAUSE_RE.finditer(line):
-            out += _refine(line[last:m.start()], colon)
-            out.append(("pause", float(m.group(1).replace(",", ".")) if m.group(1) else 2.0))
+            out += _refine(line[last:m.start()], colon, dot_pause)
+            out.append(("pause", _pause_secs(m)))
             last = m.end()
-        out += _refine(line[last:], colon)
+        out += _refine(line[last:], colon, dot_pause)
     return out
 
 
-def _refine(part, colon):
+def _refine(part, colon, dot_pause=None):
     out = []
+    if dot_pause:                       # un respiro dopo ogni punto, anche senza andare a capo
+        sentences = [s for s in re.split(r"(?<=[.!?…])[»”\"’)]*\s+", part.strip()) if s.strip()]
+        if len(sentences) > 1:
+            for k, s in enumerate(sentences):
+                out += _refine(s, colon)
+                if k < len(sentences) - 1:
+                    out.append(("pause", float(dot_pause)))
+            return out
     pieces = re.split(r"(?<=:)\s+", part.strip())
     for i, piece in enumerate(pieces):
         last = 0
@@ -132,11 +150,12 @@ def build_events(model, values):
                     add_items(it["per_ogni_domanda"], section, sec_bed, {"domanda": q, "_n": qi})
                 continue
             bed = it.get("fondo", sec_bed)
+            vol, ramp = float(it.get("volume_musica", 1.0)), float(it.get("sfumatura", 0.0))
             if "pausa" in it:
-                events.append(Event("pause", secs=float(it["pausa"]), section=section, bed=bed))
+                events.append(Event("pause", secs=float(it["pausa"]), section=section, bed=bed, vol=vol, ramp=ramp))
                 continue
             if "musica" in it:
-                events.append(Event("music", secs=float(it["musica"]), section=section, bed=bed))
+                events.append(Event("music", secs=float(it["musica"]), section=section, bed=bed, vol=vol, ramp=ramp))
                 continue
             who = next((k for k in ("coro_grande", "coro_piccolo", "M|F", "F|M", "MF", "M", "F") if k in it), None)
             if not who:
@@ -152,12 +171,12 @@ def build_events(model, values):
                 voice = {"M": voices["struttura"], "F": voices["contenuti"],
                          "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
             speed = base * float(it.get("velocita", 1.0))
-            for tok in _tokens(text, model, it.get("pausa_a_capo")):
+            for tok in _tokens(text, model, it.get("pausa_a_capo"), it.get("pausa_punto")):
                 if tok[0] == "pause":
                     events.append(Event("gap", secs=tok[1], section=section, bed=bed))
                 else:
                     t = speakable(tok[1])
-                    if t:
+                    if t and re.search(r"\w", t):
                         events.append(Event("speak", text=t, voice=voice, speed=speed * tok[2], section=section,
                                             bed=bed))
             events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed))

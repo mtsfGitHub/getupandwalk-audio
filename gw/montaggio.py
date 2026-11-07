@@ -37,17 +37,28 @@ def render(events, voice, model, log=print):
             pieces.append(a)
             kind = {"music": "music", "pause": "pause", "gap": "under"}[ev.kind]
         lv = LEVELS.get(ev.bed)
-        beds.append((ev.bed, len(a), 0.0 if not lv or (kind == "under" and not under) else lv[kind]))
+        beds.append((ev.bed, len(a), 0.0 if not lv or (kind == "under" and not under) else lv[kind] * ev.vol, ev.ramp))
         if ev.kind == "speak" and i % 20 == 0:
             log(f"  voce: {i + 1}/{len(events)}")
     tail = int(3.5 * RATE)
-    pieces.append(np.zeros(tail, dtype=np.float32)); beds.append(("nessuna", tail, 0.0))
+    pieces.append(np.zeros(tail, dtype=np.float32)); beds.append(("nessuna", tail, 0.0, 0.0))
     speech = np.concatenate(pieces)
     secs = len(speech) / RATE
     vol = float(model["musica"].get("volume", 0.6))
     mix = speech.copy()
     for name in sorted({b[0] for b in beds if b[0] in LEVELS}):
-        level = np.concatenate([np.full(n, lvl if b == name else 0.0, dtype=np.float32) for b, n, lvl in beds])
+        segs = []
+        for k, (b, n, lvl, ramp) in enumerate(beds):
+            seg = np.full(n, lvl if b == name else 0.0, dtype=np.float32)
+            if b == name and ramp > 0 and n > 2:
+                # entra e esce sfumando lentamente, dal livello di prima e verso quello di dopo
+                prev = beds[k - 1][2] if k and beds[k - 1][0] == name else 0.0
+                nxt = beds[k + 1][2] if k + 1 < len(beds) and beds[k + 1][0] == name else 0.0
+                r = min(int(ramp * RATE), n // 2)
+                seg[:r] = np.linspace(prev, lvl, r)
+                seg[n - r:] = np.linspace(lvl, nxt, r)
+            segs.append(seg)
+        level = np.concatenate(segs)
         tau = LEVELS[name]["fade"]
         a = 1 - np.exp(-1 / (tau * RATE))       # entrate e uscite sfumate
         level = lfilter([a], [1, -(1 - a)], level, zi=[level[0]])[0].astype(np.float32)

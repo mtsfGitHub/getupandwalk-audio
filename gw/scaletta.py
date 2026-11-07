@@ -20,8 +20,24 @@ class Event:
     bed: str = "accordo"     # quale musica di fondo: campane, accordo, liuto, nessuna
 
 
+MESI = "gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre"
+ROMANI = {"I": 1, "V": 5, "X": 10, "L": 50}
+
+
+def _arabic(r):
+    total, prev = 0, 0
+    for ch in reversed(r):
+        v = ROMANI[ch]
+        total += -v if v < prev else v
+        prev = max(prev, v)
+    return total
+
+
 def speakable(t):
     t = t.replace("*", "")
+    # "X agosto" → "10 agosto" (si legge "dieci agosto", non "ics agosto")
+    t = re.sub(r"\b([IVXL]{1,6})\s+(" + MESI + r")\b", lambda m: f"{_arabic(m.group(1).upper())} {m.group(2)}", t,
+               flags=re.I)
     t = re.sub(r"\bSJ\b", "gesuita", t)
     t = re.sub(r"\b(Mt|Mc|Lc|Gv)\s*(\d+),\s*(\d+)(?:\s*[-–]\s*(\d+))?",
                lambda m: f"{BOOKS[m.group(1)]}, capitolo {m.group(2)}, versetti da {m.group(3)}"

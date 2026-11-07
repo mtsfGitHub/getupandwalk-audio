@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Get up and Walk · in ascolto</title>
+<link rel="alternate" type="application/rss+xml" title="Get up and Walk · in ascolto" href="feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Literata:ital,opsz@0,7..72;1,7..72&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#EFF0F4;--surface:#FBFBFD;--ink:#1A2240;--muted:#5A6079;--line:#D5D8E3;--gold:#9A6F17;--lapis:#2B3A78;--on:#F6F2E6;
+--fd:"Libre Caslon Display",Georgia,serif;--fr:"Literata",Georgia,serif;--fu:"IBM Plex Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0D1224;--surface:#151B33;--ink:#E9E5D8;--muted:#9EA3BC;--line:#2A3254;--gold:#D6B160;--lapis:#C9A957;--on:#141A31;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fu);line-height:1.5;
+padding:24px max(16px,env(safe-area-inset-right)) 64px max(16px,env(safe-area-inset-left))}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.today{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:start}
+@media (max-width:680px){.today{grid-template-columns:1fr}}
+.today img{width:100%;border-radius:12px;display:block}
+.cap{font-size:13px;color:var(--muted);font-style:italic;margin-top:8px}
+.info{display:flex;flex-direction:column;gap:10px;min-width:0}
+.date{font-family:var(--fr);font-style:italic;color:var(--muted)}
+.lit{font-size:14px;color:var(--muted)}
+h1{font-family:var(--fd);font-weight:400;font-size:clamp(32px,6vw,46px);line-height:1.05;margin:0;text-wrap:balance}
+.by{color:var(--muted)}
+audio{width:100%;margin-top:6px}
+.actions{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+a{color:var(--lapis)}
+h2{font-family:var(--fd);font-weight:400;font-size:26px;margin:0 0 8px}
+ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.ep{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;text-align:left;border:0;border-bottom:1px solid var(--line);
+background:none;color:inherit;font:inherit;padding:12px 4px;cursor:pointer}
+.ep:hover{background:var(--surface)}
+.ep .d{color:var(--muted);font-size:13px;min-width:13ch}
+.ep .t{font-family:var(--fr)}
+.ep .m{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.ep{grid-template-columns:1fr auto}.ep .d{grid-column:1/-1}}
+footer{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Get up and Walk · in ascolto</div>
+  <section class="today">
+    <div><img src="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/07.11_Roma-Chiesa-del-Gesu-Volta-Baciccio-10.jpg" alt="Antonio Raggi, Leonardo Reti, Volta della chiesa del Gesù di Roma, sec. XVII"><div class="cap">Antonio Raggi, Leonardo Reti, Volta della chiesa del Gesù di Roma, sec. XVII</div></div>
+    <div class="info">
+      <div class="date">sabato 7 novembre 2026</div>
+      <div class="lit">Sabato della trentunesima settimana del tempo ordinario</div>
+      <h1 id="title">Con tutte le forze</h1>
+      <div class="by">Commento di Lc 16,9-15, a cura di Giuseppe Amalfa SJ</div>
+      <audio id="player" controls preload="none" src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3"></audio>
+      <div class="actions">
+        <a href="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3">Scarica l'MP3</a>
+        <a href="https://getupandwalk.gesuiti.it/2026/11/07/con-tutte-le-forze/" target="_blank" rel="noopener">Leggi il post</a>
+        <a href="feed.xml">Feed podcast</a>
+      </div>
+    </div>
+  </section>
+  
+  <footer>Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Liturgia: CEI · Voci sintetiche Kokoro.</footer>
+</div>
+<script>
+document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>{
+  const p=document.getElementById('player');p.src=b.dataset.src;p.play().catch(()=>{});
+  document.getElementById('title').textContent=b.dataset.title;window.scrollTo({top:0,behavior:'smooth'});
+}));
+</script>
+</body>
+</html>

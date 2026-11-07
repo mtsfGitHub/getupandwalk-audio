@@ -22,8 +22,12 @@ def render(events, voice, model, log=print):
         if ev.kind == "speak":
             key = (ev.text, ev.voice, round(ev.speed, 3))
             if key not in cache:
-                cache[key] = (voice.say_both(ev.text, *ev.voice.split("|"), ev.speed) if "|" in ev.voice
-                              else voice.say(ev.text, ev.voice, ev.speed))
+                if ev.voice.startswith("coro:"):
+                    cache[key] = voice.say_choir(ev.text, ev.voice[5:].split("|"), ev.speed)
+                elif "|" in ev.voice:
+                    cache[key] = voice.say_both(ev.text, *ev.voice.split("|"), ev.speed)
+                else:
+                    cache[key] = voice.say(ev.text, ev.voice, ev.speed)
             a = cache[key]
             pieces.append(a)
             kind = "under"

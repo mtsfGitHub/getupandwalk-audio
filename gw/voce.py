@@ -189,6 +189,32 @@ class TestEngine:
 
 
 class Voices:
+    def say_choir(self, text, voices, speed):
+        """Molte voci insieme, come un'assemblea: ognuna si adatta alla durata comune, con piccoli scarti
+        naturali. Una voce che non risponde viene saltata (senza far scattare la voce di riserva)."""
+        parts = []
+        for v in voices:
+            kind, _, name = v.partition(":") if ":" in v else ("kokoro", "", v)
+            try:
+                if self.test:
+                    kind = "prova"
+                parts.append(_trim(self._engine(kind).say(text, name, speed)))
+            except Exception as e:
+                print(f"Coro: salto la voce {v} ({e})")
+        parts = [p for p in parts if len(p)]
+        if not parts:
+            return self.say(text, self.fallback, speed)
+        n = int(np.median([len(p) for p in parts]))
+        rng = np.random.default_rng(len(text))
+        pad = int(0.08 * RATE)
+        mix = np.zeros(n + 2 * pad, dtype=np.float32)
+        for p in parts:
+            s = _stretch(p, n)
+            off = pad + int(rng.uniform(-0.05, 0.05) * RATE)
+            mix[off:off + n] += s * rng.uniform(0.75, 1.0)
+        mix /= np.sqrt(len(parts))
+        return _trim(mix * 0.9)
+
     def say_both(self, text, v1, v2, speed):
         """Le due voci insieme, come in coro: la più veloce si adatta alla più lenta."""
         a, b = self.say(text, v1, speed), self.say(text, v2, speed)

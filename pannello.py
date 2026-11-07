@@ -70,7 +70,7 @@ def export(day):
             elif "musica" in el:
                 item = {"id": uid(), "kind": "music", "secs": el["musica"]}
             else:
-                who = next((k for k in ("MF", "M", "F") if k in el), None)
+                who = next((k for k in ("coro_grande", "coro_piccolo", "MF", "M", "F") if k in el), None)
                 if not who:
                     return
                 tpl = str(el[who])
@@ -78,10 +78,12 @@ def export(day):
                 if not text or re.search(r"\{\w+\}", text):
                     return
                 cls = "gospel" if "{vangelo}" in tpl else "quote" if "{citazione}" in tpl else ""
-                item = {"id": uid(), "kind": "say", "voice": VOICE[who], "text": text, "tpl": tpl, "orig": text,
+                item = {"id": uid(), "kind": "say", "voice": VOICE.get(who, "both"), "text": text, "tpl": tpl, "orig": text,
                         "cls": cls, "show": text.rstrip(".") != sec["sezione"], "rateMul": float(el.get("velocita", 1))}
             if "fondo" in el:
                 item["fondo"] = el["fondo"]
+            if item.get("kind") == "say" and who.startswith("coro"):
+                item["coro"] = who
             if grp:
                 item["grp"], item["qi"] = grp, qi
             out["items"].append(item)
@@ -198,7 +200,7 @@ def convert(it, notes):
         return el
     if kind != "say":
         return None
-    who = WHO.get(it.get("voice"), "F")
+    who = it["coro"] if it.get("coro") and it.get("voice") == "both" else WHO.get(it.get("voice"), "F")
     tpl, text = it.get("tpl"), (it.get("text") or "").strip()
     if not text:
         return None

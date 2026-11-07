@@ -5,6 +5,7 @@
 #   M: "testo"          → lo legge la voce della struttura (maschile, vedi "voci" qui sotto)
 #   F: "testo"          → lo legge la voce dei contenuti (femminile)
 #   MF: "testo"         → le due voci insieme, in coro (ogni riga va a tempo)
+#   coro_piccolo / coro_grande: "testo" → le voci elencate qui sotto in "voci", tutte insieme
 #   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
 #   pausa: 10           → secondi di pausa, con la musica
 #   musica: 8           → secondi di sola musica
@@ -24,6 +25,28 @@
 voci:
   struttura: edge:it-IT-GiuseppeNeural   # voce maschile di Edge (tutte le parti maschili); alternativa solo italiana: edge:it-IT-DiegoNeural
   contenuti: edge:it-IT-IsabellaNeural   # voce femminile di Edge (citazione, Vangelo, commento, domande, preghiere); alternativa: edge:it-IT-ElsaNeural
+  coro_piccolo:                          # chi recita la prima parte del Padre nostro
+    - edge:it-IT-GiuseppeNeural
+    - edge:it-IT-IsabellaNeural
+    - edge:it-IT-DiegoNeural
+    - edge:it-IT-ElsaNeural
+  coro_grande:                           # da "Dacci oggi": italiani e voci di altri paesi che parlano italiano
+    - edge:it-IT-GiuseppeNeural
+    - edge:it-IT-IsabellaNeural
+    - edge:it-IT-DiegoNeural
+    - edge:it-IT-ElsaNeural
+    - edge:en-US-AndrewMultilingualNeural
+    - edge:en-US-AvaMultilingualNeural
+    - edge:en-US-BrianMultilingualNeural
+    - edge:en-US-EmmaMultilingualNeural
+    - edge:de-DE-FlorianMultilingualNeural
+    - edge:de-DE-SeraphinaMultilingualNeural
+    - edge:fr-FR-RemyMultilingualNeural
+    - edge:fr-FR-VivienneMultilingualNeural
+    - im_nicola
+    - if_sara
+    - em_alex
+    - ef_dora
   riserva: im_nicola                     # se le voci di Edge non rispondono: Nicola (Kokoro), e arriva una mail
   velocita: 1.0             # velocità generale
 
@@ -111,11 +134,13 @@ scaletta:
       - pausa: 40
       - M: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
         velocita: 0.92
-      - MF: |-
+      - coro_piccolo: |-
           Padre nostro, che sei nei cieli,
           sia santificato il tuo nome,
           venga il tuo regno,
           sia fatta la tua volontà, come in cielo così in terra.
+        velocita: 0.92
+      - coro_grande: |-
           Dacci oggi il nostro pane quotidiano,
           e rimetti a noi i nostri debiti
           come anche noi li rimettiamo ai nostri debitori,

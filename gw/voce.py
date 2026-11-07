@@ -62,12 +62,37 @@ class PiperEngine:
 
 
 class EdgeEngine:
+    def __init__(self):
+        self.available = None
+        self.resolved = {}
+
+    def _resolve(self, voice):
+        """Accetta anche nomi approssimativi (it-IT-GiuseppeNeural → la voce di Giuseppe che esiste davvero)."""
+        if voice not in self.resolved:
+            import asyncio
+
+            import edge_tts
+            if self.available is None:
+                self.available = [v["ShortName"] for v in asyncio.run(edge_tts.list_voices())]
+            if voice in self.available:
+                self.resolved[voice] = voice
+            else:
+                person = voice.split("-")[-1].replace("MultilingualNeural", "").replace("Neural", "").lower()
+                lang = "-".join(voice.split("-")[:2]) if voice.count("-") >= 2 else "it-IT"
+                cands = sorted((v for v in self.available if v.startswith(lang + "-") and person in v.lower()), key=len)
+                if not cands:
+                    raise RuntimeError(f"la voce {voice} non esiste tra le voci di Edge")
+                self.resolved[voice] = cands[0]
+                print(f"Voce {voice} → {cands[0]}")
+        return self.resolved[voice]
+
     def say(self, text, voice, speed):
         import asyncio
         import subprocess
         import time
 
         import edge_tts
+        voice = self._resolve(voice)
         rate = f"{round((speed - 1) * 100):+d}%"
         last = None
         for attempt in range(3):

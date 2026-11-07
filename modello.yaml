@@ -19,8 +19,8 @@
 #   (citazione, vangelo, commento, domande).
 
 voci:
-  struttura: edge:it-IT-DiegoNeural      # voce maschile di Edge (titoli, annunci, frasi di raccordo)
-  contenuti: edge:it-IT-ElsaNeural       # voce femminile di Edge (citazione, Vangelo, commento, domande, preghiere)
+  struttura: edge:it-IT-GiuseppeNeural   # voce maschile di Edge (titoli, annunci, frasi di raccordo); alternativa: edge:it-IT-DiegoNeural
+  contenuti: edge:it-IT-IsabellaNeural   # voce femminile di Edge (citazione, Vangelo, commento, domande, preghiere); alternativa: edge:it-IT-ElsaNeural
   riserva: im_nicola                     # se le voci di Edge non rispondono: Nicola (Kokoro), e arriva una mail
   velocita: 1.0             # velocità generale
 

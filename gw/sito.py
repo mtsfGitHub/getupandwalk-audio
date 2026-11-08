@@ -113,7 +113,7 @@ footer{{font-size:12px;color:var(--muted)}}
       <div class="lit" id="lit">{e(top.get("liturgia", ""))}</div>
       <h1 id="title">{e(top["title"])}</h1>
       <div class="by" id="by">Commento di {e(top.get("ref", ""))}, a cura di {e(top.get("author", ""))}</div>
-      <audio id="player" controls preload="none" src="{e(top["audio"])}"></audio>
+      <audio id="player" controls preload="none" data-src="{e(top["audio"])}" src="{e(top["audio"])}"></audio>
       <div class="actions">
         <a id="dl" href="{e(top["audio"])}">Scarica l'MP3</a>
         <a id="post" href="{e(top["post"])}" target="_blank" rel="noopener">Leggi il post</a>
@@ -133,9 +133,26 @@ function show(b,play){{
   const img=$('img');if(img){{img.hidden=!d.img;if(d.img){{img.src=d.img;img.alt=d.cap||d.title}}}}
   $('dl').href=d.src;$('post').href=d.post;
   document.querySelectorAll('.ep').forEach(x=>x.classList.toggle('on',x===b));
-  const p=$('player');if(p.getAttribute('src')!==d.src){{p.src=d.src}}
+  const p=$('player');p.dataset.src=d.src;fresh(0);
   if(play){{p.play().catch(()=>{{}});window.scrollTo({{top:0,behavior:'smooth'}})}}
 }}
+// GitHub dà a ogni MP3 un indirizzo temporaneo che scade dopo pochi minuti: il telefono se lo ricorda
+// e la seconda volta resta fermo su 0:00. Per questo si chiede sempre un indirizzo nuovo
+// (dopo la fine, dopo una pausa lunga, se il caricamento si blocca) e si riparte dal punto giusto.
+const P=$('player');let since=Date.now(),idle=null,tries=0;
+function fresh(at,resume){{
+  const b=P.dataset.src;P.src=b+(b.includes('?')?'&':'?')+'v='+Date.now();since=Date.now();
+  if(at>0){{P.preload='metadata';P.addEventListener('loadedmetadata',()=>{{try{{P.currentTime=at}}catch(e){{}}
+    if(resume)P.play().catch(()=>{{}})}},{{once:true}})}}
+  P.load();
+}}
+fresh(0);
+P.addEventListener('ended',()=>fresh(0));
+P.addEventListener('pause',()=>{{clearTimeout(idle);idle=setTimeout(()=>{{if(P.paused&&!P.ended)fresh(P.currentTime)}},150000)}});
+P.addEventListener('play',()=>{{clearTimeout(idle);if(Date.now()-since>240000&&P.currentTime===0)fresh(0,true)}});
+P.addEventListener('playing',()=>{{tries=0}});
+P.addEventListener('error',()=>{{if(tries++<3)fresh(P.currentTime||0,!P.paused||tries>0)}});
+P.addEventListener('stalled',()=>{{if(!P.paused&&tries++<3)fresh(P.currentTime,true)}});
 document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>show(b,true)));
 const first=document.querySelector('.ep');if(first)first.classList.add('on');
 </script>

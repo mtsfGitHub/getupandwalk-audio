@@ -9,14 +9,16 @@ Ognuna si può sostituire con un file vero: musica/campane.mp3, musica/accordo.m
 from pathlib import Path
 
 import numpy as np
-from scipy.signal import fftconvolve
+from scipy.signal import butter, fftconvolve, sosfilt
 
 from .musica import RATE, load_track, pavane
 
 
 def _reverb(x, seconds, rng, wet=0.5):
     n = int(seconds * RATE)
-    imp = rng.uniform(-1, 1, n) * np.power(1 - np.arange(n) / n, 3.0)
+    imp = rng.uniform(-1, 1, n)
+    imp = sosfilt(butter(2, 2200, "low", fs=RATE, output="sos"), imp)    # coda scura, non fruscia
+    imp *= np.power(1 - np.arange(n) / n, 3.0)
     w = fftconvolve(x, imp)[:len(x)]
     w /= max(1e-9, np.max(np.abs(w)))
     d = x / max(1e-9, np.max(np.abs(x)))
@@ -100,7 +102,26 @@ def held_chord(seconds, seed=5):
     return (_reverb(out, 4.5, rng, wet=0.55) * 0.75).astype(np.float32)
 
 
+# quanto addolcire ogni musica: frequenza sopra la quale si tagliano gli acuti (Hz)
+WARM = {"campane": 2600, "accordo": 3800, "liuto": 3200, "giorno": 3200}
+
+
+def warm(x, name):
+    """Toglie gli acuti graffianti e lascia il suono più rotondo."""
+    cut = WARM.get(name)
+    if not cut or not len(x):
+        return x
+    peak = float(np.max(np.abs(x)))
+    y = sosfilt(butter(4, cut, "low", fs=RATE, output="sos"), x.astype(np.float64))
+    y = sosfilt(butter(2, 90, "high", fs=RATE, output="sos"), y)          # niente rimbombo in basso
+    return (y / max(1e-9, float(np.max(np.abs(y)))) * peak).astype(np.float32)
+
+
 def track(name, seconds, day=None):
+    return warm(_track(name, seconds, day), name)
+
+
+def _track(name, seconds, day=None):
     if name == "giorno":
         # fino al 7 novembre 2026 c'era la pavana: quegli audio restano come erano
         if day is None or str(day) <= "2026-11-07":

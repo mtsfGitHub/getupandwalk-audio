@@ -97,8 +97,22 @@ def render(events, voice, model, log=print):
 def to_mp3(audio, path, title, artist, album, comment=""):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    # due passaggi: prima si misura, poi si alza o abbassa tutto allo stesso modo,
+    # così la musica da sola non viene gonfiata fino al volume della voce
+    norm = "loudnorm=I=-16:TP=-1.5:LRA=11"
+    try:
+        import json
+        r = subprocess.run(["ffmpeg", "-v", "info", "-f", "f32le", "-ar", str(RATE), "-ac", "1", "-i", "-",
+                            "-af", norm + ":print_format=json", "-f", "null", "-"],
+                           input=audio.tobytes(), capture_output=True, check=True)
+        txt = r.stderr.decode(errors="ignore")
+        m = json.loads(txt[txt.rindex("{"):txt.rindex("}") + 1])
+        norm += (f":measured_I={m['input_i']}:measured_TP={m['input_tp']}:measured_LRA={m['input_lra']}"
+                 f":measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
+    except Exception:
+        pass
     cmd = ["ffmpeg", "-y", "-v", "error", "-f", "f32le", "-ar", str(RATE), "-ac", "1", "-i", "-",
-           "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "44100", "-ac", "1",
+           "-af", norm, "-ar", "44100", "-ac", "1",
            "-codec:a", "libmp3lame", "-b:a", "96k",
            "-metadata", f"title={title}", "-metadata", f"artist={artist}", "-metadata", f"album={album}",
            "-metadata", f"comment={comment}", str(path)]

@@ -71,7 +71,7 @@ pronuncia:
   compratevene: "comprà|tevene"
 
 musica:
-  volume: 0.6               # 0 = niente musica, 1 = piena
+  volume: 0.45              # 0 = niente musica, 1 = piena
   sotto_la_voce: true       # musica bassa anche mentre la voce legge
   fondo: giorno             # musica di fondo se la sezione non dice altro: campane, accordo, liuto, giorno, nessuna
 
@@ -144,7 +144,7 @@ scaletta:
     elementi:
       - F: |-
           Nel riascoltare il Vangelo, provo a visualizzare la scena, il luogo in cui avviene, i personaggi principali, le parole che si scambiano, il tono delle voci, i gesti. [pausa media] E lascio affiorare il mio sentire, senza censure, senza giudizi. [pausa media]
-          Quale parola o frase, cattura la mia attenzione in modo particolare?
+          Quale parola o frase, [pausa 0.5] cattura la mia attenzione in modo particolare?
         velocita: 0.82
       - pausa: 5
         sfumatura_uscita: 5
@@ -168,15 +168,13 @@ scaletta:
       - F: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
         velocita: 0.92
       - pausa: 5
-      - M: "Padre nostro, che sei nei cieli,"
-        velocita: 0.92
-      - MF: "sia santificato il tuo nome,"
-        velocita: 0.92
-      - coro_piccolo: |-
-          venga il tuo regno,
-          sia fatta la tua volontà, come in cielo così in terra.
+      - M: "Padre nostro,"
         velocita: 0.92
       - coro_grande: |-
+          che sei nei cieli,
+          sia santificato il tuo nome,
+          venga il tuo regno,
+          sia fatta la tua volontà, come in cielo così in terra.
           Dacci oggi il nostro pane quotidiano,
           e rimetti a noi i nostri debiti
           come anche noi li rimettiamo ai nostri debitori,

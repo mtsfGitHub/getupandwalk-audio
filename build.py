@@ -52,10 +52,16 @@ def main():
     ap.add_argument("--voce", default="kokoro", choices=["kokoro", "prova"])
     ap.add_argument("--html", help="file HTML del post già scaricato (per le prove)")
     ap.add_argument("--no-sito", action="store_true", help="non aggiornare la pagina e il feed")
+    ap.add_argument("--contenuti", default="", help="prova con un'altra voce femminile (es. azure:it-IT-FabiolaNeural)")
+    ap.add_argument("--struttura", default="", help="prova con un'altra voce maschile")
     args = ap.parse_args()
 
     day = date.fromisoformat(args.data) if args.data.strip() else datetime.now(ZoneInfo("Europe/Rome")).date()
     model = yaml.safe_load(Path("modello.yaml").read_text("utf-8"))
+    for role in ("contenuti", "struttura"):          # prova con un'altra voce: niente parti fisse
+        if getattr(args, role):
+            model["voci"][role] = getattr(args, role)
+            model["parti_fisse"] = False
 
     print(f"Giorno: {day:%d/%m/%Y}")
     if args.html:

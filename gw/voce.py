@@ -146,7 +146,7 @@ class EdgeEngine:
             use_it = self.force_italian and "Multilingual" in voice
             base_ssml = _italian_ssml if use_it else self._orig_ssml
             # ⟦ipa:komˈpratevene|compratevene⟧ → pronuncia esatta con l'alfabeto fonetico (se il servizio lo accetta)
-            ec.mkssml = (lambda tc, t, f=base_ssml: _with_phonemes(f(tc, t))) if "⟦" in send else base_ssml
+            ec.mkssml = (lambda tc, t, f=base_ssml: _with_phonemes(f(tc, t))) if "⟦" in text else base_ssml
             # Le voci "multilingue" (Giuseppe) sulle frasi brevi scelgono l'inglese: la frase viene detta
             # dentro una frase italiana più lunga e poi si tiene solo il pezzo giusto.
             short = not plain and "Multilingual" in voice and len(text.split()) <= 10

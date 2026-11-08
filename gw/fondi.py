@@ -103,7 +103,7 @@ def held_chord(seconds, seed=5):
 
 
 # quanto addolcire ogni musica: frequenza sopra la quale si tagliano gli acuti (Hz)
-WARM = {"campane": 2600, "accordo": 3800, "liuto": 3200, "giorno": 3200}
+WARM = {"campane": 2000, "accordo": 2800, "liuto": 2400, "giorno": 2400}
 
 
 def warm(x, name):

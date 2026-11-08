@@ -17,7 +17,7 @@ LEVELS = {"campane": {"music": 1.0, "pause": 0.55, "under": 0.38, "fade": 1.6},
 
 
 VOICE_DB = -20.0      # volume di ogni frase (dBFS, misurato dove c'è voce)
-MUSIC_DB = -8.0       # musica da sola, a volume 0.45: tanti dB sotto la voce
+MUSIC_DB = -10.0      # musica da sola, a volume 0.45: tanti dB sotto la voce
 
 
 def render(events, voice, model, log=print, marks=None, store=None):

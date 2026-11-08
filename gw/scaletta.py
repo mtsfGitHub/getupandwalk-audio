@@ -199,18 +199,18 @@ def build_events(model, values):
             if it.get("di_seguito"):
                 # tutto in una sola lettura, con un breve respiro a fine riga: l'intonazione resta continua
                 t = " ⟦pausa⟧ ".join(speakable(r) for r in text.split("\n") if r.strip())
-                events.append(Event("speak", text=t, voice=voice, speed=speed, section=section, bed=bed,
+                events.append(Event("speak", text=t, voice=voice, speed=speed, section=section, bed=bed, vol=vol,
                                     fixed=fixed, pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
                                     gain=float(it.get("volume_voce", 1.0))))
                 events.append(Event("gap", secs=float(model.get("pause", {}).get("a_capo", 1.2)), section=section,
-                                    bed=bed))
+                                    bed=bed, vol=vol))
                 continue
             # "crescendo: [2, 4, 8, 12, 16]": il coro si allarga riga dopo riga (l'ultimo numero vale per il resto)
             grow = it.get("crescendo") if who.startswith("coro") else None
             line = 0
             for tok in _tokens(text, model, it.get("pausa_a_capo"), it.get("pausa_punto")):
                 if tok[0] == "pause":
-                    events.append(Event("gap", secs=tok[1], section=section, bed=bed))
+                    events.append(Event("gap", secs=tok[1], section=section, bed=bed, vol=vol))
                 else:
                     t = speakable(tok[1])
                     if t and re.search(r"\w", t):
@@ -220,15 +220,15 @@ def build_events(model, values):
                             line += 1
                         # le brevi citazioni rallentano un poco, ma mai troppo
                         sp = max(speed * tok[2], min(speed, 0.85))
-                        for j, piece in enumerate(t.split("|")):      # "comprà|tevene": pezzi incollati
+                        for j, piece in enumerate(re.split(r"\|(?![^⟦]*⟧)", t)):      # "comprà|tevene": pezzi incollati
                             if j:
-                                events.append(Event("gap", secs=0.0, section=section, bed=bed))
+                                events.append(Event("gap", secs=0.0, section=section, bed=bed, vol=vol))
                             if piece.strip():
                                 events.append(Event("speak", text=piece.strip(), voice=voice, speed=sp,
-                                                    section=section, bed=bed, fixed=fixed,
+                                                    section=section, bed=bed, vol=vol, fixed=fixed,
                                                     pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
                                                     gain=float(it.get("volume_voce", 1.0))))
-            events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed))
+            events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed, vol=vol))
 
     for sec in model["scaletta"]:
         cond = sec.get("se")

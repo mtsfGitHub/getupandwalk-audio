@@ -16,7 +16,7 @@ class KokoroEngine:
         self.pipe = KPipeline(lang_code="i", repo_id="hexgrad/Kokoro-82M")
 
     def say(self, text, voice, speed):
-        text = text.replace("⟦pausa⟧", ",").replace(", ,", ",")
+        text = _plain(text.replace("⟦pausa⟧", ",").replace(", ,", ","))
         parts = []
         for res in self.pipe(text, voice=voice, speed=speed, split_pattern=None):
             audio = getattr(res, "audio", None)
@@ -74,6 +74,12 @@ def _italian_ssml(tc, escaped_text):
 
 
 CARRIER = "Ecco una breve frase, detta in lingua italiana:"
+
+
+def _plain(text):
+    """⟦ipa:…|parola⟧ → parola (per le voci che non accettano la pronuncia fonetica)."""
+    import re
+    return re.sub(r"⟦ipa:[^|⟧]+\|([^⟧]+)⟧", r"\1", text)
 
 
 def _with_phonemes(ssml):
@@ -141,7 +147,7 @@ class EdgeEngine:
         if self._orig_ssml is None:
             self._orig_ssml = ec.mkssml
         voice = self._resolve(voice)
-        text = text.replace(" ⟦pausa⟧ ", " ")
+        text = _plain(text.replace(" ⟦pausa⟧ ", " "))
         rate = f"{round((speed - 1) * 100):+d}%"
         last, plain = None, False
         for attempt in range(4):
@@ -280,7 +286,7 @@ class AzureEngine:
 
 class TestEngine:
     def say(self, text, voice, speed):
-        text = text.replace("⟦pausa⟧", "")
+        text = _plain(text.replace("⟦pausa⟧", ""))
         words = max(1, len(text.split()))
         n = int(RATE * words * 0.38 / speed)
         t = np.arange(n) / RATE

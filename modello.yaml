@@ -79,7 +79,9 @@ pause:
 # (con l'accento, oppure a pezzi separati da | che la voce dice e il programma incolla).
 # Valgono per tutti i giorni. Esempio (tolto il #):
 #   compratevene: "comprà|tevene"
-pronuncia: {}
+pronuncia:
+  # ⟦ipa:…|parola⟧ = pronuncia esatta in alfabeto fonetico (solo voci di Azure; con Edge si legge la parola normale)
+  compratevene: "⟦ipa:komˈpratevene|compratevene⟧"
 
 # Parti fisse (Padre nostro, "Mi preparo", introduzioni…) generate una volta sola e riusate ogni giorno:
 # da mettere a true solo quando la preghiera è definitiva.
@@ -163,8 +165,9 @@ scaletta:
     se: vangelo
     elementi:
       - F: |-
-          Nel riascoltare il Vangelo, provo a visualizzare la scena, il luogo in cui avviene, i personaggi principali, le parole che si scambiano, il tono delle voci, i gesti. [pausa media] E lascio affiorare il mio sentire, senza censure, senza giudizi. [pausa media]
-          Quale parola o frase, [pausa 0.5] cattura la mia attenzione in modo particolare?
+          Nel riascoltare il Vangelo, provo a visualizzare la scena: il luogo in cui avviene: i personaggi principali: le parole che si scambiano: il tono delle voci: i gesti. [pausa media] 
+          Lascio affiorare il mio sentire, senza censure, senza giudizi. [pausa media]
+          Quale parola o frase cattura la mia attenzione in modo particolare?
         velocita: 0.82
       - pausa: 5
         sfumatura_uscita: 5
@@ -185,9 +188,10 @@ scaletta:
       - pausa: 60
         volume_musica: 0.5
         sfumatura: 8
-      - F: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
+      - F: "Concludiamo la nostra preghiera unendoci a quella del Figlio."
         velocita: 0.82
       - pausa: 5
+        sfumatura_uscita: 4
       - M: |-
           Padre nostro che sei nei cieli,
           sia santificato il tuo nome,
@@ -202,9 +206,12 @@ scaletta:
         velocita: 0.88
         tono: -5
         morbido: true
-        volume_voce: 0.8
+        volume_voce: 0.7
         di_seguito: true
+        volume_musica: 0.4
 
   - sezione: Chiusura
     elementi:
-      - musica: 8
+      - musica: 10
+        volume_musica: 0.11
+        sfumatura_uscita: 10

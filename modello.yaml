@@ -38,7 +38,7 @@
 voci:
   # azure: = voci di Azure (vedi la pagina "campioni" del sito); se Azure non risponde si usano Giuseppe e Isabella di Edge
   struttura: azure:it-IT-GiuseppeMultilingualNeural   # voce maschile (tutte le parti maschili); provato anche: azure:it-IT-Alessio:DragonLatestNeural
-  contenuti: azure:it-IT-FabiolaNeural   # voce femminile (citazione, Vangelo, commento, domande); provate anche: azure:it-IT-Isabella:DragonLatestNeural, edge:it-IT-IsabellaNeural
+  contenuti: azure:it-IT-Isabella:DragonLatestNeural   # voce femminile (citazione, Vangelo, commento, domande); in prova: azure:it-IT-FabiolaNeural
   coro_piccolo:                          # chi recita la prima parte del Padre nostro
     - edge:it-IT-GiuseppeNeural
     - edge:it-IT-IsabellaNeural

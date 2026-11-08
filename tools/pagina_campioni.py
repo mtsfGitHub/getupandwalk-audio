@@ -9,6 +9,8 @@ files = sorted(p.name for p in d.glob("*.mp3"))
 
 
 def label(name):
+    if name.startswith("prova-"):
+        return re.sub(r"\.mp3$", "", name[6:]).replace("-", " ").replace("08 ", "8 novembre, con ")
     if name.startswith("0-"):
         return "Tutti gli uomini" if "uomini" in name else "Tutte le donne"
     n = re.sub(r"^(donne|uomini)-|\.mp3$", "", name)
@@ -23,9 +25,11 @@ def block(title, items, note=""):
     return f"<h2>{title}</h2>{note}{rows}"
 
 
+prove = [f for f in files if f.startswith("prova-")]
 uomini = [f for f in files if f.startswith("uomini-")]
 donne = [f for f in files if f.startswith("donne-")]
 tutti = sorted((f for f in files if f.startswith("0-")), key=lambda f: "uomini" not in f)
+NOTE_PROVE = '<p class="n">La stessa preghiera con voci diverse, per confrontarle.</p>'
 NOTE_TUTTI = '<p class="n">Tutti gli uomini, poi tutte le donne, una voce dopo l&#39;altra.</p>'
 page = f"""<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Voci Azure a confronto</title>
@@ -40,6 +44,7 @@ audio{{width:100%}} .n{{font-size:.9rem;color:#6b6158}}
 «compratevene» con l'accento scritto in modo esatto, e la domanda «Quale parola o frase…».</p>
 <p class="n">«HD» e «Dragon» sono le voci più recenti e naturali; «MAI» sono voci nuovissime di Microsoft, «Flash» la loro versione veloce.
 Quando hai scelto, scrivi a Claude il nome dell'uomo e quello della donna.</p>
+{block("Prove sulla preghiera intera", prove, NOTE_PROVE) if prove else ""}
 {block("Tutti insieme", tutti, NOTE_TUTTI)}
 {block("Uomini", uomini)}
 {block("Donne", donne)}

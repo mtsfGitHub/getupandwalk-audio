@@ -98,6 +98,9 @@ def export(day):
                 item["coro"] = who
                 if "crescendo" in el:
                     item["grow"] = el["crescendo"]
+            extra = {k: el[k] for k in ("tono", "morbido", "volume_voce", "di_seguito") if k in el}
+            if extra and item.get("kind") == "say":
+                item["extra"] = extra
             if item.get("kind") == "say" and alt:
                 item["alt"] = alt
             if grp:
@@ -205,6 +208,8 @@ def _element(el, ind):
             lines.append(f"{lead}per_ogni_domanda:")
             for sub in v:
                 lines += _element(sub, ind + "    ")
+        elif isinstance(v, bool):
+            lines.append(f"{lead}{k}: {'true' if v else 'false'}")
         elif isinstance(v, (int, float)):
             lines.append(f"{lead}{k}: {_num(v)}")
         elif isinstance(v, list):
@@ -285,6 +290,8 @@ def convert(it, notes):
         el["pausa_punto"] = it["dotp"]
     if it.get("grow") and str(who).startswith("coro"):
         el["crescendo"] = it["grow"]
+    for k, v in (it.get("extra") or {}).items():
+        el[k] = v
     if it.get("fondo"):
         el["fondo"] = it["fondo"]
     return el

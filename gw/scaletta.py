@@ -30,6 +30,9 @@ class Event:
     ramp: float = 0.0        # secondi per arrivarci, sfumando
     ramp_out: float = 0.0    # secondi per uscirne, sfumando
     fixed: bool = False      # frase uguale tutti i giorni: si genera una volta e si riusa
+    pitch: float = 0.0       # tono in percentuale (negativo = più grave)
+    soft: bool = False       # voce ammorbidita
+    gain: float = 1.0        # volume della voce (1 = come tutte le altre)
 
 
 MESI = "gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre"
@@ -193,6 +196,15 @@ def build_events(model, values):
                          "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
             speed = base * float(it.get("velocita", 1.0))
             text = apply_pronunciation(text, model.get("pronuncia"))
+            if it.get("di_seguito"):
+                # tutto in una sola lettura, con un breve respiro a fine riga: l'intonazione resta continua
+                t = " ⟦pausa⟧ ".join(speakable(r) for r in text.split("\n") if r.strip())
+                events.append(Event("speak", text=t, voice=voice, speed=speed, section=section, bed=bed,
+                                    fixed=fixed, pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
+                                    gain=float(it.get("volume_voce", 1.0))))
+                events.append(Event("gap", secs=float(model.get("pause", {}).get("a_capo", 1.2)), section=section,
+                                    bed=bed))
+                continue
             # "crescendo: [2, 4, 8, 12, 16]": il coro si allarga riga dopo riga (l'ultimo numero vale per il resto)
             grow = it.get("crescendo") if who.startswith("coro") else None
             line = 0
@@ -213,7 +225,9 @@ def build_events(model, values):
                                 events.append(Event("gap", secs=0.0, section=section, bed=bed))
                             if piece.strip():
                                 events.append(Event("speak", text=piece.strip(), voice=voice, speed=sp,
-                                                    section=section, bed=bed, fixed=fixed))
+                                                    section=section, bed=bed, fixed=fixed,
+                                                    pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
+                                                    gain=float(it.get("volume_voce", 1.0))))
             events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed))
 
     for sec in model["scaletta"]:

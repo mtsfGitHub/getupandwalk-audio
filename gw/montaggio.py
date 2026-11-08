@@ -35,9 +35,11 @@ def render(events, voice, model, log=print, marks=None, store=None):
                 beds[-1] = (b[0], len(pieces[-1]), b[2], b[3])
             continue
         if ev.kind == "speak":
-            key = (ev.text, ev.voice, round(ev.speed, 3))
+            key = (ev.text, ev.voice, round(ev.speed, 3), ev.pitch, ev.soft, ev.gain)
+            skey = ev.voice + (f"#tono{ev.pitch:g}" if ev.pitch else "") + ("#morbido" if ev.soft else "") \
+                + (f"#vol{ev.gain:g}" if ev.gain != 1 else "")
             if key not in cache and ev.fixed and store is not None:
-                kept = store.get(ev.text, ev.voice, ev.speed)
+                kept = store.get(ev.text, skey, ev.speed)
                 if kept is not None:
                     cache[key] = kept
             if key not in cache:
@@ -47,13 +49,15 @@ def render(events, voice, model, log=print, marks=None, store=None):
                     cache[key] = voice.say_choir(ev.text, ev.voice[5:].split("|"), ev.speed)
                 elif "|" in ev.voice:
                     cache[key] = voice.say_both(ev.text, *ev.voice.split("|"), ev.speed)
+                elif ev.pitch or ev.soft:
+                    cache[key] = voice.say(ev.text, ev.voice, ev.speed, pitch=ev.pitch, soft=ev.soft)
                 else:
                     cache[key] = voice.say(ev.text, ev.voice, ev.speed)
-                cache[key] = voice_level(cache[key], VOICE_DB)
+                cache[key] = voice_level(cache[key], VOICE_DB) * np.float32(ev.gain)
                 # si salva solo se è venuta con le voci scelte (non con quelle di riserva)
                 if ev.fixed and store is not None and not getattr(voice, "test", False) \
                         and not getattr(voice, "broken", {}) and getattr(voice, "skipped", 0) == skipped_before:
-                    store.put(ev.text, ev.voice, ev.speed, cache[key])
+                    store.put(ev.text, skey, ev.speed, cache[key])
             a = cache[key]
             if glue and len(a) > 4 * cut:
                 a = a[cut:]

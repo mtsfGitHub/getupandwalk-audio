@@ -19,6 +19,11 @@
 #   fondo: nessuna      → (accanto a un elemento o a una sezione) quale musica di fondo:
 #                         campane, accordo, liuto (la pavana), giorno (una musica nuova ogni giorno) oppure nessuna
 #   per_ogni_domanda:   → ripete gli elementi indicati per ogni domanda del post
+#   tono: -5            → (accanto a M o F) voce un po' più grave (in percentuale); +5 più acuta
+#   morbido: true       → (accanto a M o F) voce ammorbidita, meno squillante
+#   volume_voce: 0.8    → (accanto a M o F) voce più bassa delle altre (1 = uguale)
+#   di_seguito: true    → (accanto a M o F) tutto il testo in una sola lettura, con un respiro a fine riga
+#                         (intonazione continua, come una preghiera; senza, ogni riga è una frase a sé)
 #
 # Dentro i testi:
 #   [pausa] = 2 secondi di silenzio, [pausa 4] = 4 secondi, [pausa breve] = 1, [pausa media] = 2, [pausa lunga] = 3,5;
@@ -32,7 +37,7 @@
 
 voci:
   # azure: = voci di Azure (vedi la pagina "campioni" del sito); se Azure non risponde si usano Giuseppe e Isabella di Edge
-  struttura: azure:it-IT-Alessio:DragonLatestNeural    # voce maschile (tutte le parti maschili); prima: edge:it-IT-GiuseppeNeural
+  struttura: azure:it-IT-GiuseppeMultilingualNeural   # voce maschile (tutte le parti maschili); provato anche: azure:it-IT-Alessio:DragonLatestNeural
   contenuti: azure:it-IT-Isabella:DragonLatestNeural   # voce femminile (citazione, Vangelo, commento, domande); prima: edge:it-IT-IsabellaNeural
   coro_piccolo:                          # chi recita la prima parte del Padre nostro
     - edge:it-IT-GiuseppeNeural
@@ -71,10 +76,14 @@ pause:
   punto_interrogativo: 1.2  # dopo il punto di domanda, dove c'è il respiro dopo i punti
 
 # Parole che la voce pronuncia male: a sinistra come sono scritte, a destra come vanno lette
-# (con l'accento, oppure a pezzi separati da | che la voce dice e il programma incolla:
-#  così si sposta l'accento quando la voce non obbedisce). Valgono per tutti i giorni.
-pronuncia:
-  compratevene: "comprà|tevene"
+# (con l'accento, oppure a pezzi separati da | che la voce dice e il programma incolla).
+# Valgono per tutti i giorni. Esempio (tolto il #):
+#   compratevene: "comprà|tevene"
+pronuncia: {}
+
+# Parti fisse (Padre nostro, "Mi preparo", introduzioni…) generate una volta sola e riusate ogni giorno:
+# da mettere a true solo quando la preghiera è definitiva.
+parti_fisse: false
 
 musica:
   volume: 0.45              # 0 = niente musica, 1 = piena
@@ -87,7 +96,7 @@ scaletta:
     fondo: campane
     elementi:
       - musica: 8
-      - M: "Oggi è {giorno}, {liturgia}."
+      - M: "Oggi è {giorno}, [pausa breve] {liturgia}."
       - pausa: 7
 
   - sezione: Citazione
@@ -179,10 +188,8 @@ scaletta:
       - F: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
         velocita: 0.82
       - pausa: 5
-      - M: "Padre nostro,"
-        velocita: 0.92
-      - coro_grande: |-
-          che sei nei cieli,
+      - M: |-
+          Padre nostro che sei nei cieli,
           sia santificato il tuo nome,
           venga il tuo regno,
           sia fatta la tua volontà, come in cielo così in terra.
@@ -192,8 +199,11 @@ scaletta:
           e non abbandonarci alla tentazione,
           ma liberaci dal male.
           Amen.
-        velocita: 0.92
-        crescendo: [2, 4, 8, 12, 20]
+        velocita: 0.88
+        tono: -5
+        morbido: true
+        volume_voce: 0.8
+        di_seguito: true
 
   - sezione: Chiusura
     elementi:

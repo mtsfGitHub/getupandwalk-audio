@@ -16,6 +16,7 @@ class KokoroEngine:
         self.pipe = KPipeline(lang_code="i", repo_id="hexgrad/Kokoro-82M")
 
     def say(self, text, voice, speed):
+        text = text.replace("⟦pausa⟧", ",").replace(", ,", ",")
         parts = []
         for res in self.pipe(text, voice=voice, speed=speed, split_pattern=None):
             audio = getattr(res, "audio", None)
@@ -130,7 +131,7 @@ class EdgeEngine:
                 print(f"Voce {voice} → {cands[0]}")
         return self.resolved[voice]
 
-    def say(self, text, voice, speed):
+    def say(self, text, voice, speed, pitch=0):
         import asyncio
         import subprocess
         import time
@@ -140,6 +141,7 @@ class EdgeEngine:
         if self._orig_ssml is None:
             self._orig_ssml = ec.mkssml
         voice = self._resolve(voice)
+        text = text.replace(" ⟦pausa⟧ ", " ")
         rate = f"{round((speed - 1) * 100):+d}%"
         last, plain = None, False
         for attempt in range(4):
@@ -155,7 +157,7 @@ class EdgeEngine:
                 buf, words = bytearray(), []
 
                 async def run():
-                    com = edge_tts.Communicate(send, voice, rate=rate,
+                    com = edge_tts.Communicate(send, voice, rate=rate, pitch=f"{round(pitch * 1.2):+d}Hz",
                                                boundary="WordBoundary" if short else "SentenceBoundary")
                     async for ch in com.stream():
                         if ch["type"] == "audio":
@@ -225,7 +227,7 @@ class AzureEngine:
     no_lang = set()
 
     @classmethod
-    def ssml(cls, text, voice, speed):
+    def ssml(cls, text, voice, speed, pitch=0):
         from xml.sax.saxutils import escape
         rate = f"{round((speed - 1) * 100):+d}%"
         # le voci multilingue (anche Dragon e MAI) vanno tenute sull'italiano, se lo accettano
@@ -233,16 +235,16 @@ class AzureEngine:
         open_lang, close_lang = ("<lang xml:lang='it-IT'>", "</lang>") if multi else ("", "")
         return ("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
                 "xmlns:mstts='https://www.w3.org/2001/mstts' xml:lang='it-IT'>"
-                f"<voice name='{voice}'>{open_lang}<prosody rate='{rate}'>{_with_phonemes(escape(text))}</prosody>"
+                f"<voice name='{voice}'>{open_lang}<prosody rate='{rate}' pitch='{pitch:+.0f}%'>{_breaks(_with_phonemes(escape(text)))}</prosody>"
                 f"{close_lang}</voice></speak>")
 
-    def say(self, text, voice, speed):
+    def say(self, text, voice, speed, pitch=0):
         import io
         import time
         import wave
 
         import requests
-        body = self.ssml(text, voice, speed).encode("utf-8")
+        body = self.ssml(text, voice, speed, pitch).encode("utf-8")
         last = None
         for attempt in range(4):
             try:
@@ -254,7 +256,7 @@ class AzureEngine:
                 if r.status_code == 400 and voice not in self.no_lang and "<lang" in body.decode():
                     print(f"Azure: la voce {voice} non accetta la lingua dichiarata, riprovo senza")
                     self.no_lang.add(voice)
-                    body = self.ssml(text, voice, speed).encode("utf-8")
+                    body = self.ssml(text, voice, speed, pitch).encode("utf-8")
                     continue
                 if r.status_code != 200:
                     raise PermissionError(f"Azure {r.status_code}: {r.text[:200]}")
@@ -278,6 +280,7 @@ class AzureEngine:
 
 class TestEngine:
     def say(self, text, voice, speed):
+        text = text.replace("⟦pausa⟧", "")
         words = max(1, len(text.split()))
         n = int(RATE * words * 0.38 / speed)
         t = np.arange(n) / RATE
@@ -343,19 +346,26 @@ class Voices:
             return "edge:it-IT-IsabellaNeural" if _is_female(name) else "edge:it-IT-GiuseppeNeural"
         return self.fallback
 
-    def say(self, text, voice, speed):
+    def say(self, text, voice, speed, pitch=0, soft=False):
+        """pitch: tono in percentuale (-5 = un po' più grave); soft: voce ammorbidita, meno squillante."""
         kind, _, name = voice.partition(":") if ":" in voice else ("kokoro", "", voice)
         if kind in self.broken:
-            return self.say(text, self._reserve(kind, name), speed)
+            return self.say(text, self._reserve(kind, name), speed, pitch, soft)
         try:
-            return _deess(_trim(self._engine(kind).say(text, name, speed)), name)
+            eng = self._engine(kind)
+            a = eng.say(text, name, speed, pitch=pitch) if pitch and kind in ("edge", "azure") \
+                else eng.say(text, name, speed)
+            a = _deess(_trim(a), name)
+            if soft:
+                a = _filter(a, "highshelf=f=2500:g=-4,lowpass=f=9000")
+            return a
         except Exception as e:
             if voice == self.fallback:
                 raise
             reserve = self._reserve(kind, name)
             print(f"ATTENZIONE: {e}. Uso la voce di riserva ({reserve}).")
             self.broken[kind] = str(e)
-            return self.say(text, reserve, speed)
+            return self.say(text, reserve, speed, pitch, soft)
 
 
 FEMALE = ("isabella", "elsa", "ava", "emma", "seraphina", "vivienne", "if_", "ef_", "pf_", "paola",
@@ -378,6 +388,11 @@ def _filter(a, chain):
 
 
 SIBILANT = ("giuseppe", "diego")      # voci con le "s" troppo taglienti
+
+
+def _breaks(ssml_text, ms=550):
+    """⟦pausa⟧ → un breve respiro dentro la stessa lettura (solo Azure)."""
+    return ssml_text.replace("⟦pausa⟧", f"<break time='{ms}ms'/>")
 
 
 def _deess(a, name):

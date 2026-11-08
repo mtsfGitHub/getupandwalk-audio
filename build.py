@@ -98,11 +98,14 @@ def main():
             i = daily_info(day)
             print(f"Musica del giorno: {i['inst']} in {i['key']}, giro {i['prog']}")
     marks = []
-    from gw.fisse import Store
-    store = Store()
+    store = None
+    if model.get("parti_fisse"):          # solo quando la preghiera è definitiva
+        from gw.fisse import Store
+        store = Store()
     audio, secs = render(events, voice, model, marks=marks, store=store)
-    store.save()
-    print(f"Parti fisse: {store.hits} riusate, {store.new} nuove")
+    if store:
+        store.save()
+        print(f"Parti fisse: {store.hits} riusate, {store.new} nuove")
     import json as _json
     Path("out").mkdir(exist_ok=True); (Path("out") / "tempi.json").write_text(_json.dumps(marks, ensure_ascii=False), "utf-8")   # per controllare l'audio
     print("TEMPI " + _json.dumps(marks, ensure_ascii=False))

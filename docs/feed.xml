@@ -5,7 +5,7 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Sun, 08 Nov 2026 13:55:32 +0000</lastBuildDate>
+  <lastBuildDate>Sun, 08 Nov 2026 13:59:55 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
@@ -26,8 +26,8 @@
     <link>https://getupandwalk.gesuiti.it/2026/11/07/con-tutte-le-forze/</link>
     <guid isPermaLink="false">getupandwalk-2026-11-07</guid>
     <pubDate>Sat, 07 Nov 2026 05:00:00 +0000</pubDate>
-    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3" length="7310344" type="audio/mpeg"/>
-    <itunes:duration>609</itunes:duration>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3" length="7416296" type="audio/mpeg"/>
+    <itunes:duration>618</itunes:duration>
     <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/07.11_Roma-Chiesa-del-Gesu-Volta-Baciccio-10.jpg"/>
   </item>
 </channel>

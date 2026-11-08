@@ -54,7 +54,9 @@ def speakable(t):
                lambda m: f"{BOOKS[m.group(1)]}, capitolo {m.group(2)}, versetti da {m.group(3)}"
                          + (f" a {m.group(4)}" if m.group(4) else ""), t)
     t = re.sub(r"[«»“”\"]", "", t).replace("‘", "")
+    t = re.sub(r"\b(po|mo|di|de|be|to|va|fa|da|sta)’", r"\1'", t, flags=re.I)   # un po’, va’, di’: apostrofo vero
     t = re.sub(r"’(?=\w)", "'", t).replace("’", "")
+    t = re.sub(r"([!?…])\s*\.", r"\1", t)          # «aprici!». → aprici!  (non due segni di fine frase)
     return re.sub(r"\s+", " ", t).strip()
 
 

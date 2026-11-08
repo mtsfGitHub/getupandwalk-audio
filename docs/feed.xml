@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Sat, 07 Nov 2026 23:56:41 +0000</lastBuildDate>
+  <lastBuildDate>Sun, 08 Nov 2026 00:04:34 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/07.11_Roma-Chiesa-del-Gesu-Volta-Baciccio-10.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/8.png"/>
+  <item>
+    <title>domenica 8 novembre 2026 · Quando l’alba è ancora buio</title>
+    <description>Trentaduesima domenica del Tempo Ordinario. Commento di Mt 25,1-13, a cura di Mounira Abdelhamid Serra.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/08/quando-lalba-e-ancora-buio/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-08</guid>
+    <pubDate>Sun, 08 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-08/getupandwalk-2026-11-08.mp3" length="7936989" type="audio/mpeg"/>
+    <itunes:duration>661</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/8.png"/>
+  </item>
   <item>
     <title>sabato 7 novembre 2026 · Con tutte le forze</title>
     <description>Sabato della trentunesima settimana del Tempo Ordinario. Commento di Lc 16,9-15, a cura di Giuseppe Amalfa SJ.</description>

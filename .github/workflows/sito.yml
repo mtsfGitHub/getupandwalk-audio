@@ -1,0 +1,63 @@
+name: Sito con gli audio
+
+# Pubblica la pagina insieme agli MP3 degli ultimi giorni, serviti direttamente dal sito:
+# indirizzi fissi che non scadono, così sul telefono si può riascoltare, tornare avanti e indietro.
+# Richiede in Settings › Pages › Source: "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**", ".github/workflows/sito.yml"]
+  workflow_run:
+    workflows: ["Audio del giorno"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sito
+  cancel-in-progress: true
+
+jobs:
+  pubblica:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Pagina e MP3 degli ultimi 40 giorni
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p _site/audio
+          cp -r docs/. _site/
+          for tag in $(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=60" --jq '.[].tag_name' | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | sort -r | head -40); do
+            gh release download "$tag" -R "$GITHUB_REPOSITORY" -p "getupandwalk-$tag.mp3" -D _site/audio --clobber || true
+          done
+          python3 - <<'EOF'
+          import os, re, pathlib
+          repo = os.environ["GITHUB_REPOSITORY"]
+          have = {p.name for p in pathlib.Path("_site/audio").glob("*.mp3")}
+          page = pathlib.Path("_site/index.html")
+          html = page.read_text("utf-8")
+          pat = re.compile(r"https://github\.com/" + re.escape(repo) + r"/releases/download/[^/\"']+/(getupandwalk-[0-9-]+\.mp3)")
+          html = pat.sub(lambda m: "audio/" + m.group(1) if m.group(1) in have else m.group(0), html)
+          page.write_text(html, "utf-8")
+          print(len(have), "MP3 serviti dal sito")
+          EOF
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -248,7 +248,7 @@ class Voices:
         if kind in self.broken:
             return self.say(text, self.fallback, speed)
         try:
-            return _trim(self._engine(kind).say(text, name, speed))
+            return _deess(_trim(self._engine(kind).say(text, name, speed)), name)
         except Exception as e:
             if voice == self.fallback:
                 raise
@@ -273,6 +273,31 @@ def _filter(a, chain):
                          input=a.astype(np.float32).tobytes(), check=True, capture_output=True).stdout
     b = np.frombuffer(raw, dtype=np.float32)
     return np.pad(b, (0, max(0, len(a) - len(b))))[:len(a)]
+
+
+SIBILANT = ("giuseppe", "diego")      # voci con le "s" troppo taglienti
+
+
+def _deess(a, name):
+    """Attenua solo le "s" (de-esser): non tocca il resto della voce."""
+    if any(v in name.lower() for v in SIBILANT) and len(a) > RATE // 10:
+        return _filter(a, "deesser=i=0.3:m=0.5:f=0.5")
+    return a
+
+
+def level(a, target_db=-20.0, max_gain_db=8.0):
+    """Porta ogni frase allo stesso volume (misurato solo dove c'è voce), così Giuseppe, Isabella
+    e il coro si sentono alla pari."""
+    a = np.asarray(a, dtype=np.float32)
+    w = int(0.02 * RATE)
+    n = len(a) // w
+    if n < 3:
+        return a
+    fr = np.sqrt(np.mean(a[:n * w].reshape(n, w).astype(np.float64) ** 2, axis=1)) + 1e-9
+    active = fr[fr > fr.max() * 10 ** (-30 / 20)]
+    cur = 20 * np.log10(np.sqrt(np.mean(active ** 2)))
+    g = max(-max_gain_db, min(max_gain_db, target_db - cur))
+    return (a * 10 ** (g / 20)).astype(np.float32)
 
 
 def _soften(a, female):

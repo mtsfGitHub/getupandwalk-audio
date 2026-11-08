@@ -6,13 +6,18 @@ import numpy as np
 from scipy.signal import lfilter
 
 from .fondi import track
+from .voce import level as voice_level
 from .musica import RATE
 
 # livello di ogni musica: da sola (musica), nelle pause, sotto la voce; e quanto lentamente sfuma (secondi)
-LEVELS = {"campane": {"music": 0.55, "pause": 0.55, "under": 0.38, "fade": 1.6},
-          "accordo": {"music": 0.55, "pause": 0.8, "under": 0.32, "fade": 1.4},
-          "liuto": {"music": 0.55, "pause": 0.75, "under": 0.28, "fade": 1.4},
-          "giorno": {"music": 0.55, "pause": 0.75, "under": 0.28, "fade": 1.4}}
+LEVELS = {"campane": {"music": 1.0, "pause": 0.55, "under": 0.38, "fade": 1.6},
+          "accordo": {"music": 1.0, "pause": 0.8, "under": 0.32, "fade": 1.4},
+          "liuto": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4},
+          "giorno": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4}}
+
+
+VOICE_DB = -20.0      # volume di ogni frase (dBFS, misurato dove c'è voce)
+MUSIC_DB = -8.0       # musica da sola, a volume 0.45: tanti dB sotto la voce
 
 
 def render(events, voice, model, log=print, marks=None):
@@ -38,6 +43,7 @@ def render(events, voice, model, log=print, marks=None):
                     cache[key] = voice.say_both(ev.text, *ev.voice.split("|"), ev.speed)
                 else:
                     cache[key] = voice.say(ev.text, ev.voice, ev.speed)
+                cache[key] = voice_level(cache[key], VOICE_DB)
             a = cache[key]
             if glue and len(a) > 4 * cut:
                 a = a[cut:]
@@ -90,7 +96,10 @@ def render(events, voice, model, log=print, marks=None):
         music = np.zeros(len(speech), dtype=np.float32)
         t = track(name, (used[-1] + 1) / RATE + 2, model.get("_giorno"))
         music[:min(len(t), len(music))] = t[:len(music)]
-        mix += music * level * vol * 0.45
+        # ogni musica portata allo stesso volume, in proporzione fissa alla voce
+        rms = float(np.sqrt(np.mean(t.astype(np.float64) ** 2))) + 1e-9
+        k = 10 ** ((VOICE_DB + MUSIC_DB) / 20) / rms / 0.45
+        mix += music * level * vol * k
     # "aria di stanza": un fruscio scurissimo e quasi impercettibile, come in una registrazione vera,
     # perché tra una frase e l'altra non ci sia il vuoto digitale assoluto
     air_db = float(model["musica"].get("aria", -62))
@@ -111,8 +120,9 @@ def render(events, voice, model, log=print, marks=None):
 def to_mp3(audio, path, title, artist, album, comment=""):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    # due passaggi: prima si misura, poi si alza o abbassa tutto allo stesso modo,
-    # così la musica da sola non viene gonfiata fino al volume della voce
+    # si misura il volume complessivo e si alza o abbassa TUTTO dello stesso guadagno
+    # (loudnorm "dinamico" gonfierebbe la musica da sola fino al volume della voce);
+    # un limitatore tiene a bada solo i picchi
     norm = "loudnorm=I=-16:TP=-1.5:LRA=11"
     try:
         import json
@@ -121,8 +131,8 @@ def to_mp3(audio, path, title, artist, album, comment=""):
                            input=audio.tobytes(), capture_output=True, check=True)
         txt = r.stderr.decode(errors="ignore")
         m = json.loads(txt[txt.rindex("{"):txt.rindex("}") + 1])
-        norm += (f":measured_I={m['input_i']}:measured_TP={m['input_tp']}:measured_LRA={m['input_lra']}"
-                 f":measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
+        gain = max(-20.0, min(20.0, -16.0 - float(m["input_i"])))
+        norm = f"volume={gain:.2f}dB,alimiter=limit=0.84:attack=5:release=80:level=false"
     except Exception:
         pass
     cmd = ["ffmpeg", "-y", "-v", "error", "-f", "f32le", "-ar", str(RATE), "-ac", "1", "-i", "-",

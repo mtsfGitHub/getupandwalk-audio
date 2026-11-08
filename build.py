@@ -88,7 +88,11 @@ def main():
         if f"{day:%Y-%m-%d}" > "2026-11-07":
             i = daily_info(day)
             print(f"Musica del giorno: {i['inst']} in {i['key']}, giro {i['prog']}")
-    audio, secs = render(events, voice, model)
+    marks = []
+    audio, secs = render(events, voice, model, marks=marks)
+    import json as _json
+    Path("out").mkdir(exist_ok=True); (Path("out") / "tempi.json").write_text(_json.dumps(marks, ensure_ascii=False), "utf-8")   # per controllare l'audio
+    print("TEMPI " + _json.dumps(marks, ensure_ascii=False))
     tag = f"{day:%Y-%m-%d}"
     filename = f"getupandwalk-{tag}.mp3"
     out = Path("out")

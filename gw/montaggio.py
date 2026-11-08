@@ -15,7 +15,7 @@ LEVELS = {"campane": {"music": 0.55, "pause": 0.55, "under": 0.38, "fade": 1.6},
           "giorno": {"music": 0.55, "pause": 0.75, "under": 0.28, "fade": 1.4}}
 
 
-def render(events, voice, model, log=print):
+def render(events, voice, model, log=print, marks=None):
     pieces, beds = [], []            # audio della voce; per ogni pezzo: (musica di fondo, livello)
     under = model["musica"].get("sotto_la_voce", True)
     cache = {}
@@ -44,6 +44,9 @@ def render(events, voice, model, log=print):
             glue = False
             pieces.append(a)
             kind = "under"
+            if marks is not None:
+                pos = sum(len(p) for p in pieces[:-1]) / RATE
+                marks.append((round(pos, 2), round(pos + len(a) / RATE, 2), ev.section, ev.voice.split(":")[-1][:24], ev.text[:50]))
         else:
             a = np.zeros(int(ev.secs * RATE), dtype=np.float32)
             pieces.append(a)

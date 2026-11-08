@@ -1,0 +1,29 @@
+name: Campioni voci Azure
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  campioni:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - run: pip install numpy scipy requests pyyaml soundfile
+      - run: python campioni_azure.py
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+      - name: Pubblica i campioni
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete campioni-azure -y --cleanup-tag 2>/dev/null || true
+          gh release create campioni-azure out/campioni-azure/*.mp3 --title "Campioni voci Azure" --notes "Voci italiane di Azure a confronto" --prerelease

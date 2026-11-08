@@ -186,6 +186,76 @@ class EdgeEngine:
         raise RuntimeError(f"le voci di Edge non rispondono ({last})")
 
 
+class AzureEngine:
+    """Il servizio ufficiale di Microsoft (Azure AI Speech): stesse voci di Edge e molte altre,
+    con il controllo completo di pronuncia e pause. Chiave e area nei segreti di GitHub."""
+
+    def __init__(self):
+        import os
+        self.key = os.environ.get("AZURE_SPEECH_KEY", "").strip()
+        self.region = os.environ.get("AZURE_SPEECH_REGION", "").strip().lower().replace(" ", "")
+        if not self.key or not self.region:
+            raise RuntimeError("mancano AZURE_SPEECH_KEY / AZURE_SPEECH_REGION")
+        self.base = f"https://{self.region}.tts.speech.microsoft.com/cognitiveservices"
+        self.chars = 0
+
+    def _headers(self, extra=None):
+        h = {"Ocp-Apim-Subscription-Key": self.key, "User-Agent": "getupandwalk-audio"}
+        h.update(extra or {})
+        return h
+
+    def voices(self):
+        import requests
+        r = requests.get(f"{self.base}/voices/list", headers=self._headers(), timeout=30)
+        r.raise_for_status()
+        return r.json()
+
+    @staticmethod
+    def ssml(text, voice, speed):
+        from xml.sax.saxutils import escape
+        rate = f"{round((speed - 1) * 100):+d}%"
+        multi = "Multilingual" in voice or "DragonHD" in voice     # solo queste accettano <lang>
+        open_lang, close_lang = ("<lang xml:lang='it-IT'>", "</lang>") if multi else ("", "")
+        return ("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
+                "xmlns:mstts='https://www.w3.org/2001/mstts' xml:lang='it-IT'>"
+                f"<voice name='{voice}'>{open_lang}<prosody rate='{rate}'>{_with_phonemes(escape(text))}</prosody>"
+                f"{close_lang}</voice></speak>")
+
+    def say(self, text, voice, speed):
+        import io
+        import time
+        import wave
+
+        import requests
+        body = self.ssml(text, voice, speed).encode("utf-8")
+        last = None
+        for attempt in range(4):
+            try:
+                r = requests.post(f"{self.base}/v1", data=body, timeout=60, headers=self._headers({
+                    "Content-Type": "application/ssml+xml",
+                    "X-Microsoft-OutputFormat": "riff-24khz-16bit-mono-pcm"}))
+                if r.status_code == 429 or r.status_code >= 500:
+                    raise RuntimeError(f"Azure {r.status_code}")
+                if r.status_code != 200:
+                    raise PermissionError(f"Azure {r.status_code}: {r.text[:200]}")
+                with wave.open(io.BytesIO(r.content)) as w:
+                    rate, frames = w.getframerate(), w.readframes(w.getnframes())
+                a = np.frombuffer(frames, dtype="<i2").astype(np.float32) / 32768
+                if rate != RATE:
+                    from scipy.signal import resample_poly
+                    from math import gcd
+                    g = gcd(RATE, rate)
+                    a = resample_poly(a, RATE // g, rate // g).astype(np.float32)
+                self.chars += len(text)
+                return a
+            except PermissionError:
+                raise                      # chiave sbagliata, voce inesistente: inutile riprovare
+            except Exception as e:
+                last = e
+                time.sleep(3 * (attempt + 1))
+        raise RuntimeError(f"Azure non risponde ({last})")
+
+
 class TestEngine:
     def say(self, text, voice, speed):
         words = max(1, len(text.split()))
@@ -240,7 +310,7 @@ class Voices:
             kind = "prova"
         if kind not in self.engines:
             self.engines[kind] = {"kokoro": KokoroEngine, "piper": PiperEngine, "edge": EdgeEngine,
-                                  "prova": TestEngine}[kind]()
+                                  "azure": AzureEngine, "prova": TestEngine}[kind]()
         return self.engines[kind]
 
     def say(self, text, voice, speed):

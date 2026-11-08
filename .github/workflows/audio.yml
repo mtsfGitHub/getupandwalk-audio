@@ -3,6 +3,8 @@ name: Audio del giorno
 on:
   schedule:
     - cron: "41 3 * * *"   # ogni notte verso le 4:40 (ora italiana d'inverno), dopo l'uscita del post
+    - cron: "13 4 * * *"   # riserve, se GitHub ritarda la prima: se l'audio del giorno c'è già, non fanno nulla
+    - cron: "47 4 * * *"
   workflow_dispatch:
     inputs:
       data:
@@ -19,7 +21,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  controlla:
+    runs-on: ubuntu-latest
+    outputs:
+      fatto: ${{ steps.c.outputs.fatto }}
+    steps:
+      - id: c
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TZ: Europe/Rome
+        run: |
+          D=$(date +%F)
+          if [ "${{ github.event_name }}" = "schedule" ] && gh release view "$D" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "L'audio di oggi ($D) c'è già"; echo "fatto=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "fatto=false" >> "$GITHUB_OUTPUT"
+          fi
+
   audio:
+    needs: controlla
+    if: needs.controlla.outputs.fatto != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:

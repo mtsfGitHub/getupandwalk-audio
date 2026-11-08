@@ -85,7 +85,7 @@ pronuncia:
 
 # Parti fisse (Padre nostro, "Mi preparo", introduzioni…) generate una volta sola e riusate ogni giorno:
 # da mettere a true solo quando la preghiera è definitiva.
-parti_fisse: false
+parti_fisse: true
 
 musica:
   volume: 0.45              # 0 = niente musica, 1 = piena

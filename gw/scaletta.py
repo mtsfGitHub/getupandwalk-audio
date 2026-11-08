@@ -194,8 +194,12 @@ def build_events(model, values):
                 else:
                     t = speakable(tok[1])
                     if t and re.search(r"\w", t):
-                        events.append(Event("speak", text=t, voice=voice, speed=speed * tok[2], section=section,
-                                            bed=bed))
+                        for j, piece in enumerate(t.split("|")):      # "comprà|tevene": pezzi incollati
+                            if j:
+                                events.append(Event("gap", secs=0.0, section=section, bed=bed))
+                            if piece.strip():
+                                events.append(Event("speak", text=piece.strip(), voice=voice, speed=speed * tok[2],
+                                                    section=section, bed=bed))
             events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed))
 
     for sec in model["scaletta"]:

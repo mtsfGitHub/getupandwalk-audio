@@ -61,7 +61,9 @@ def render(events, voice, model, log=print):
                 if ri:
                     seg[:ri] = np.linspace(prev, lvl, ri)
                 if ro:
-                    seg[n - ro:] = np.linspace(lvl, nxt, ro)
+                    hold = int(1.5 * RATE) if nxt == 0 and ro > 2 * RATE else 0   # finire prima: il silenzio è silenzio
+                    seg[n - ro:n - hold] = np.linspace(lvl, nxt, ro - hold)
+                    seg[n - hold:] = nxt
             segs.append(seg)
         level = np.concatenate(segs)
         tau = LEVELS[name]["fade"]

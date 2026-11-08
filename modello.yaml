@@ -146,6 +146,7 @@ scaletta:
           Quale parola o frase cattura la mia attenzione in modo particolare?
         velocita: 0.82
       - pausa: 5
+        sfumatura_uscita: 5
       - M: "{vangelo}"
         velocita: 0.82
         pausa_a_capo: 2.5

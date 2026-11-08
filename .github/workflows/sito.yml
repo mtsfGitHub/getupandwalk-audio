@@ -9,7 +9,7 @@ on:
     branches: [main]
     paths: ["docs/**", ".github/workflows/sito.yml"]
   workflow_run:
-    workflows: ["Audio del giorno"]
+    workflows: ["Audio del giorno", "Campioni voci Azure"]
     types: [completed]
   workflow_dispatch:
 
@@ -53,6 +53,12 @@ jobs:
           page.write_text(html, "utf-8")
           print(len(have), "MP3 serviti dal sito")
           EOF
+          # pagina per ascoltare i campioni delle voci, se ci sono
+          if gh release view campioni-azure -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            mkdir -p _site/campioni
+            gh release download campioni-azure -R "$GITHUB_REPOSITORY" -p "*.mp3" -D _site/campioni --clobber
+            python3 tools/pagina_campioni.py _site/campioni
+          fi
           touch _site/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3

@@ -108,6 +108,9 @@ def main():
     mp3 = to_mp3(audio, out / filename, title=f"{post.title} · {day:%d/%m/%Y}", artist="Get up and Walk",
                  album="Get up and Walk · in ascolto", comment=post.url)
     print(f"MP3: {mp3} ({secs / 60:.1f} minuti, {mp3.stat().st_size / 1e6:.1f} MB)")
+    az = voice.engines.get("azure")
+    if az is not None:
+        print(f"Caratteri Azure usati oggi: {az.chars}")
 
     (out / "data.txt").write_text(tag)
     if voice.broken:

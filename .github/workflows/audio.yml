@@ -120,7 +120,7 @@ jobs:
           git checkout -- voci-fisse 2>/dev/null || true; git clean -fdq voci-fisse 2>/dev/null || true
           git pull --rebase origin main
           python ripubblica.py "$D" /tmp/sito
-          if [ -d /tmp/fisse ]; then rm -rf voci-fisse && cp -r /tmp/fisse voci-fisse; fi
+          python tools/unisci_fisse.py /tmp/fisse
           git add docs voci-fisse 2>/dev/null || git add docs
           git commit -m "Audio del $D" || echo "Niente da aggiornare"
           git push

@@ -73,6 +73,7 @@ pronuncia:
 musica:
   volume: 0.45              # 0 = niente musica, 1 = piena
   sotto_la_voce: true       # musica bassa anche mentre la voce legge
+  aria: -62                 # "aria di stanza" quasi impercettibile tra le frasi (dB); -99 = silenzio assoluto
   fondo: giorno             # musica di fondo se la sezione non dice altro: campane, accordo, liuto, giorno, nessuna
 
 scaletta:

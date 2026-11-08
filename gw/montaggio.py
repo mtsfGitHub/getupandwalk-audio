@@ -91,6 +91,17 @@ def render(events, voice, model, log=print, marks=None):
         t = track(name, (used[-1] + 1) / RATE + 2, model.get("_giorno"))
         music[:min(len(t), len(music))] = t[:len(music)]
         mix += music * level * vol * 0.45
+    # "aria di stanza": un fruscio scurissimo e quasi impercettibile, come in una registrazione vera,
+    # perché tra una frase e l'altra non ci sia il vuoto digitale assoluto
+    air_db = float(model["musica"].get("aria", -62))
+    if air_db > -90:
+        from scipy.signal import butter, sosfilt
+        rng = np.random.default_rng(11)
+        air = sosfilt(butter(2, [80, 1400], "band", fs=RATE, output="sos"), rng.standard_normal(len(mix)))
+        air *= 10 ** (air_db / 20) / max(1e-9, float(np.sqrt(np.mean(air ** 2))))
+        edge = min(len(air) // 2, int(3 * RATE))
+        air[:edge] *= np.linspace(0, 1, edge); air[-edge:] *= np.linspace(1, 0, edge)
+        mix += air.astype(np.float32)
     peak = max(1e-9, float(np.max(np.abs(mix))))
     if peak > 0.98:
         mix *= 0.98 / peak

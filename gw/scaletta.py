@@ -29,6 +29,7 @@ class Event:
     vol: float = 1.0         # volume della musica in questo momento (0.5 = metà)
     ramp: float = 0.0        # secondi per arrivarci, sfumando
     ramp_out: float = 0.0    # secondi per uscirne, sfumando
+    fixed: bool = False      # frase uguale tutti i giorni: si genera una volta e si riusa
 
 
 MESI = "gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre"
@@ -178,6 +179,8 @@ def build_events(model, values):
             who = next((k for k in ("coro_grande", "coro_piccolo", "M|F", "F|M", "MF", "M", "F") if k in it), None)
             if not who:
                 continue
+            # fissa = senza parti che cambiano ogni giorno (l'evangelista sono solo quattro)
+            fixed = "|" not in who and set(re.findall(r"\{(\w+)\}", str(it[who]))) <= {"evangelista"}
             text = fill(it[who], extra).strip()
             if "|" in who:                      # voci alternate: una domanda ciascuno
                 who = who.split("|")[(extra or {}).get("_n", 0) % 2]
@@ -210,7 +213,7 @@ def build_events(model, values):
                                 events.append(Event("gap", secs=0.0, section=section, bed=bed))
                             if piece.strip():
                                 events.append(Event("speak", text=piece.strip(), voice=voice, speed=sp,
-                                                    section=section, bed=bed))
+                                                    section=section, bed=bed, fixed=fixed))
             events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed))
 
     for sec in model["scaletta"]:

@@ -20,7 +20,7 @@ VOICE_DB = -20.0      # volume di ogni frase (dBFS, misurato dove c'è voce)
 MUSIC_DB = -8.0       # musica da sola, a volume 0.45: tanti dB sotto la voce
 
 
-def render(events, voice, model, log=print, marks=None):
+def render(events, voice, model, log=print, marks=None, store=None):
     pieces, beds = [], []            # audio della voce; per ogni pezzo: (musica di fondo, livello)
     under = model["musica"].get("sotto_la_voce", True)
     cache = {}
@@ -36,7 +36,13 @@ def render(events, voice, model, log=print, marks=None):
             continue
         if ev.kind == "speak":
             key = (ev.text, ev.voice, round(ev.speed, 3))
+            if key not in cache and ev.fixed and store is not None:
+                kept = store.get(ev.text, ev.voice, ev.speed)
+                if kept is not None:
+                    cache[key] = kept
             if key not in cache:
+                broken_before = len(getattr(voice, "broken", {}))
+                skipped_before = getattr(voice, "skipped", 0)
                 if ev.voice.startswith("coro:"):
                     cache[key] = voice.say_choir(ev.text, ev.voice[5:].split("|"), ev.speed)
                 elif "|" in ev.voice:
@@ -44,6 +50,10 @@ def render(events, voice, model, log=print, marks=None):
                 else:
                     cache[key] = voice.say(ev.text, ev.voice, ev.speed)
                 cache[key] = voice_level(cache[key], VOICE_DB)
+                # si salva solo se è venuta con le voci scelte (non con quelle di riserva)
+                if ev.fixed and store is not None and not getattr(voice, "test", False) \
+                        and not getattr(voice, "broken", {}) and getattr(voice, "skipped", 0) == skipped_before:
+                    store.put(ev.text, ev.voice, ev.speed, cache[key])
             a = cache[key]
             if glue and len(a) > 4 * cut:
                 a = a[cut:]

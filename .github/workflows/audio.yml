@@ -78,10 +78,13 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           D=$(cat out/data.txt)
           mkdir -p /tmp/sito && cp docs/episodes.json /tmp/sito/ && cp "docs/posts/$D.json" /tmp/sito/post.json
+          rm -rf /tmp/fisse && cp -r voci-fisse /tmp/fisse 2>/dev/null || true
           git checkout -- docs && git clean -fdq docs
+          git checkout -- voci-fisse 2>/dev/null || true; git clean -fdq voci-fisse 2>/dev/null || true
           git pull --rebase origin main
           python ripubblica.py "$D" /tmp/sito
-          git add docs
+          if [ -d /tmp/fisse ]; then rm -rf voci-fisse && cp -r /tmp/fisse voci-fisse; fi
+          git add docs voci-fisse 2>/dev/null || git add docs
           git commit -m "Audio del $D" || echo "Niente da aggiornare"
           git push
 

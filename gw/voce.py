@@ -300,6 +300,7 @@ class Voices:
                 parts.append(_soften(_trim(self._engine(kind).say(text, name, speed)), _is_female(name)))
             except Exception as e:
                 print(f"Coro: salto la voce {v} ({e})")
+                self.skipped += 1
         parts = [p for p in parts if len(p)]
         if not parts:
             return self.say(text, self.fallback, speed)
@@ -323,6 +324,7 @@ class Voices:
 
     def __init__(self, test=False, fallback="im_nicola"):
         self.test = test
+        self.skipped = 0      # voci del coro saltate perché non hanno risposto
         self.engines = {}
         self.fallback = fallback
         self.broken = {}      # motore → errore, se ha smesso di funzionare in questa esecuzione

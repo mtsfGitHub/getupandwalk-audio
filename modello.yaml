@@ -7,6 +7,7 @@
 #   MF: "testo"         → le due voci insieme, in coro (ogni riga va a tempo)
 #   M|F: "testo"        → (dentro per_ogni_domanda) le voci si alternano: la prima M, la seconda F, …
 #   coro_piccolo / coro_grande: "testo" → le voci elencate qui sotto in "voci", tutte insieme
+#   crescendo: [2, 4, 8, 12, 16] → (accanto a un coro) quante voci a ogni riga: il coro si allarga
 #   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
 #   pausa: 10           → secondi di pausa, con la musica
 #   musica: 8           → secondi di sola musica
@@ -89,14 +90,17 @@ scaletta:
     fondo: accordo
     elementi:
       - M: "Una citazione di {citazione_fonte_letta}"
+        velocita: 0.92
       - pausa: 5
       - F: "{citazione}"
+        velocita: 0.92
       - musica: 8
 
   - sezione: Mi preparo
     fondo: accordo
     elementi:
       - M: "Mi preparo."
+        velocita: 0.92
       - pausa: 5
       - F: |-
           Chiudo gli occhi, [pausa breve]
@@ -104,6 +108,7 @@ scaletta:
           mi concentro sul momento presente,
           [pausa lunga]
           Esprimo interiormente il mio desiderio di stare alla presenza del Signore.
+        velocita: 0.92
       - pausa: 4
 
   - sezione: Entro nel testo
@@ -120,8 +125,8 @@ scaletta:
         pausa_punto: 2
         fondo: nessuna
       - pausa: 10
-        fondo: giorno
         sfumatura_entrata: 9
+        fondo: giorno
 
   - sezione: Mi lascio ispirare
     se: commento
@@ -167,7 +172,7 @@ scaletta:
         volume_musica: 0.5
         sfumatura: 8
       - F: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
-        velocita: 0.92
+        velocita: 0.82
       - pausa: 5
       - M: "Padre nostro,"
         velocita: 0.92
@@ -183,6 +188,7 @@ scaletta:
           ma liberaci dal male.
           Amen.
         velocita: 0.92
+        crescendo: [2, 4, 8, 12, 16]
 
   - sezione: Chiusura
     elementi:

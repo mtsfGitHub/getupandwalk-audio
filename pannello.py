@@ -96,6 +96,8 @@ def export(day):
                     item[f] = el[k]
             if item.get("kind") == "say" and who.startswith("coro"):
                 item["coro"] = who
+                if "crescendo" in el:
+                    item["grow"] = el["crescendo"]
             if item.get("kind") == "say" and alt:
                 item["alt"] = alt
             if grp:
@@ -205,6 +207,8 @@ def _element(el, ind):
                 lines += _element(sub, ind + "    ")
         elif isinstance(v, (int, float)):
             lines.append(f"{lead}{k}: {_num(v)}")
+        elif isinstance(v, list):
+            lines.append(f"{lead}{k}: [" + ", ".join(_num(x) for x in v) + "]")
         elif "\n" in str(v):
             lines.append(f"{lead}{k}: |-")
             lines += [ind + "    " + l for l in str(v).split("\n")]
@@ -279,6 +283,8 @@ def convert(it, notes):
         el["pausa_a_capo"] = it["nlp"]
     if it.get("dotp") is not None:
         el["pausa_punto"] = it["dotp"]
+    if it.get("grow") and str(who).startswith("coro"):
+        el["crescendo"] = it["grow"]
     if it.get("fondo"):
         el["fondo"] = it["fondo"]
     return el

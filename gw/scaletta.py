@@ -190,17 +190,26 @@ def build_events(model, values):
                          "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
             speed = base * float(it.get("velocita", 1.0))
             text = apply_pronunciation(text, model.get("pronuncia"))
+            # "crescendo: [2, 4, 8, 12, 16]": il coro si allarga riga dopo riga (l'ultimo numero vale per il resto)
+            grow = it.get("crescendo") if who.startswith("coro") else None
+            line = 0
             for tok in _tokens(text, model, it.get("pausa_a_capo"), it.get("pausa_punto")):
                 if tok[0] == "pause":
                     events.append(Event("gap", secs=tok[1], section=section, bed=bed))
                 else:
                     t = speakable(tok[1])
                     if t and re.search(r"\w", t):
+                        if grow:
+                            names = voices.get(who) or [voices["struttura"], voices["contenuti"]]
+                            voice = "coro:" + "|".join(names[:max(1, int(grow[min(line, len(grow) - 1)]))])
+                            line += 1
+                        # le brevi citazioni rallentano un poco, ma mai troppo
+                        sp = max(speed * tok[2], min(speed, 0.85))
                         for j, piece in enumerate(t.split("|")):      # "comprà|tevene": pezzi incollati
                             if j:
                                 events.append(Event("gap", secs=0.0, section=section, bed=bed))
                             if piece.strip():
-                                events.append(Event("speak", text=piece.strip(), voice=voice, speed=speed * tok[2],
+                                events.append(Event("speak", text=piece.strip(), voice=voice, speed=sp,
                                                     section=section, bed=bed))
             events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed))
 

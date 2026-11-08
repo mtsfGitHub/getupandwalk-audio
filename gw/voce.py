@@ -220,7 +220,7 @@ class Voices:
             off = pad + int(rng.uniform(-0.05, 0.05) * RATE)
             mix[off:off + n] += s * rng.uniform(0.75, 1.0)
         mix /= np.sqrt(len(parts))
-        return _trim(_filter(mix, "lowpass=f=6500,highshelf=f=3500:g=-3") * 0.9)
+        return _trim(_filter(mix, "lowpass=f=8000,highshelf=f=3500:g=-1.5") * 0.9)
 
     def say_both(self, text, v1, v2, speed):
         """Le due voci insieme, come in coro: la più veloce si adatta alla più lenta."""
@@ -281,7 +281,8 @@ SIBILANT = ("giuseppe", "diego")      # voci con le "s" troppo taglienti
 def _deess(a, name):
     """Attenua solo le "s" (de-esser): non tocca il resto della voce."""
     if any(v in name.lower() for v in SIBILANT) and len(a) > RATE // 10:
-        return _filter(a, "deesser=i=0.3:m=0.5:f=0.5")
+        # metà voce originale e metà filtrata: le "s" si attenuano, il timbro resta quello di prima
+        return (0.5 * a + 0.5 * _filter(a, "deesser=i=0.3:m=0.5:f=0.5")).astype(np.float32)
     return a
 
 
@@ -304,9 +305,10 @@ def _soften(a, female):
     """Nel coro le voci femminili, insieme, diventano acute e aspre: si scuriscono di un semitono
     e si smussano gli acuti. Le voci maschili si smussano appena."""
     if female:
-        return _filter(a, f"asetrate={int(RATE * 0.944)},aresample={RATE},atempo=1.0593,"
-                          "highshelf=f=2800:g=-6,lowpass=f=5500")
-    return _filter(a, "highshelf=f=4000:g=-3")
+        # via di mezzo: mezzo semitono più scure, acuti smussati senza spegnerli
+        return _filter(a, f"asetrate={int(RATE * 0.9715)},aresample={RATE},atempo=1.0293,"
+                          "highshelf=f=2800:g=-3.5,lowpass=f=7000")
+    return _filter(a, "highshelf=f=4000:g=-1.5")
 
 
 def _stretch(a, length):

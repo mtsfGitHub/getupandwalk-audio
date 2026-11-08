@@ -131,5 +131,145 @@
   "velocita": 0.88,
   "creato": "2026-11-08",
   "usato": "2026-11-08"
+ },
+ "e6474138e2b6362a": {
+  "testo": "Mi preparo.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "4b795f73238aa6c1": {
+  "testo": "Chiudo gli occhi,",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "5a0d221e88ad0493": {
+  "testo": "libero la mente da preoccupazioni e pensieri",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "5d21fefc8d44d391": {
+  "testo": "mi concentro sul momento presente,",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "3a69201e82ef7016": {
+  "testo": "Esprimo interiormente il mio desiderio di stare alla presenza del Signore.",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "a3b96d9c3b95516c": {
+  "testo": "Ascolta questo passaggio dal Vangelo secondo san Matteo.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 1.0,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "5f4cf2ddd0c9a989": {
+  "testo": "Mi lascio ispirare.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "cf5d041e7d880f04": {
+  "testo": "Nel riascoltare il Vangelo, provo a visualizzare la scena:",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "cf38ebea467a7946": {
+  "testo": "il luogo in cui avviene:",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "45d42f37f9566fb3": {
+  "testo": "i personaggi principali:",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "5413f8f3885c2753": {
+  "testo": "le parole che si scambiano:",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "9b7c714d27c92573": {
+  "testo": "il tono delle voci:",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "3c8dea51611b8835": {
+  "testo": "i gesti.",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "de5f6f21bb407cc5": {
+  "testo": "Lascio affiorare il mio sentire, senza censure, senza giudizi.",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "cf340992f3794a46": {
+  "testo": "Quale parola o frase,",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "6ce0a8975fc43e9a": {
+  "testo": "cattura la mia attenzione in modo particolare?",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "b7044d2fd16be3ec": {
+  "testo": "Ritorno su qualcosa che si è mosso in me.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "d69d6aae363c03eb": {
+  "testo": "Ne posso parlare con il Signore, come un amico parla con un amico.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "4ed46a03fb61ab66": {
+  "testo": "Concludiamo la nostra preghiera unendoci a quella del Figlio.",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "723871e1165bd242": {
+  "testo": "Padre nostro che sei nei cieli, ⟦pausa⟧ sia santificato il tuo nome, ⟦pausa⟧ venga il tuo regno, ⟦pausa⟧ sia fatta la tua volontà, come in cielo così in terra. ⟦pausa⟧ Dacci oggi il nostro pane quotidiano, ⟦pausa⟧ e rimetti a noi i nostri debiti ⟦pausa⟧ come anche noi li rimettiamo ai nostri debitori, ⟦pausa⟧ e non abbandonarci alla tentazione, ⟦pausa⟧ ma liberaci dal male. ⟦pausa⟧ Amen.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural#tono-5#morbido#vol0.7",
+  "velocita": 0.88,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
  }
 }

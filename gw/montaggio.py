@@ -9,10 +9,10 @@ from .fondi import track
 from .musica import RATE
 
 # livello di ogni musica: da sola (musica), nelle pause, sotto la voce; e quanto lentamente sfuma (secondi)
-LEVELS = {"campane": {"music": 1.0, "pause": 0.55, "under": 0.38, "fade": 1.6},
-          "accordo": {"music": 1.0, "pause": 0.8, "under": 0.32, "fade": 1.4},
-          "liuto": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4},
-          "giorno": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4}}
+LEVELS = {"campane": {"music": 0.55, "pause": 0.55, "under": 0.38, "fade": 1.6},
+          "accordo": {"music": 0.55, "pause": 0.8, "under": 0.32, "fade": 1.4},
+          "liuto": {"music": 0.55, "pause": 0.75, "under": 0.28, "fade": 1.4},
+          "giorno": {"music": 0.55, "pause": 0.75, "under": 0.28, "fade": 1.4}}
 
 
 def render(events, voice, model, log=print):

@@ -1,0 +1,26 @@
+name: Prova pronuncia
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - run: pip install edge-tts==7.3.1 numpy scipy pyyaml requests beautifulsoup4
+      - run: python prova_pronuncia.py
+      - name: Pubblica la prova
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete prova-pronuncia -y --cleanup-tag 2>/dev/null || true
+          gh release create prova-pronuncia out/prova-pronuncia.mp3 --title "Prova pronuncia" --notes "Varianti di pronuncia" --prerelease

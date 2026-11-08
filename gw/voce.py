@@ -75,6 +75,11 @@ def _italian_ssml(tc, escaped_text):
 CARRIER = "Ecco una breve frase, detta in lingua italiana:"
 
 
+def _with_phonemes(ssml):
+    import re
+    return re.sub(r"⟦ipa:([^|⟧]+)\|([^⟧]+)⟧", r"<phoneme alphabet='ipa' ph='\1'>\2</phoneme>", ssml)
+
+
 def _norm(w):
     import re
     return re.sub(r"[^\w]", "", w.lower())
@@ -139,7 +144,9 @@ class EdgeEngine:
         last, plain = None, False
         for attempt in range(4):
             use_it = self.force_italian and "Multilingual" in voice
-            ec.mkssml = _italian_ssml if use_it else self._orig_ssml
+            base_ssml = _italian_ssml if use_it else self._orig_ssml
+            # ⟦ipa:komˈpratevene|compratevene⟧ → pronuncia esatta con l'alfabeto fonetico (se il servizio lo accetta)
+            ec.mkssml = (lambda tc, t, f=base_ssml: _with_phonemes(f(tc, t))) if "⟦" in send else base_ssml
             # Le voci "multilingue" (Giuseppe) sulle frasi brevi scelgono l'inglese: la frase viene detta
             # dentro una frase italiana più lunga e poi si tiene solo il pezzo giusto.
             short = not plain and "Multilingual" in voice and len(text.split()) <= 10

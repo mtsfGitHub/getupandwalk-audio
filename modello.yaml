@@ -165,7 +165,7 @@ scaletta:
         sfumatura: 8
       - F: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
         velocita: 0.92
-      - pausa: 5
+      - pausa: 3
       - M: "Padre nostro, che sei nei cieli,"
         velocita: 0.92
       - MF: "sia santificato il tuo nome,"

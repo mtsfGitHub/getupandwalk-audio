@@ -20,6 +20,7 @@ KNOWN = [
 STOP = re.compile(r"^(TAG\b|TAG[A-Za-z]|Condividi|Iscriviti|Seguici|Da leggere|Vuoi ricevere)", re.I)
 ART = re.compile(r"\bsec\.|secolo|\b1[0-9]{3}\b|affresco|olio su|tela|tavola|chiesa|basilica|museo|volta|"
                  r"cappella|mosaico|particolare|scultura|dipinto|icona", re.I)
+CREDIT = re.compile(r"^\s*(©|\(c\)|foto\b|immagine\b|credit)|diritti riservati|realizzata con|riproduzione", re.I)
 SEPARATOR = re.compile(r"^[\*\-–—_\s]+$")
 BLOCKS = ["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "figcaption", "blockquote", "pre"]
 BOOKS = {"Mt": "Matteo", "Mc": "Marco", "Lc": "Luca", "Gv": "Giovanni"}
@@ -168,17 +169,20 @@ def parse_post(html, day, url):
         if re.match(r"^commento di\b", text, re.I):
             continue
         if cur is None:
-            preamble.append(text)
+            preamble.append((tag, text))
         elif text != post.author:
             cur.paras.append(text)
 
     post.sections = [s for s in post.sections if s.paras]
-    if preamble:
-        if len(preamble) >= 3 and ART.search(preamble[0]):
-            post.caption = preamble.pop(0).replace("\n", " ")
-        if len(preamble) >= 2:
-            post.quote_source = preamble[-1].replace("\n", " ")
-            post.quote_lines = [l for p in preamble[:-1] for l in p.split("\n")]
+    # didascalie dell'immagine e note di copyright: non vanno lette come citazione
+    captions = [t for tag, t in preamble if tag == "figcaption" or CREDIT.search(t)]
+    preamble = [t for tag, t in preamble if not (tag == "figcaption" or CREDIT.search(t))]
+    if len(preamble) >= 3 and ART.search(preamble[0]):
+        captions.append(preamble.pop(0))
+    post.caption = " ".join(c.replace("\n", " ") for c in captions)
+    if len(preamble) >= 2:
+        post.quote_source = preamble[-1].replace("\n", " ")
+        post.quote_lines = [l for p in preamble[:-1] for l in p.split("\n")]
     if not post.sections:
         raise RuntimeError("Non ho trovato le sezioni del post (Mi preparo, Entro nel testo…)")
     return post

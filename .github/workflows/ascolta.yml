@@ -1,0 +1,35 @@
+name: Ascolta (trascrizione di controllo)
+
+on:
+  workflow_dispatch:
+    inputs:
+      data:
+        description: "Data dell'audio AAAA-MM-GG"
+        required: true
+      inizio:
+        description: "Da quale secondo"
+        default: "0"
+      fine:
+        description: "A quale secondo (vuoto = fino alla fine)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  ascolta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - run: pip install faster-whisper
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          D="${{ github.event.inputs.data }}"
+          gh release download "$D" -p "getupandwalk-$D.mp3" -O audio.mp3
+          python tools/ascolta.py audio.mp3 "${{ github.event.inputs.inizio }}" ${{ github.event.inputs.fine }}

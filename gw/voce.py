@@ -204,11 +204,23 @@ class AzureEngine:
         h.update(extra or {})
         return h
 
+    REGIONS = ["westeurope", "italynorth", "northeurope", "francecentral", "germanywestcentral", "swedencentral",
+               "uksouth", "switzerlandnorth", "eastus", "eastus2", "westus", "westus2", "centralus"]
+
     def voices(self):
+        """Elenco delle voci; se l'area indicata non è quella della chiave, prova le aree più comuni."""
         import requests
-        r = requests.get(f"{self.base}/voices/list", headers=self._headers(), timeout=30)
-        r.raise_for_status()
-        return r.json()
+        tried = []
+        for region in [self.region] + [r for r in self.REGIONS if r != self.region]:
+            base = f"https://{region}.tts.speech.microsoft.com/cognitiveservices"
+            r = requests.get(f"{base}/voices/list", headers=self._headers(), timeout=30)
+            if r.status_code == 200:
+                if region != self.region:
+                    print(f"AREA GIUSTA: {region} (non {self.region}): conviene correggere AZURE_SPEECH_REGION")
+                self.region, self.base = region, base
+                return r.json()
+            tried.append(f"{region}={r.status_code}")
+        raise RuntimeError("Azure rifiuta la chiave in tutte le aree provate: " + ", ".join(tried))
 
     @staticmethod
     def ssml(text, voice, speed):

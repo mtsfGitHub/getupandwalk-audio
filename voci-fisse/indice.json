@@ -1,0 +1,51 @@
+{
+ "e44b65893e183f8e": {
+  "testo": "Mi preparo.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "89f61e9666085f8f": {
+  "testo": "Chiudo gli occhi,",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "b3b114fd2a664ef6": {
+  "testo": "libero la mente da preoccupazioni e pensieri",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "5b8c29eca8e7550f": {
+  "testo": "mi concentro sul momento presente,",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "b1f6f76c4d11fe68": {
+  "testo": "Esprimo interiormente il mio desiderio di stare alla presenza del Signore.",
+  "voce": "azure:it-IT-Isabella:DragonLatestNeural",
+  "velocita": 0.92,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "02953c518d289307": {
+  "testo": "Ascolta questo passaggio dal Vangelo secondo san Luca.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 1.0,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ },
+ "3cbe55b75e5716ac": {
+  "testo": "Mi lascio ispirare.",
+  "voce": "azure:it-IT-GiuseppeMultilingualNeural",
+  "velocita": 0.82,
+  "creato": "2026-11-08",
+  "usato": "2026-11-08"
+ }
+}

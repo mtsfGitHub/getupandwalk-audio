@@ -61,6 +61,13 @@ pause:
   a_capo: 1.2               # a ogni a capo e tra una battuta e l'altra
   due_punti: 1.0            # dopo i due punti
   punto_e_virgola: 1.0      # dopo il punto e virgola
+  punto_esclamativo: 0.7    # dopo il punto esclamativo, dove c'è il respiro dopo i punti
+  punto_interrogativo: 1.2  # dopo il punto di domanda, dove c'è il respiro dopo i punti
+
+# Parole che la voce pronuncia male: a sinistra come sono scritte, a destra come vanno lette
+# (basta l'accento sulla vocale giusta). Valgono per tutti i giorni.
+pronuncia:
+  compratevene: compràtevene
 
 musica:
   volume: 0.6               # 0 = niente musica, 1 = piena
@@ -158,6 +165,7 @@ scaletta:
         sfumatura: 8
       - F: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
         velocita: 0.92
+      - pausa: 5
       - M: "Padre nostro, che sei nei cieli,"
         velocita: 0.92
       - MF: "sia santificato il tuo nome,"

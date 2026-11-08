@@ -60,7 +60,9 @@ def speakable(t):
 
 def _tokens(text, cfg, nl_pause=None, dot_pause=None):
     """Testo → pezzi da leggere e pause (a capo, [pausa], due punti, brevi citazioni con altro passo)."""
-    nl, colon = cfg["pause"]["a_capo"], (cfg["pause"]["due_punti"], cfg["pause"].get("punto_e_virgola", 0.0))
+    p = cfg["pause"]
+    nl = p["a_capo"]
+    colon = (p["due_punti"], p.get("punto_e_virgola", 0.0), p.get("punto_esclamativo"), p.get("punto_interrogativo"))
     if nl_pause is not None:
         nl = float(nl_pause)
     out = []
@@ -82,12 +84,15 @@ def _refine(part, colon, dot_pause=None):
     if dot_pause:                       # un respiro dopo ogni punto, anche senza andare a capo
         sentences = [s for s in re.split(r"(?<=[.!?…])[»”\"’)]*\s+", part.strip()) if s.strip()]
         if len(sentences) > 1:
+            excl, quest = (colon[2], colon[3]) if isinstance(colon, tuple) and len(colon) > 3 else (None, None)
             for k, s in enumerate(sentences):
                 out += _refine(s, colon)
                 if k < len(sentences) - 1:
-                    out.append(("pause", float(dot_pause)))
+                    end = re.sub(r"[»”\"’)\s]+$", "", s)[-1:]
+                    pause = excl if end == "!" else quest if end == "?" else None
+                    out.append(("pause", float(dot_pause if pause is None else min(pause, dot_pause))))
             return out
-    colon, semi = colon if isinstance(colon, tuple) else (colon, 0.0)
+    colon, semi = (colon[0], colon[1]) if isinstance(colon, tuple) else (colon, 0.0)
     pieces = re.split(r"(?<=[:;])\s+", part.strip())
     for i, piece in enumerate(pieces):
         last = 0
@@ -104,6 +109,15 @@ def _refine(part, colon, dot_pause=None):
         if i < len(pieces) - 1 and piece.strip():
             out.append(("pause", semi if piece.rstrip().endswith(";") else colon))
     return out
+
+
+def apply_pronunciation(text, words):
+    """Parole che la voce sbaglia: si scrivono come vanno lette (es. compratevene → compràtevene)."""
+    for w, say in (words or {}).items():
+        def keep_case(m, say=say):
+            return say[:1].upper() + say[1:] if m.group(0)[:1].isupper() else say
+        text = re.sub(r"\b" + re.escape(w) + r"\b", keep_case, text, flags=re.I)
+    return text
 
 
 def fill_values(post, liturgia):
@@ -173,6 +187,7 @@ def build_events(model, values):
                 voice = {"M": voices["struttura"], "F": voices["contenuti"],
                          "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
             speed = base * float(it.get("velocita", 1.0))
+            text = apply_pronunciation(text, model.get("pronuncia"))
             for tok in _tokens(text, model, it.get("pausa_a_capo"), it.get("pausa_punto")):
                 if tok[0] == "pause":
                     events.append(Event("gap", secs=tok[1], section=section, bed=bed))

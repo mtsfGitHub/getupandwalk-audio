@@ -205,7 +205,7 @@ class Voices:
             try:
                 if self.test:
                     kind = "prova"
-                parts.append(_trim(self._engine(kind).say(text, name, speed)))
+                parts.append(_soften(_trim(self._engine(kind).say(text, name, speed)), _is_female(name)))
             except Exception as e:
                 print(f"Coro: salto la voce {v} ({e})")
         parts = [p for p in parts if len(p)]
@@ -220,11 +220,12 @@ class Voices:
             off = pad + int(rng.uniform(-0.05, 0.05) * RATE)
             mix[off:off + n] += s * rng.uniform(0.75, 1.0)
         mix /= np.sqrt(len(parts))
-        return _trim(mix * 0.9)
+        return _trim(_filter(mix, "lowpass=f=6500,highshelf=f=3500:g=-3") * 0.9)
 
     def say_both(self, text, v1, v2, speed):
         """Le due voci insieme, come in coro: la più veloce si adatta alla più lenta."""
-        a, b = self.say(text, v1, speed), self.say(text, v2, speed)
+        a = _soften(self.say(text, v1, speed), _is_female(v1))
+        b = _soften(self.say(text, v2, speed), _is_female(v2))
         n = max(len(a), len(b))
         return (_stretch(a, n) + _stretch(b, n)) * 0.62
 
@@ -254,6 +255,33 @@ class Voices:
             print(f"ATTENZIONE: {e}. Uso la voce di riserva ({self.fallback}).")
             self.broken[kind] = str(e)
             return self.say(text, self.fallback, speed)
+
+
+FEMALE = ("isabella", "elsa", "ava", "emma", "seraphina", "vivienne", "if_", "ef_", "pf_", "paola")
+
+
+def _is_female(name):
+    return any(f in name.lower() for f in FEMALE)
+
+
+def _filter(a, chain):
+    import subprocess
+    if len(a) == 0:
+        return a
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-f", "f32le", "-ar", str(RATE), "-ac", "1", "-i", "-",
+                          "-af", chain, "-f", "f32le", "-"],
+                         input=a.astype(np.float32).tobytes(), check=True, capture_output=True).stdout
+    b = np.frombuffer(raw, dtype=np.float32)
+    return np.pad(b, (0, max(0, len(a) - len(b))))[:len(a)]
+
+
+def _soften(a, female):
+    """Nel coro le voci femminili, insieme, diventano acute e aspre: si scuriscono di un semitono
+    e si smussano gli acuti. Le voci maschili si smussano appena."""
+    if female:
+        return _filter(a, f"asetrate={int(RATE * 0.944)},aresample={RATE},atempo=1.0593,"
+                          "highshelf=f=2800:g=-6,lowpass=f=5500")
+    return _filter(a, "highshelf=f=4000:g=-3")
 
 
 def _stretch(a, length):

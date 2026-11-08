@@ -144,7 +144,7 @@ scaletta:
     elementi:
       - F: |-
           Nel riascoltare il Vangelo, provo a visualizzare la scena, il luogo in cui avviene, i personaggi principali, le parole che si scambiano, il tono delle voci, i gesti. [pausa media] E lascio affiorare il mio sentire, senza censure, senza giudizi. [pausa media]
-          Quale parola o frase cattura la mia attenzione in modo particolare?
+          Quale parola o frase, cattura la mia attenzione in modo particolare?
         velocita: 0.82
       - pausa: 5
         sfumatura_uscita: 5
@@ -167,7 +167,7 @@ scaletta:
         sfumatura: 8
       - F: "Concludiamo la nostra preghiera unendoci alla preghiera del Figlio."
         velocita: 0.92
-      - pausa: 3
+      - pausa: 5
       - M: "Padre nostro, che sei nei cieli,"
         velocita: 0.92
       - MF: "sia santificato il tuo nome,"

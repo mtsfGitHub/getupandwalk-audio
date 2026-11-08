@@ -65,9 +65,10 @@ pause:
   punto_interrogativo: 1.2  # dopo il punto di domanda, dove c'è il respiro dopo i punti
 
 # Parole che la voce pronuncia male: a sinistra come sono scritte, a destra come vanno lette
-# (basta l'accento sulla vocale giusta). Valgono per tutti i giorni.
+# (con l'accento, oppure a pezzi separati da | che la voce dice e il programma incolla:
+#  così si sposta l'accento quando la voce non obbedisce). Valgono per tutti i giorni.
 pronuncia:
-  compratevene: compràtevene
+  compratevene: "comprà|tevene"
 
 musica:
   volume: 0.6               # 0 = niente musica, 1 = piena

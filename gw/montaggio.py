@@ -19,7 +19,16 @@ def render(events, voice, model, log=print):
     pieces, beds = [], []            # audio della voce; per ogni pezzo: (musica di fondo, livello)
     under = model["musica"].get("sotto_la_voce", True)
     cache = {}
+    glue = False                     # "comprà|tevene": i pezzi si toccano, senza il margine di silenzio
+    cut = int(0.018 * RATE)
     for i, ev in enumerate(events):
+        if ev.kind == "gap" and ev.secs == 0:
+            glue = True
+            if pieces and len(pieces[-1]) > 4 * cut:
+                pieces[-1] = pieces[-1][:-cut]
+                b = beds[-1]
+                beds[-1] = (b[0], len(pieces[-1]), b[2], b[3])
+            continue
         if ev.kind == "speak":
             key = (ev.text, ev.voice, round(ev.speed, 3))
             if key not in cache:
@@ -30,6 +39,9 @@ def render(events, voice, model, log=print):
                 else:
                     cache[key] = voice.say(ev.text, ev.voice, ev.speed)
             a = cache[key]
+            if glue and len(a) > 4 * cut:
+                a = a[cut:]
+            glue = False
             pieces.append(a)
             kind = "under"
         else:

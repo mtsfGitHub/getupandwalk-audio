@@ -167,7 +167,7 @@ scaletta:
       - F: |-
           Nel riascoltare il Vangelo, provo a visualizzare la scena: il luogo in cui avviene: i personaggi principali: le parole che si scambiano: il tono delle voci: i gesti. [pausa media] 
           Lascio affiorare il mio sentire, senza censure, senza giudizi. [pausa media]
-          Quale parola o frase cattura la mia attenzione in modo particolare?
+          Quale parola o frase, [pausa 0.5] cattura la mia attenzione in modo particolare?
         velocita: 0.82
       - pausa: 5
         sfumatura_uscita: 5
@@ -208,10 +208,9 @@ scaletta:
         morbido: true
         volume_voce: 0.7
         di_seguito: true
-        volume_musica: 0.4
 
   - sezione: Chiusura
     elementi:
       - musica: 10
-        volume_musica: 0.11
+        volume_musica: 0.28
         sfumatura_uscita: 10

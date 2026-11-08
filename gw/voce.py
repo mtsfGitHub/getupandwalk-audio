@@ -404,7 +404,7 @@ def _filter(a, chain):
     return np.pad(b, (0, max(0, len(a) - len(b))))[:len(a)]
 
 
-SIBILANT = ("giuseppe", "diego")      # voci con le "s" troppo taglienti
+SIBILANT = ()      # voci con le "s" troppo taglienti (nessuna, con Azure: il filtro mescolato dava un timbro metallico)
 
 
 def _breaks(ssml_text, ms=550):

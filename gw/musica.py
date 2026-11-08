@@ -102,9 +102,18 @@ def pavane(seconds, seed=7):
 def load_track(path, seconds):
     """Un brano vero (per esempio da Pray as you go), ripetuto fino alla durata richiesta."""
     import subprocess
-    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-ac", "1", "-ar", str(RATE), "-f", "f32le", "-"],
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-ac", "2", "-ar", str(RATE), "-f", "f32le", "-"],
                          check=True, capture_output=True).stdout
-    a = np.frombuffer(raw, dtype=np.float32)
+    st = np.frombuffer(raw, dtype=np.float32).reshape(-1, 2)
+    left, right = st[:, 0], st[:, 1]
+    corr = float(np.corrcoef(left, right)[0, 1]) if np.std(left) > 0 and np.std(right) > 0 else 1.0
+    if corr < 0.7:
+        # due microfoni lontani (registrazione col telefono): sommarli dà un suono metallico, "a pettine";
+        # meglio un canale solo, il più forte
+        a = left if np.mean(left ** 2) >= np.mean(right ** 2) else right
+    else:
+        a = (left + right) / 2
+    a = np.ascontiguousarray(a)
     need = int((seconds + 6) * RATE)
     reps = int(np.ceil(need / max(1, len(a))))
     a = np.tile(a, reps)[:need]

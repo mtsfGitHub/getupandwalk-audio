@@ -12,7 +12,7 @@ import numpy as np
 from .musica import RATE
 
 DIR = Path(__file__).resolve().parent.parent / "voci-fisse"
-VERSION = 1           # cambiarlo rigenera tutto (per esempio se cambia il modo di trattare le voci)
+VERSION = 2           # cambiarlo rigenera tutto (per esempio se cambia il modo di trattare le voci)
 KEEP_DAYS = 60        # una frase non più usata da tanto si cancella
 
 

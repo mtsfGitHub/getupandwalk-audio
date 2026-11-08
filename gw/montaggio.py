@@ -10,10 +10,12 @@ from .voce import level as voice_level
 from .musica import RATE
 
 # livello di ogni musica: da sola (musica), nelle pause, sotto la voce; e quanto lentamente sfuma (secondi)
-LEVELS = {"campane": {"music": 1.0, "pause": 0.55, "under": 0.38, "fade": 1.6},
-          "accordo": {"music": 1.0, "pause": 0.8, "under": 0.32, "fade": 1.4},
-          "liuto": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4},
-          "giorno": {"music": 1.0, "pause": 0.75, "under": 0.28, "fade": 1.4}}
+# (con volume 0.45 nel modello: musica da sola 18 dB sotto la voce, nelle pause 20 dB, sotto la voce 29 dB,
+#  come durante il Padre nostro)
+LEVELS = {"campane": {"music": 0.4, "pause": 0.32, "under": 0.11, "fade": 1.6},
+          "accordo": {"music": 0.4, "pause": 0.32, "under": 0.11, "fade": 1.4},
+          "liuto": {"music": 0.4, "pause": 0.32, "under": 0.11, "fade": 1.4},
+          "giorno": {"music": 0.4, "pause": 0.32, "under": 0.11, "fade": 1.4}}
 
 
 VOICE_DB = -20.0      # volume di ogni frase (dBFS, misurato dove c'è voce)
@@ -79,6 +81,13 @@ def render(events, voice, model, log=print, marks=None, store=None):
     tail = int(3.5 * RATE)
     pieces.append(np.zeros(tail, dtype=np.float32)); beds.append(("nessuna", tail, 0.0, (0.0, 0.0)))
     speech = np.concatenate(pieces)
+    # voci un po' meno squillanti: acuti smussati con dolcezza, su tutto il parlato
+    tone = model.get("musica", {}).get("smussa_voci", "highshelf=f=4500:g=-2.5,highshelf=f=8000:g=-2")
+    if tone and not getattr(voice, "test", False):
+        from .voce import _filter
+        speech = _filter(speech, tone)[:len(speech)]
+        if len(speech) < sum(len(p) for p in pieces):
+            speech = np.pad(speech, (0, sum(len(p) for p in pieces) - len(speech)))
     secs = len(speech) / RATE
     vol = float(model["musica"].get("volume", 0.6))
     mix = speech.copy()
@@ -151,7 +160,7 @@ def to_mp3(audio, path, title, artist, album, comment=""):
         pass
     cmd = ["ffmpeg", "-y", "-v", "error", "-f", "f32le", "-ar", str(RATE), "-ac", "1", "-i", "-",
            "-af", norm, "-ar", "44100", "-ac", "1",
-           "-codec:a", "libmp3lame", "-b:a", "96k",
+           "-codec:a", "libmp3lame", "-b:a", "128k",
            "-metadata", f"title={title}", "-metadata", f"artist={artist}", "-metadata", f"album={album}",
            "-metadata", f"comment={comment}", str(path)]
     subprocess.run(cmd, input=audio.tobytes(), check=True)

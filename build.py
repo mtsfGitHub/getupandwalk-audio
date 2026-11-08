@@ -61,7 +61,13 @@ def main():
     if args.html:
         post = parse_post(Path(args.html).read_text("utf-8"), day, "https://getupandwalk.gesuiti.it/")
     else:
-        post = fetch_post(day)
+        try:
+            post = fetch_post(day)
+        except RuntimeError as e:
+            if "Nessun post" in str(e):
+                print(f"{e}: forse non è ancora uscito.")
+                return 3
+            raise
     print(f"Post: {post.title} — {post.ref} — {post.author}\n  {post.url}")
     print("Sezioni trovate: " + ", ".join(f"{s.label} ({len(s.paras)})" for s in post.sections))
     if post.quote_lines:

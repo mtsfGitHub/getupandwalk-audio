@@ -2,9 +2,13 @@ name: Audio del giorno
 
 on:
   schedule:
-    - cron: "41 3 * * *"   # ogni notte verso le 4:40 (ora italiana d'inverno), dopo l'uscita del post
-    - cron: "13 4 * * *"   # riserve, se GitHub ritarda la prima: se l'audio del giorno c'è già, non fanno nulla
-    - cron: "47 4 * * *"
+    # il post esce verso le 00:10: primo tentativo alle 00:30 (ora italiana d'inverno), poi riprove
+    # se GitHub ritarda o il post non c'è ancora; se l'audio del giorno c'è già, non fanno nulla
+    - cron: "30 23 * * *"
+    - cron: "30 0 * * *"
+    - cron: "13 2 * * *"
+    - cron: "41 3 * * *"
+    - cron: "47 4 * * *"   # ultimo tentativo: se il post non c'è ancora, arriva la mail
   workflow_dispatch:
     inputs:
       data:
@@ -70,12 +74,23 @@ jobs:
           key: kokoro-82m-v1
 
       - name: Crea l'audio
+        id: build
         env:
           AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
           AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
-        run: python build.py --data "${{ github.event.inputs.data }}"
+        run: |
+          set +e
+          python build.py --data "${{ github.event.inputs.data }}"
+          rc=$?
+          if [ $rc -eq 3 ] && [ "${{ github.event_name }}" = "schedule" ] && [ "$(date +%H)" -lt 5 ]; then
+            echo "Il post di oggi non è ancora uscito: ci riprova il prossimo avvio."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          exit $rc
 
       - name: Pubblica l'MP3
+        if: steps.build.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -87,13 +102,14 @@ jobs:
           fi
 
       - name: Avvisa per mail se è stata usata la voce di riserva
-        if: hashFiles('out/avviso.md') != ''
+        if: steps.build.outputs.skip != 'true' && (hashFiles('out/avviso.md') != '')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh issue create --title "Audio del $(cat out/data.txt) con la voce di riserva" --body-file out/avviso.md
 
       - name: Aggiorna la pagina e il feed
+        if: steps.build.outputs.skip != 'true'
         run: |
           git config user.name "audio-del-giorno"
           git config user.email "actions@users.noreply.github.com"

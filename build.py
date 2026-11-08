@@ -5,6 +5,7 @@ Uso:  python build.py                 → oggi (ora italiana)
       python build.py --voce prova    → toni al posto delle voci, per provare il montaggio
 """
 import argparse
+import re
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -24,16 +25,24 @@ NAMES = {"it-IT-DiegoNeural": "Diego", "it-IT-ElsaNeural": "Elsa", "it-IT-Isabel
          "it-IT-GiuseppeNeural": "Giuseppe", "im_nicola": "Nicola", "if_sara": "Sara"}
 
 
+def _person(spec):
+    """edge:it-IT-GiuseppeNeural → Giuseppe; azure:it-IT-Alessio:DragonLatestNeural → Alessio"""
+    n = spec.split(":", 1)[-1]
+    m = re.match(r"[a-z]{2}-[A-Z]{2}-([A-Za-z]+?)(Multilingual)?(Neural)?(:|$)", n)
+    return NAMES.get(n, m.group(1) if m else n)
+
+
 def voices_label(model, voice):
     specs = [model["voci"]["struttura"], model["voci"]["contenuti"]]
     if any(s.split(":")[0] in voice.broken for s in specs if ":" in s):
-        specs = [voice.fallback]
+        specs = [voice._reserve(s.split(":")[0], s.split(":", 1)[-1]) for s in specs]
     names = []
     for s in specs:
-        n = NAMES.get(s.split(":")[-1], s.split(":")[-1])
+        n = _person(s)
         if n not in names:
             names.append(n)
-    engine = "Microsoft Edge" if specs[0].startswith("edge:") else "Kokoro" if ":" not in specs[0] or specs[0].startswith("kokoro:") else specs[0].split(":")[0].capitalize()
+    kind = specs[0].split(":")[0] if ":" in specs[0] else "kokoro"
+    engine = {"edge": "Microsoft Edge", "azure": "Microsoft Azure", "kokoro": "Kokoro"}.get(kind, kind.capitalize())
     return " e ".join(names) + f", {engine}"
 
 
@@ -103,7 +112,7 @@ def main():
     (out / "data.txt").write_text(tag)
     if voice.broken:
         (out / "avviso.md").write_text(
-            f"L'audio del {day:%d/%m/%Y} è uscito con la voce di riserva ({voice.fallback}), "
+            f"L'audio del {day:%d/%m/%Y} è uscito con le voci di riserva ({voices_label(model, voice)}), "
             f"perché le voci scelte non hanno funzionato:\n\n"
             + "\n".join(f"- {k}: {v}" for k, v in voice.broken.items())
             + "\n\nSe succede più giorni di fila, il servizio potrebbe essere cambiato: scrivilo a Claude.\n")

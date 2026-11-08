@@ -7,7 +7,7 @@
 #   MF: "testo"         → le due voci insieme, in coro (ogni riga va a tempo)
 #   M|F: "testo"        → (dentro per_ogni_domanda) le voci si alternano: la prima M, la seconda F, …
 #   coro_piccolo / coro_grande: "testo" → le voci elencate qui sotto in "voci", tutte insieme
-#   crescendo: [2, 4, 8, 12, 16] → (accanto a un coro) quante voci a ogni riga: il coro si allarga
+#   crescendo: [2, 4, 8, 12, 20] → (accanto a un coro) quante voci a ogni riga: il coro si allarga
 #   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
 #   pausa: 10           → secondi di pausa, con la musica
 #   musica: 8           → secondi di sola musica
@@ -31,16 +31,21 @@
 #   (citazione, vangelo, commento, domande).
 
 voci:
-  struttura: edge:it-IT-GiuseppeNeural   # voce maschile di Edge (tutte le parti maschili); alternativa solo italiana: edge:it-IT-DiegoNeural
-  contenuti: edge:it-IT-IsabellaNeural   # voce femminile di Edge (citazione, Vangelo, commento, domande, preghiere); alternativa: edge:it-IT-ElsaNeural
+  # azure: = voci di Azure (vedi la pagina "campioni" del sito); se Azure non risponde si usano Giuseppe e Isabella di Edge
+  struttura: azure:it-IT-Alessio:DragonLatestNeural    # voce maschile (tutte le parti maschili); prima: edge:it-IT-GiuseppeNeural
+  contenuti: azure:it-IT-Isabella:DragonLatestNeural   # voce femminile (citazione, Vangelo, commento, domande); prima: edge:it-IT-IsabellaNeural
   coro_piccolo:                          # chi recita la prima parte del Padre nostro
     - edge:it-IT-GiuseppeNeural
     - edge:it-IT-IsabellaNeural
     - edge:it-IT-DiegoNeural
     - edge:it-IT-ElsaNeural
-  coro_grande:                           # da "Dacci oggi": italiani e voci di altri paesi che parlano italiano
+  coro_grande:                           # il Padre nostro: italiani e voci di altri paesi che parlano italiano (in quest'ordine entrano)
+    - azure:it-IT-Alessio:DragonLatestNeural
+    - azure:it-IT-Isabella:DragonLatestNeural
     - edge:it-IT-GiuseppeNeural
     - edge:it-IT-IsabellaNeural
+    - azure:it-IT-FabiolaNeural
+    - azure:it-IT-MarcelloMultilingualNeural
     - edge:it-IT-DiegoNeural
     - edge:it-IT-ElsaNeural
     - edge:en-US-AndrewMultilingualNeural
@@ -188,7 +193,7 @@ scaletta:
           ma liberaci dal male.
           Amen.
         velocita: 0.92
-        crescendo: [2, 4, 8, 12, 16]
+        crescendo: [2, 4, 8, 12, 20]
 
   - sezione: Chiusura
     elementi:

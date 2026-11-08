@@ -52,7 +52,7 @@ def render(events, voice, model, log=print, marks=None):
             kind = "under"
             if marks is not None:
                 pos = sum(len(p) for p in pieces[:-1]) / RATE
-                marks.append((round(pos, 2), round(pos + len(a) / RATE, 2), ev.section, ev.voice.split(":")[-1][:24], ev.text[:50]))
+                marks.append((round(pos, 2), round(pos + len(a) / RATE, 2), ev.section, ev.voice.split(":", 1)[-1][:30], ev.text[:50]))
         else:
             a = np.zeros(int(ev.secs * RATE), dtype=np.float32)
             pieces.append(a)

@@ -222,11 +222,14 @@ class AzureEngine:
             tried.append(f"{region}={r.status_code}")
         raise RuntimeError("Azure rifiuta la chiave in tutte le aree provate: " + ", ".join(tried))
 
-    @staticmethod
-    def ssml(text, voice, speed):
+    no_lang = set()
+
+    @classmethod
+    def ssml(cls, text, voice, speed):
         from xml.sax.saxutils import escape
         rate = f"{round((speed - 1) * 100):+d}%"
-        multi = "Multilingual" in voice or "DragonHD" in voice     # solo queste accettano <lang>
+        # le voci multilingue (anche Dragon e MAI) vanno tenute sull'italiano, se lo accettano
+        multi = ("Multilingual" in voice or ":" in voice) and voice not in cls.no_lang
         open_lang, close_lang = ("<lang xml:lang='it-IT'>", "</lang>") if multi else ("", "")
         return ("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
                 "xmlns:mstts='https://www.w3.org/2001/mstts' xml:lang='it-IT'>"
@@ -248,6 +251,11 @@ class AzureEngine:
                     "X-Microsoft-OutputFormat": "riff-24khz-16bit-mono-pcm"}))
                 if r.status_code == 429 or r.status_code >= 500:
                     raise RuntimeError(f"Azure {r.status_code}")
+                if r.status_code == 400 and voice not in self.no_lang and "<lang" in body.decode():
+                    print(f"Azure: la voce {voice} non accetta la lingua dichiarata, riprovo senza")
+                    self.no_lang.add(voice)
+                    body = self.ssml(text, voice, speed).encode("utf-8")
+                    continue
                 if r.status_code != 200:
                     raise PermissionError(f"Azure {r.status_code}: {r.text[:200]}")
                 with wave.open(io.BytesIO(r.content)) as w:
@@ -284,6 +292,8 @@ class Voices:
         parts = []
         for v in voices:
             kind, _, name = v.partition(":") if ":" in v else ("kokoro", "", v)
+            if kind in self.broken:
+                continue
             try:
                 if self.test:
                     kind = "prova"
@@ -325,21 +335,29 @@ class Voices:
                                   "azure": AzureEngine, "prova": TestEngine}[kind]()
         return self.engines[kind]
 
+    def _reserve(self, kind, name):
+        """Se Azure non risponde (limite gratuito finito, chiave scaduta…) si torna alle voci di Edge."""
+        if kind == "azure" and "edge" not in self.broken:
+            return "edge:it-IT-IsabellaNeural" if _is_female(name) else "edge:it-IT-GiuseppeNeural"
+        return self.fallback
+
     def say(self, text, voice, speed):
         kind, _, name = voice.partition(":") if ":" in voice else ("kokoro", "", voice)
         if kind in self.broken:
-            return self.say(text, self.fallback, speed)
+            return self.say(text, self._reserve(kind, name), speed)
         try:
             return _deess(_trim(self._engine(kind).say(text, name, speed)), name)
         except Exception as e:
             if voice == self.fallback:
                 raise
-            print(f"ATTENZIONE: {e}. Uso la voce di riserva ({self.fallback}).")
+            reserve = self._reserve(kind, name)
+            print(f"ATTENZIONE: {e}. Uso la voce di riserva ({reserve}).")
             self.broken[kind] = str(e)
-            return self.say(text, self.fallback, speed)
+            return self.say(text, reserve, speed)
 
 
-FEMALE = ("isabella", "elsa", "ava", "emma", "seraphina", "vivienne", "if_", "ef_", "pf_", "paola")
+FEMALE = ("isabella", "elsa", "ava", "emma", "seraphina", "vivienne", "if_", "ef_", "pf_", "paola",
+          "fabiola", "fiamma", "imelda", "irma", "palmira", "pierina", "rosa", "harper")
 
 
 def _is_female(name):

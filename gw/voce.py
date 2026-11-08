@@ -252,12 +252,23 @@ class AzureEngine:
         import requests
         body = self.ssml(text, voice, speed, pitch).encode("utf-8")
         last = None
-        for attempt in range(4):
+        for attempt in range(10):
             try:
                 r = requests.post(f"{self.base}/v1", data=body, timeout=60, headers=self._headers({
                     "Content-Type": "application/ssml+xml",
                     "X-Microsoft-OutputFormat": "riff-24khz-16bit-mono-pcm"}))
-                if r.status_code == 429 or r.status_code >= 500:
+                if r.status_code == 429:
+                    # il piano gratuito accetta circa 20 richieste al minuto: si aspetta e si riprova
+                    try:
+                        wait = float(r.headers.get("Retry-After", 0))
+                    except ValueError:
+                        wait = 0
+                    wait = max(wait, min(60, 15 * (attempt + 1)))
+                    print(f"Azure: troppe richieste, aspetto {wait:.0f} s")
+                    time.sleep(wait)
+                    last = RuntimeError("Azure 429")
+                    continue
+                if r.status_code >= 500:
                     raise RuntimeError(f"Azure {r.status_code}")
                 if r.status_code == 400 and voice not in self.no_lang and "<lang" in body.decode():
                     print(f"Azure: la voce {voice} non accetta la lingua dichiarata, riprovo senza")

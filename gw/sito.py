@@ -97,7 +97,7 @@ header.top a{{color:inherit;text-decoration:none;display:flex;align-items:center
 @media (max-width:560px){{header.top img{{width:64px;height:64px}}header.top .in,header.top a{{gap:14px}}}}
 .banda{{background:var(--grigio)}}
 .banda .in{{padding-block:16px;font-family:var(--ft);font-size:clamp(24px,3.6vw,32px);letter-spacing:.16em;text-transform:uppercase;color:var(--nero)}}
-main .in{{padding-block:32px 48px;display:flex;flex-direction:column;gap:40px}}
+main .in{{padding-block:32px 48px;display:flex;flex-direction:column;gap:28px}}
 .oggi{{background:var(--grigio);padding:24px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;align-items:start}}
 @media (max-width:820px){{.oggi{{grid-template-columns:1fr;gap:24px;padding:16px}}}}
 .oggi img{{width:100%;height:auto;display:block;max-width:100%}}
@@ -147,7 +147,7 @@ display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
   header.top .sotto{{display:none}}
   .banda .in{{padding-block:6px;font-size:clamp(16px,4.6vw,22px);letter-spacing:.14em;
     padding-left:calc(max(16px,env(safe-area-inset-left,0px)) + 52px)}}
-  main .in{{padding-block:20px 36px;gap:28px}}
+  main .in{{padding-block:20px 36px;gap:20px}}
   .oggi{{grid-template-columns:1fr;gap:18px;padding:12px}}
   .info{{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 18px;align-items:start;width:100%}}
   .info .cal{{width:clamp(104px,24vw,168px);height:clamp(100px,22vw,148px)}}
@@ -201,7 +201,7 @@ footer a{{color:#fff}}
       </div>
     </div>
   </section>
-  {"<section><h2>Gli ultimi giorni</h2><ul class='giorni' id='giorni'>" + cards + "</ul>" + ("<button type='button' class='altri' id='altri'>Mostra tutti i giorni</button>" if len(eps) > 7 else "") + "</section>" if len(eps) > 1 else ""}
+  {"<section aria-label='Gli ultimi giorni'><ul class='giorni' id='giorni'>" + cards + "</ul>" + ("<button type='button' class='altri' id='altri'>Mostra tutti i giorni</button>" if len(eps) > 7 else "") + "</section>" if len(eps) > 1 else ""}
 </div></main>
 <footer><div class="in">Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci generate al computer<span id="voci" hidden></span></div></footer>
 <script>

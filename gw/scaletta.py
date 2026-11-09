@@ -197,53 +197,63 @@ def build_events(model, values):
             who = next((k for k in ("coro_grande", "coro_piccolo", "M|F", "F|M", "MF", "M", "F") if k in it), None)
             if not who:
                 continue
-            # fissa = senza parti che cambiano ogni giorno (l'evangelista sono solo quattro)
-            fixed = "|" not in who and set(re.findall(r"\{(\w+)\}", str(it[who]))) <= {"evangelista"}
-            text = fill(it[who], extra).strip()
-            if "|" in who:                      # voci alternate: una domanda ciascuno
-                who = who.split("|")[(extra or {}).get("_n", 0) % 2]
-            if not text or re.search(r"\{\w+\}", text):
-                continue
-            if who.startswith("coro"):
-                voice = "coro:" + "|".join(voices.get(who) or [voices["struttura"], voices["contenuti"]])
-            else:
-                voice = {"M": voices["struttura"], "F": voices["contenuti"],
-                         "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
-            speed = base * float(it.get("velocita", 1.0))
-            text = apply_pronunciation(text, model.get("pronuncia"))
-            if it.get("di_seguito"):
-                # tutto in una sola lettura, con un breve respiro a fine riga: l'intonazione resta continua
-                t = " ⟦pausa⟧ ".join(speakable(r) for r in text.split("\n") if r.strip())
-                events.append(Event("speak", text=t, voice=voice, speed=speed, section=section, bed=bed, vol=vol,
-                                    fixed=fixed, pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
-                                    gain=float(it.get("volume_voce", 1.0))))
-                events.append(Event("gap", secs=float(model.get("pause", {}).get("a_capo", 1.2)), section=section,
-                                    bed=bed, vol=vol))
-                continue
-            # "crescendo: [2, 4, 8, 12, 16]": il coro si allarga riga dopo riga (l'ultimo numero vale per il resto)
-            grow = it.get("crescendo") if who.startswith("coro") else None
-            line = 0
-            for tok in _tokens(text, model, it.get("pausa_a_capo"), it.get("pausa_punto")):
-                if tok[0] == "pause":
-                    events.append(Event("gap", secs=tok[1], section=section, bed=bed, vol=vol))
+            start = len(events)
+            try:
+                # fissa = senza parti che cambiano ogni giorno (l'evangelista sono solo quattro)
+                fixed = "|" not in who and set(re.findall(r"\{(\w+)\}", str(it[who]))) <= {"evangelista"}
+                text = fill(it[who], extra).strip()
+                if "|" in who:                      # voci alternate: una domanda ciascuno
+                    who = who.split("|")[(extra or {}).get("_n", 0) % 2]
+                if not text or re.search(r"\{\w+\}", text):
+                    continue
+                if who.startswith("coro"):
+                    voice = "coro:" + "|".join(voices.get(who) or [voices["struttura"], voices["contenuti"]])
                 else:
-                    t = speakable(tok[1])
-                    if t and re.search(r"\w", t):
-                        if grow:
-                            names = voices.get(who) or [voices["struttura"], voices["contenuti"]]
-                            voice = "coro:" + "|".join(names[:max(1, int(grow[min(line, len(grow) - 1)]))])
-                            line += 1
-                        # le brevi citazioni rallentano un poco, ma mai troppo
-                        sp = max(speed * tok[2], min(speed, 0.85))
-                        for j, piece in enumerate(re.split(r"\|(?![^⟦]*⟧)", t)):      # "comprà|tevene": pezzi incollati
-                            if j:
-                                events.append(Event("gap", secs=0.0, section=section, bed=bed, vol=vol))
-                            if piece.strip():
-                                events.append(Event("speak", text=piece.strip(), voice=voice, speed=sp,
-                                                    section=section, bed=bed, vol=vol, fixed=fixed,
-                                                    pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
-                                                    gain=float(it.get("volume_voce", 1.0))))
-            events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed, vol=vol))
+                    voice = {"M": voices["struttura"], "F": voices["contenuti"],
+                             "MF": voices["struttura"] + "|" + voices["contenuti"]}[who]
+                speed = base * float(it.get("velocita", 1.0))
+                text = apply_pronunciation(text, model.get("pronuncia"))
+                if it.get("di_seguito"):
+                    # tutto in una sola lettura, con un breve respiro a fine riga: l'intonazione resta continua
+                    t = " ⟦pausa⟧ ".join(speakable(r) for r in text.split("\n") if r.strip())
+                    events.append(Event("speak", text=t, voice=voice, speed=speed, section=section, bed=bed, vol=vol,
+                                        fixed=fixed, pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
+                                        gain=float(it.get("volume_voce", 1.0))))
+                    events.append(Event("gap", secs=float(model.get("pause", {}).get("a_capo", 1.2)), section=section,
+                                        bed=bed, vol=vol))
+                    continue
+                # "crescendo: [2, 4, 8, 12, 16]": il coro si allarga riga dopo riga (l'ultimo numero vale per il resto)
+                grow = it.get("crescendo") if who.startswith("coro") else None
+                line = 0
+                for tok in _tokens(text, model, it.get("pausa_a_capo"), it.get("pausa_punto")):
+                    if tok[0] == "pause":
+                        events.append(Event("gap", secs=tok[1], section=section, bed=bed, vol=vol))
+                    else:
+                        t = speakable(tok[1])
+                        if t and re.search(r"\w", t):
+                            if grow:
+                                names = voices.get(who) or [voices["struttura"], voices["contenuti"]]
+                                voice = "coro:" + "|".join(names[:max(1, int(grow[min(line, len(grow) - 1)]))])
+                                line += 1
+                            # le brevi citazioni rallentano un poco, ma mai troppo
+                            sp = max(speed * tok[2], min(speed, 0.85))
+                            for j, piece in enumerate(re.split(r"\|(?![^⟦]*⟧)", t)):      # "comprà|tevene": pezzi incollati
+                                if j:
+                                    events.append(Event("gap", secs=0.0, section=section, bed=bed, vol=vol))
+                                if piece.strip():
+                                    events.append(Event("speak", text=piece.strip(), voice=voice, speed=sp,
+                                                        section=section, bed=bed, vol=vol, fixed=fixed,
+                                                        pitch=float(it.get("tono", 0)), soft=bool(it.get("morbido")),
+                                                        gain=float(it.get("volume_voce", 1.0))))
+                events.append(Event("gap", secs=max(0.45, nl), section=section, bed=bed, vol=vol))
+
+            finally:
+                # sfumatura_entrata / sfumatura_uscita accanto a una frase: la musica cambia mentre la voce parla
+                spoken = [e for e in events[start:] if e.bed == bed]
+                if spoken and r_in:
+                    spoken[0].ramp = r_in
+                if spoken and r_out:
+                    spoken[-1].ramp_out = r_out
 
     for sec in model["scaletta"]:
         cond = sec.get("se")

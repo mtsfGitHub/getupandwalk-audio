@@ -37,8 +37,8 @@
 
 voci:
   # azure: = voci di Azure (vedi la pagina "campioni" del sito); se Azure non risponde si usano Giuseppe e Isabella di Edge
-  struttura: azure:it-IT-GiuseppeMultilingualNeural   # voce maschile (tutte le parti maschili); provato anche: azure:it-IT-Alessio:DragonLatestNeural
-  contenuti: azure:it-IT-Isabella:DragonLatestNeural   # voce femminile (citazione, Vangelo, commento, domande); in prova: azure:it-IT-FabiolaNeural
+  struttura: azure:it-IT-Isabella:DragonLatestNeural   # voce della struttura (titoli, istruzioni, domande alternate); dal 9 novembre è Isabella (prima Giuseppe)
+  contenuti: azure:it-IT-GiuseppeMultilingualNeural   # voce dei contenuti (citazione, Vangelo, commento); dal 9 novembre è Giuseppe (prima Isabella)
   coro_piccolo:                          # chi recita la prima parte del Padre nostro
     - edge:it-IT-GiuseppeNeural
     - edge:it-IT-IsabellaNeural
@@ -120,7 +120,7 @@ scaletta:
       - pausa: 5
       - F: |-
           Chiudo gli occhi, [pausa breve]
-          libero la mente da preoccupazioni e pensieri
+          libero la mente da preoccupazioni e pensieri [pausa lunga] 
           mi concentro sul momento presente,
           [pausa lunga]
           Esprimo interiormente il mio desiderio di stare alla presenza del Signore.
@@ -133,7 +133,7 @@ scaletta:
     elementi:
       - M: "Ascolta questo passaggio dal Vangelo secondo san {evangelista}."
         fondo: nessuna
-      - pausa: 5
+      - pausa: 3
         fondo: nessuna
       - F: "{vangelo}"
         velocita: 0.92
@@ -165,9 +165,9 @@ scaletta:
     se: vangelo
     elementi:
       - F: |-
-          Nel riascoltare il Vangelo, provo a visualizzare la scena: il luogo in cui avviene: i personaggi principali: le parole che si scambiano: il tono delle voci: i gesti. [pausa media] 
+          Nel riascoltare il Vangelo, provo a visualizzare la scena [pausa lunga]  il luogo in cui avviene  [pausa media] i personaggi principali  [pausa media] le parole che si scambiano: il tono delle voci: i gesti. [pausa media] 
           Lascio affiorare il mio sentire, senza censure, senza giudizi. [pausa media]
-          Quale parola o frase, [pausa 0.5] cattura la mia attenzione in modo particolare?
+          Quale parola o frase [0,3] cattura la mia attenzione in modo particolare?
         velocita: 0.82
       - pausa: 5
         sfumatura_uscita: 5
@@ -182,17 +182,19 @@ scaletta:
   - sezione: Ringrazio
     elementi:
       - M: |-
-          Ritorno su qualcosa che si è mosso in me.
-          Ne posso parlare con il Signore, come un amico parla con un amico.
+          Ritorno su qualcosa che si è mosso in me. [pausa lunga]
+          Ne posso parlare con il Signore. Come un amico parla con un amico.
         velocita: 0.92
       - pausa: 60
         volume_musica: 0.5
-        sfumatura: 8
-      - F: "Concludiamo la nostra preghiera unendoci a quella del Figlio."
+        sfumatura_entrata: 8
+      - M: "Concludiamo la nostra preghiera, unendoci a quella del Figlio."
         velocita: 0.82
-      - pausa: 5
-        sfumatura_uscita: 4
-      - M: |-
+        volume_musica: 0
+        sfumatura_entrata: 5
+      - pausa: 4
+        fondo: nessuna
+      - F: |-
           Padre nostro che sei nei cieli,
           sia santificato il tuo nome,
           venga il tuo regno,
@@ -201,16 +203,17 @@ scaletta:
           e rimetti a noi i nostri debiti
           come anche noi li rimettiamo ai nostri debitori,
           e non abbandonarci alla tentazione,
-          ma liberaci dal male.
-          Amen.
+          ma liberaci dal male. Amen.
         velocita: 0.88
-        tono: -5
-        morbido: true
-        volume_voce: 0.7
         di_seguito: true
+        fondo: nessuna
+        morbido: true
+        tono: -5
+        volume_voce: 0.7
 
   - sezione: Chiusura
     elementi:
       - musica: 10
         volume_musica: 0.28
-        sfumatura_uscita: 10
+        sfumatura_entrata: 3
+        sfumatura_uscita: 7

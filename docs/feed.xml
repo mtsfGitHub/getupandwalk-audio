@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Sun, 08 Nov 2026 16:07:13 +0000</lastBuildDate>
+  <lastBuildDate>Mon, 09 Nov 2026 00:16:16 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/8.png"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/han-shang-698LrKZFmQU-unsplash.jpg"/>
+  <item>
+    <title>lunedì 9 novembre 2026 · Tempio vivo</title>
+    <description>Festa della Dedicazione della Basilica Lateranense. Commento di Gv 2,13-22, a cura di Marco Ruggiero.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/09/tempio-vivo/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-09</guid>
+    <pubDate>Mon, 09 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-09/getupandwalk-2026-11-09.mp3" length="10736340" type="audio/mpeg"/>
+    <itunes:duration>671</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/han-shang-698LrKZFmQU-unsplash.jpg"/>
+  </item>
   <item>
     <title>domenica 8 novembre 2026 · Quando l’alba è ancora buio</title>
     <description>Trentaduesima domenica del Tempo Ordinario. Commento di Mt 25,1-13, a cura di Mounira Abdelhamid Serra.</description>

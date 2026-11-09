@@ -36,7 +36,7 @@ jobs:
           TZ: Europe/Rome
         run: |
           D=$(date +%F)
-          if [ "${{ github.event_name }}" = "schedule" ] && gh release view "$D" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          if { [ "${{ github.event_name }}" = "schedule" ] || [ -z "${{ github.event.inputs.data }}" ]; } && gh api "repos/$GITHUB_REPOSITORY/releases/tags/$D" >/dev/null 2>&1; then
             echo "L'audio di oggi ($D) c'è già"; echo "fatto=true" >> "$GITHUB_OUTPUT"
           else
             echo "fatto=false" >> "$GITHUB_OUTPUT"

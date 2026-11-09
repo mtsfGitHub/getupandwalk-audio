@@ -49,6 +49,7 @@ h2{font-family:var(--ft);font-weight:400;font-size:22px;letter-spacing:.12em;tex
 .giorni{list-style:none;margin:0;padding:0 0 10px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,250px);gap:20px;
 overflow-x:auto;scroll-snap-type:x mandatory}
 .giorni li{scroll-snap-align:start;display:flex}
+.giorni li[hidden]{display:none!important}
 .ep{width:100%;background:var(--grigio);border:0;padding:12px 12px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;
 display:flex;flex-direction:column;gap:12px;outline-offset:3px}
 .ep .cal{height:112px}
@@ -71,7 +72,8 @@ display:flex;flex-direction:column;gap:12px;outline-offset:3px}
   header.top img{width:36px;height:36px}
   header.top .nome{font-size:clamp(20px,5.6vw,27px)}
   header.top .sotto{display:none}
-  .banda .in{padding-block:6px;font-size:clamp(16px,4.6vw,22px);letter-spacing:.14em}
+  .banda .in{padding-block:6px;font-size:clamp(16px,4.6vw,22px);letter-spacing:.14em;
+    padding-left:calc(max(16px,env(safe-area-inset-left,0px)) + 52px)}
   main .in{padding-block:20px 36px;gap:28px}
   .oggi{grid-template-columns:1fr;gap:18px;padding:12px}
   .info{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 18px;align-items:start;width:100%}
@@ -85,14 +87,14 @@ display:flex;flex-direction:column;gap:12px;outline-offset:3px}
   .by .sep{display:block;height:0;overflow:hidden}
   /* giorni precedenti in griglia di tre, come sul sito */
   .giorni{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-columns:auto;overflow:visible;gap:16px}
-  .giorni li:nth-child(n+7){display:none}
+  .giorni li:nth-child(n+8){display:none}
   .giorni.tutti li{display:flex}
   .altri{display:inline-flex}
 }
 /* telefono in verticale */
 @media (max-width:560px) and (min-height:521px){
   .giorni{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(180px,200px);overflow-x:auto;gap:14px}
-  .giorni li:nth-child(n+7){display:flex}
+  .giorni li:nth-child(n+8){display:flex}
   .altri{display:none!important}
   .ep .cal{height:96px}
   .ep .t{font-size:18px}
@@ -126,7 +128,7 @@ footer a{color:#fff}
       </div>
     </div>
   </section>
-  <section><h2>Gli ultimi giorni</h2><ul class='giorni' id='giorni'><li><button type="button" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-09/getupandwalk-2026-11-09.mp3" data-title="Tempio vivo" data-date="lunedì 9 novembre 2026" data-lit="Festa della Dedicazione della Basilica Lateranense" data-ref="Gv 2,13-22" data-author="Marco Ruggiero" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/han-shang-698LrKZFmQU-unsplash.jpg" data-cap="Foto di han shang su Unsplash" data-post="https://getupandwalk.gesuiti.it/2026/11/09/tempio-vivo/" data-voci="Isabella e Giuseppe, Microsoft Azure" data-g="9" data-m="Novembre" data-a="2026" data-dur="11:22"><span class="cal"><b>9</b><span>Novembre</span><small>2026</small></span><span class="t">Tempio vivo</span><span class="m">Commento di <span class="nw">Gv 2,13-22</span><br>a cura di <em>Marco Ruggiero</em></span><span class="dur">▶ 11:22</span></button></li>
+  <section><h2>Gli ultimi giorni</h2><ul class='giorni' id='giorni'><li hidden><button type="button" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-09/getupandwalk-2026-11-09.mp3" data-title="Tempio vivo" data-date="lunedì 9 novembre 2026" data-lit="Festa della Dedicazione della Basilica Lateranense" data-ref="Gv 2,13-22" data-author="Marco Ruggiero" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/han-shang-698LrKZFmQU-unsplash.jpg" data-cap="Foto di han shang su Unsplash" data-post="https://getupandwalk.gesuiti.it/2026/11/09/tempio-vivo/" data-voci="Isabella e Giuseppe, Microsoft Azure" data-g="9" data-m="Novembre" data-a="2026" data-dur="11:22"><span class="cal"><b>9</b><span>Novembre</span><small>2026</small></span><span class="t">Tempio vivo</span><span class="m">Commento di <span class="nw">Gv 2,13-22</span><br>a cura di <em>Marco Ruggiero</em></span><span class="dur">▶ 11:22</span></button></li>
 <li><button type="button" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-08/getupandwalk-2026-11-08.mp3" data-title="Quando l’alba è ancora buio" data-date="domenica 8 novembre 2026" data-lit="Trentaduesima domenica del Tempo Ordinario" data-ref="Mt 25,1-13" data-author="Mounira Abdelhamid Serra" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/8.png" data-cap="© Immagine realizzata con ChatGPT. Tutti i diritti riservati. È vietata la riproduzione o la diffusione senza autorizzazione dell’autrice." data-post="https://getupandwalk.gesuiti.it/2026/11/08/quando-lalba-e-ancora-buio/" data-voci="Giuseppe e Isabella, Microsoft Azure" data-g="8" data-m="Novembre" data-a="2026" data-dur="11:08"><span class="cal"><b>8</b><span>Novembre</span><small>2026</small></span><span class="t">Quando l’alba è ancora buio</span><span class="m">Commento di <span class="nw">Mt 25,1-13</span><br>a cura di <em>Mounira Abdelhamid Serra</em></span><span class="dur">▶ 11:08</span></button></li>
 <li><button type="button" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3" data-title="Con tutte le forze" data-date="sabato 7 novembre 2026" data-lit="Sabato della trentunesima settimana del Tempo Ordinario" data-ref="Lc 16,9-15" data-author="Giuseppe Amalfa SJ" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/07.11_Roma-Chiesa-del-Gesu-Volta-Baciccio-10.jpg" data-cap="Antonio Raggi, Leonardo Reti, Volta della chiesa del Gesù di Roma, sec. XVII" data-post="https://getupandwalk.gesuiti.it/2026/11/07/con-tutte-le-forze/" data-voci="Giuseppe e Isabella, Microsoft Azure" data-g="7" data-m="Novembre" data-a="2026" data-dur="10:17"><span class="cal"><b>7</b><span>Novembre</span><small>2026</small></span><span class="t">Con tutte le forze</span><span class="m">Commento di <span class="nw">Lc 16,9-15</span><br>a cura di <em>Giuseppe Amalfa SJ</em></span><span class="dur">▶ 10:17</span></button></li></ul></section>
 </div></main>
@@ -139,12 +141,12 @@ function show(b,play){
   $('cap').textContent=d.cap;$('cg').textContent=d.g;$('cm').textContent=d.m;$('ca').textContent=d.a;
   const img=$('img');if(img){img.hidden=!d.img;if(d.img){img.src=d.img;img.alt=d.cap||d.title}}
   $('dl').href=d.src;$('post').href=d.post;
-  document.querySelectorAll('.ep').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.ep').forEach(x=>{x.classList.toggle('on',x===b);x.parentElement.hidden=x===b});
   const p=$('player');if(p.getAttribute('src')!==d.src){p.src=d.src;p.load()}
   if(play){p.play().catch(()=>{});window.scrollTo({top:0,behavior:'smooth'})}
 }
 document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>show(b,true)));
-const first=document.querySelector('.ep');if(first)first.classList.add('on');
+const first=document.querySelector('.ep');if(first){first.classList.add('on');first.parentElement.hidden=true}
 const altri=$('altri');if(altri)altri.addEventListener('click',()=>{$('giorni').classList.add('tutti');altri.remove()});
 </script>
 </body>

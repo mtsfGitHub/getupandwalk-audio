@@ -176,6 +176,15 @@ def apply(path):
         out["elementi"] = els
         scaletta.append(out)
 
+    # Vangelo e commento: gli a capo che erano paragrafi del post tornano paragrafi (riga vuota),
+    # quelli aggiunti a mano restano a capo semplici
+    day = doc.get("day")
+    if day and Path(f"docs/posts/{day}.json").exists():
+        orig = fill_values(load_post(day), "")
+        for k in ("vangelo", "commento"):
+            if k in CORRECTIONS and "\n\n" not in CORRECTIONS[k] and "\n\n" in orig.get(k, ""):
+                CORRECTIONS[k] = _paragraphs(orig[k], CORRECTIONS[k])
+
     text = Path("modello.yaml").read_text("utf-8")
     head = text[:text.index("\nscaletta:") + 1]
     Path("modello.yaml").write_text(head + write_scaletta(scaletta), "utf-8")
@@ -238,6 +247,17 @@ def write_scaletta(scaletta):
 
 
 CORRECTIONS = {}
+
+
+def _paragraphs(orig, new):
+    import difflib
+    o = orig.replace("\n\n", "\n")
+    sm = difflib.SequenceMatcher(None, o, new, autojunk=False)
+    para = set()
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            para.update(j1 + k for k in range(i2 - i1) if o[i1 + k] == "\n")
+    return "".join("\n\n" if c == "\n" and j in para else c for j, c in enumerate(new))
 
 
 def _extract(tpl, text):

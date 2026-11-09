@@ -5,12 +5,13 @@ from dataclasses import dataclass
 from .liturgia import day_name
 
 BOOKS = {"Mt": "Matteo", "Mc": "Marco", "Lc": "Luca", "Gv": "Giovanni"}
-PAUSE_RE = re.compile(r"\[\s*pausa(?:\s+(\d+(?:[.,]\d+)?|breve|media|lunga))?\s*(?:s|sec|secondi)?\s*\]", re.I)
+# [pausa], [pausa 2], [pausa breve|media|lunga], e anche solo il numero: [0,3] = tre decimi di secondo
+PAUSE_RE = re.compile(r"\[\s*(?:pausa(?:\s+(\d+(?:[.,]\d+)?|breve|media|lunga))?|(\d+(?:[.,]\d+)?))\s*(?:s|sec|secondi)?\s*\]", re.I)
 PAUSE_WORDS = {"breve": 1.0, "media": 2.0, "lunga": 3.5}
 
 
 def _pause_secs(m):
-    v = (m.group(1) or "").lower()
+    v = (m.group(1) or m.group(2) or "").lower()
     if not v:
         return 2.0
     return PAUSE_WORDS.get(v) or float(v.replace(",", "."))
@@ -72,10 +73,24 @@ def _tokens(text, cfg, nl_pause=None, dot_pause=None):
     if nl_pause is not None:
         nl = float(nl_pause)
     out = []
-    lines = [l.strip() for l in str(text).split("\n") if l.strip()]
+    text = str(text)
+    # nei testi del giorno (Vangelo, commento) i paragrafi sono separati da una riga vuota: lì la pausa
+    # di paragrafo; un a capo semplice (aggiunto a mano) ha la pausa normale di "a capo"
+    marked = "\n\n" in text
+    parts = re.split(r"(\n\s*\n|\n)", text)
+    lines, seps, pending = [], [], None
+    for k, chunk in enumerate(parts):
+        if k % 2:
+            pending = chunk if pending is None or "\n\n" not in pending.replace(" ", "") else pending
+            continue
+        if chunk.strip():
+            lines.append(chunk.strip())
+            seps.append(pending)
+            pending = None
     for n, line in enumerate(lines):
         if n:
-            out.append(("pause", nl))
+            para = seps[n] is not None and seps[n].count("\n") > 1
+            out.append(("pause", nl if (para or not marked) else p["a_capo"]))
         last = 0
         for m in PAUSE_RE.finditer(line):
             out += _refine(line[last:m.start()], colon, dot_pause)
@@ -138,8 +153,8 @@ def fill_values(post, liturgia):
         "titolo": post.title,
         "autore": post.author,
         "evangelista": post.evangelist,
-        "vangelo": "\n".join(p.replace("\n", " ") for p in gospel.paras) if gospel else "",
-        "commento": "\n".join(p.replace("\n", " ") for p in comm.paras) if comm else "",
+        "vangelo": "\n\n".join(p.replace("\n", " ") for p in gospel.paras) if gospel else "",
+        "commento": "\n\n".join(p.replace("\n", " ") for p in comm.paras) if comm else "",
         "domande": [p.replace("\n", " ") for p in dom.paras] if dom else [],
         "citazione": "\n".join(post.quote_lines),
         "citazione_fonte": src,

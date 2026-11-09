@@ -134,7 +134,7 @@ scaletta:
     elementi:
       - M: "Ascolta questo passaggio dal Vangelo secondo san {evangelista}."
         fondo: nessuna
-      - pausa: 5
+      - pausa: 3
         fondo: nessuna
       - F: "{vangelo}"
         velocita: 0.92
@@ -183,13 +183,13 @@ scaletta:
   - sezione: Ringrazio
     elementi:
       - M: |-
-          Ritorno su qualcosa che si è mosso in me.
+          Ritorno su qualcosa che si è mosso in me. [pausa lunga]
           Ne posso parlare con il Signore. Come un amico parla con un amico.
         velocita: 0.92
       - pausa: 60
         volume_musica: 0.5
         sfumatura: 8
-      - F: "Concludiamo la nostra preghiera unendoci a quella del Figlio."
+      - F: "Concludiamo la nostra preghiera, unendoci a quella del Figlio."
         velocita: 0.82
       - pausa: 5
         sfumatura_uscita: 4

@@ -64,7 +64,7 @@ def write_page(eps):
         return " ".join(f'data-{k}="{e(v)}"' for k, v in fields.items())
 
     cards = "\n".join(
-        f'<li><button type="button" class="ep" {data(x)}>'
+        f'<li{" hidden" if x is top else ""}><button type="button" class="ep" {data(x)}>'
         f'<span class="cal"><b>{e(parts(x["date"])[0])}</b><span>{e(parts(x["date"])[1])}</span><small>{e(parts(x["date"])[2])}</small></span>'
         f'<span class="t">{e(x["title"])}</span>'
         f'<span class="m">Commento di <span class="nw">{e(x.get("ref", ""))}</span><br>a cura di <em>{e(x.get("author", ""))}</em></span>'
@@ -122,6 +122,7 @@ h2{{font-family:var(--ft);font-weight:400;font-size:22px;letter-spacing:.12em;te
 .giorni{{list-style:none;margin:0;padding:0 0 10px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,250px);gap:20px;
 overflow-x:auto;scroll-snap-type:x mandatory}}
 .giorni li{{scroll-snap-align:start;display:flex}}
+.giorni li[hidden]{{display:none!important}}
 .ep{{width:100%;background:var(--grigio);border:0;padding:12px 12px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;
 display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
 .ep .cal{{height:112px}}
@@ -144,7 +145,8 @@ display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
   header.top img{{width:36px;height:36px}}
   header.top .nome{{font-size:clamp(20px,5.6vw,27px)}}
   header.top .sotto{{display:none}}
-  .banda .in{{padding-block:6px;font-size:clamp(16px,4.6vw,22px);letter-spacing:.14em}}
+  .banda .in{{padding-block:6px;font-size:clamp(16px,4.6vw,22px);letter-spacing:.14em;
+    padding-left:calc(max(16px,env(safe-area-inset-left,0px)) + 52px)}}
   main .in{{padding-block:20px 36px;gap:28px}}
   .oggi{{grid-template-columns:1fr;gap:18px;padding:12px}}
   .info{{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 18px;align-items:start;width:100%}}
@@ -158,14 +160,14 @@ display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
   .by .sep{{display:block;height:0;overflow:hidden}}
   /* giorni precedenti in griglia di tre, come sul sito */
   .giorni{{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-columns:auto;overflow:visible;gap:16px}}
-  .giorni li:nth-child(n+7){{display:none}}
+  .giorni li:nth-child(n+8){{display:none}}
   .giorni.tutti li{{display:flex}}
   .altri{{display:inline-flex}}
 }}
 /* telefono in verticale */
 @media (max-width:560px) and (min-height:521px){{
   .giorni{{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(180px,200px);overflow-x:auto;gap:14px}}
-  .giorni li:nth-child(n+7){{display:flex}}
+  .giorni li:nth-child(n+8){{display:flex}}
   .altri{{display:none!important}}
   .ep .cal{{height:96px}}
   .ep .t{{font-size:18px}}
@@ -199,7 +201,7 @@ footer a{{color:#fff}}
       </div>
     </div>
   </section>
-  {"<section><h2>Gli ultimi giorni</h2><ul class='giorni' id='giorni'>" + cards + "</ul>" + ("<button type='button' class='altri' id='altri'>Mostra tutti i giorni</button>" if len(eps) > 6 else "") + "</section>" if len(eps) > 1 else ""}
+  {"<section><h2>Gli ultimi giorni</h2><ul class='giorni' id='giorni'>" + cards + "</ul>" + ("<button type='button' class='altri' id='altri'>Mostra tutti i giorni</button>" if len(eps) > 7 else "") + "</section>" if len(eps) > 1 else ""}
 </div></main>
 <footer><div class="in">Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci generate al computer<span id="voci" hidden></span></div></footer>
 <script>
@@ -210,12 +212,12 @@ function show(b,play){{
   $('cap').textContent=d.cap;$('cg').textContent=d.g;$('cm').textContent=d.m;$('ca').textContent=d.a;
   const img=$('img');if(img){{img.hidden=!d.img;if(d.img){{img.src=d.img;img.alt=d.cap||d.title}}}}
   $('dl').href=d.src;$('post').href=d.post;
-  document.querySelectorAll('.ep').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.ep').forEach(x=>{{x.classList.toggle('on',x===b);x.parentElement.hidden=x===b}});
   const p=$('player');if(p.getAttribute('src')!==d.src){{p.src=d.src;p.load()}}
   if(play){{p.play().catch(()=>{{}});window.scrollTo({{top:0,behavior:'smooth'}})}}
 }}
 document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>show(b,true)));
-const first=document.querySelector('.ep');if(first)first.classList.add('on');
+const first=document.querySelector('.ep');if(first){{first.classList.add('on');first.parentElement.hidden=true}}
 const altri=$('altri');if(altri)altri.addEventListener('click',()=>{{$('giorni').classList.add('tutti');altri.remove()}});
 </script>
 </body>

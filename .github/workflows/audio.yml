@@ -82,7 +82,7 @@ jobs:
           set +e
           python build.py --data "${{ github.event.inputs.data }}"
           rc=$?
-          if [ $rc -eq 3 ] && [ "${{ github.event_name }}" = "schedule" ] && [ "$(date +%H)" -lt 5 ]; then
+          if [ $rc -eq 3 ] && { [ "${{ github.event_name }}" = "schedule" ] || [ -z "${{ github.event.inputs.data }}" ]; } && [ "$(date +%H)" -lt 5 ]; then
             echo "Il post di oggi non è ancora uscito: ci riprova il prossimo avvio."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0

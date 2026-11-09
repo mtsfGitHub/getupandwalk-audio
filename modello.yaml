@@ -210,10 +210,3 @@ scaletta:
         morbido: true
         tono: -5
         volume_voce: 0.7
-
-  - sezione: Chiusura
-    elementi:
-      - musica: 10
-        volume_musica: 0.28
-        sfumatura_entrata: 3
-        sfumatura_uscita: 7

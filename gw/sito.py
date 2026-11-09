@@ -100,7 +100,7 @@ header.top a{{color:inherit;text-decoration:none;display:flex;align-items:center
 main .in{{padding-block:32px 48px;display:flex;flex-direction:column;gap:40px}}
 .oggi{{background:var(--grigio);padding:24px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;align-items:start}}
 @media (max-width:820px){{.oggi{{grid-template-columns:1fr;gap:24px;padding:16px}}}}
-.oggi img{{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;max-width:100%}}
+.oggi img{{width:100%;height:auto;display:block;max-width:100%}}
 .cap{{font-size:13px;color:var(--muted);margin-top:6px}}
 .info{{display:flex;flex-direction:column;align-items:flex-start;gap:14px;min-width:0}}
 .cal{{background:var(--giallo);color:var(--nero);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:300;line-height:1.1}}
@@ -137,28 +137,40 @@ display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
 .ep.on .dur{{color:var(--blu);font-weight:600}}
 .nw{{white-space:nowrap}}
 .testo{{display:flex;flex-direction:column;gap:10px;min-width:0}}
-/* telefono e tablet: come la versione mobile di Get up and Walk */
-@media (max-width:820px){{
-  header.top .in{{padding-block:14px}}
-  header.top img{{width:52px;height:52px}}
-  header.top .nome{{font-size:clamp(22px,6.4vw,30px)}}
-  .oggi{{padding:12px}}
+/* telefono e tablet (anche il telefono in orizzontale): banda stretta come la versione mobile di Get up and Walk */
+@media (max-width:1024px),(max-height:520px){{
+  header.top .in{{padding-block:6px}}
+  header.top a{{gap:16px}}
+  header.top img{{width:36px;height:36px}}
+  header.top .nome{{font-size:clamp(20px,5.6vw,27px)}}
+  header.top .sotto{{display:none}}
+  .banda .in{{padding-block:6px;font-size:clamp(16px,4.6vw,22px);letter-spacing:.14em}}
+  main .in{{padding-block:20px 36px;gap:28px}}
+  .oggi{{grid-template-columns:1fr;gap:18px;padding:12px}}
   .info{{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 18px;align-items:start;width:100%}}
-  .info .cal{{width:clamp(104px,30vw,150px);height:clamp(104px,30vw,140px)}}
-  .info .cal b{{font-size:clamp(40px,11vw,52px)}}
-  .info .cal span{{font-size:clamp(17px,4.6vw,21px)}}
+  .info .cal{{width:clamp(104px,24vw,168px);height:clamp(100px,22vw,148px)}}
+  .info .cal b{{font-size:clamp(40px,9vw,56px)}}
+  .info .cal span{{font-size:clamp(17px,3.6vw,22px)}}
   .info audio,.info .azioni{{grid-column:1/-1}}
   .info audio{{max-width:none}}
-  h1{{font-size:clamp(24px,6.6vw,32px)}}
+  h1{{font-size:clamp(24px,5.4vw,34px)}}
   .by{{font-size:15px}}
   .by .sep{{display:block;height:0;overflow:hidden}}
+  /* giorni precedenti in griglia di tre, come sul sito */
+  .giorni{{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-columns:auto;overflow:visible;gap:16px}}
+  .giorni li:nth-child(n+7){{display:none}}
+  .giorni.tutti li{{display:flex}}
+  .altri{{display:inline-flex}}
 }}
-@media (max-width:560px){{
-  header.top .sotto{{display:none}}
-  .giorni{{grid-auto-columns:minmax(180px,200px);gap:14px}}
+/* telefono in verticale */
+@media (max-width:560px) and (min-height:521px){{
+  .giorni{{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(180px,200px);overflow-x:auto;gap:14px}}
+  .giorni li:nth-child(n+7){{display:flex}}
+  .altri{{display:none!important}}
   .ep .cal{{height:96px}}
   .ep .t{{font-size:18px}}
 }}
+.altri{{display:none;margin-top:14px;background:var(--nero);color:#fff;border:0;padding:9px 14px;font:inherit;font-size:15px;cursor:pointer}}
 footer{{background:var(--blu);color:#fff;font-size:13px}}
 footer .in{{padding-block:18px calc(18px + env(safe-area-inset-bottom))}}
 footer a{{color:#fff}}
@@ -187,7 +199,7 @@ footer a{{color:#fff}}
       </div>
     </div>
   </section>
-  {"<section><h2>Gli ultimi giorni</h2><ul class='giorni'>" + cards + "</ul></section>" if len(eps) > 1 else ""}
+  {"<section><h2>Gli ultimi giorni</h2><ul class='giorni' id='giorni'>" + cards + "</ul>" + ("<button type='button' class='altri' id='altri'>Mostra tutti i giorni</button>" if len(eps) > 6 else "") + "</section>" if len(eps) > 1 else ""}
 </div></main>
 <footer><div class="in">Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci generate al computer<span id="voci" hidden></span></div></footer>
 <script>
@@ -204,6 +216,7 @@ function show(b,play){{
 }}
 document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>show(b,true)));
 const first=document.querySelector('.ep');if(first)first.classList.add('on');
+const altri=$('altri');if(altri)altri.addEventListener('click',()=>{{$('giorni').classList.add('tutti');altri.remove()}});
 </script>
 </body>
 </html>

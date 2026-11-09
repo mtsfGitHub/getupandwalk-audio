@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Mon, 09 Nov 2026 17:19:17 +0000</lastBuildDate>
+  <lastBuildDate>Mon, 09 Nov 2026 23:36:59 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/han-shang-698LrKZFmQU-unsplash.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/10.11_Foto-GUAW-10-novembre-2026.jpg"/>
+  <item>
+    <title>martedì 10 novembre 2026 · Allenati all’umiltà</title>
+    <description>Martedì della trentaduesima settimana del Tempo Ordinario. Commento di Lc 17,7-10, a cura di Ilaria Zipponi.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/10/allenati-allumilta/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-10</guid>
+    <pubDate>Tue, 10 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-10/getupandwalk-2026-11-10.mp3" length="8595571" type="audio/mpeg"/>
+    <itunes:duration>537</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/10.11_Foto-GUAW-10-novembre-2026.jpg"/>
+  </item>
   <item>
     <title>lunedì 9 novembre 2026 · Tempio vivo</title>
     <description>Festa della Dedicazione della Basilica Lateranense. Commento di Gv 2,13-22, a cura di Marco Ruggiero.</description>

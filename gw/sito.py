@@ -67,7 +67,7 @@ def write_page(eps):
         f'<li><button type="button" class="ep" {data(x)}>'
         f'<span class="cal"><b>{e(parts(x["date"])[0])}</b><span>{e(parts(x["date"])[1])}</span><small>{e(parts(x["date"])[2])}</small></span>'
         f'<span class="t">{e(x["title"])}</span>'
-        f'<span class="m">Commento di {e(x.get("ref", ""))}<br>a cura di <em>{e(x.get("author", ""))}</em></span>'
+        f'<span class="m">Commento di <span class="nw">{e(x.get("ref", ""))}</span><br>a cura di <em>{e(x.get("author", ""))}</em></span>'
         f'<span class="dur">▶ {_mmss(x["seconds"])}</span></button></li>' for x in eps)
     g, m, a = parts(top["date"])
     img = f'<img id="img" src="{e(top.get("image", ""))}" alt="{e(top.get("caption") or top["title"])}"{"" if top.get("image") else " hidden"}>'
@@ -135,6 +135,30 @@ display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
 .ep:hover{{background:var(--grigio2)}}
 .ep.on{{box-shadow:inset 0 -4px 0 var(--blu)}}
 .ep.on .dur{{color:var(--blu);font-weight:600}}
+.nw{{white-space:nowrap}}
+.testo{{display:flex;flex-direction:column;gap:10px;min-width:0}}
+/* telefono e tablet: come la versione mobile di Get up and Walk */
+@media (max-width:820px){{
+  header.top .in{{padding-block:14px}}
+  header.top img{{width:52px;height:52px}}
+  header.top .nome{{font-size:clamp(22px,6.4vw,30px)}}
+  .oggi{{padding:12px}}
+  .info{{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 18px;align-items:start;width:100%}}
+  .info .cal{{width:clamp(104px,30vw,150px);height:clamp(104px,30vw,140px)}}
+  .info .cal b{{font-size:clamp(40px,11vw,52px)}}
+  .info .cal span{{font-size:clamp(17px,4.6vw,21px)}}
+  .info audio,.info .azioni{{grid-column:1/-1}}
+  .info audio{{max-width:none}}
+  h1{{font-size:clamp(24px,6.6vw,32px)}}
+  .by{{font-size:15px}}
+  .by .sep{{display:block;height:0;overflow:hidden}}
+}}
+@media (max-width:560px){{
+  header.top .sotto{{display:none}}
+  .giorni{{grid-auto-columns:minmax(180px,200px);gap:14px}}
+  .ep .cal{{height:96px}}
+  .ep .t{{font-size:18px}}
+}}
 footer{{background:var(--blu);color:#fff;font-size:13px}}
 footer .in{{padding-block:18px calc(18px + env(safe-area-inset-bottom))}}
 footer a{{color:#fff}}
@@ -151,9 +175,11 @@ footer a{{color:#fff}}
     <div>{img}<div class="cap" id="cap">{e(top.get("caption", ""))}</div></div>
     <div class="info">
       <div class="cal" id="cal"><b id="cg">{e(g)}</b><span id="cm">{e(m)}</span><small id="ca">{e(a)}</small></div>
-      <div class="lit" id="lit">{e(top.get("liturgia", ""))}</div>
-      <h1 id="title">{e(top["title"])}</h1>
-      <div class="by">commento di <span id="ref">{e(top.get("ref", ""))}</span>, a cura di <em id="author">{e(top.get("author", ""))}</em></div>
+      <div class="testo">
+        <div class="lit" id="lit">{e(top.get("liturgia", ""))}</div>
+        <h1 id="title">{e(top["title"])}</h1>
+        <div class="by">commento di <span id="ref" class="nw">{e(top.get("ref", ""))}</span><span class="sep">, </span>a cura di <em id="author">{e(top.get("author", ""))}</em></div>
+      </div>
       <audio id="player" controls preload="none" src="{e(top["audio"])}"></audio>
       <div class="azioni">
         <a class="btn blu" id="post" href="{e(top["post"])}" target="_blank" rel="noopener">Vai alla preghiera&nbsp;›</a>

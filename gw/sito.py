@@ -49,16 +49,27 @@ def write_page(eps):
     e = html.escape
     if not eps:
         return
-    top, rest = eps[0], eps[1:]
+    top = eps[0]
+
+    def parts(iso):
+        d = datetime.strptime(iso, "%Y-%m-%d").date()
+        return str(d.day), MONTHS[d.month - 1].capitalize(), str(d.year)
+
     def data(x):
+        g, m, a = parts(x["date"])
         fields = {"src": x["audio"], "title": x["title"], "date": _date_label(x["date"]), "lit": x.get("liturgia", ""),
-                  "by": f'Commento di {x.get("ref", "")}, a cura di {x.get("author", "")}', "img": x.get("image", ""),
-                  "cap": x.get("caption", ""), "post": x["post"], "voci": x.get("voci", "")}
+                  "ref": x.get("ref", ""), "author": x.get("author", ""), "img": x.get("image", ""),
+                  "cap": x.get("caption", ""), "post": x["post"], "voci": x.get("voci", ""),
+                  "g": g, "m": m, "a": a, "dur": _mmss(x["seconds"])}
         return " ".join(f'data-{k}="{e(v)}"' for k, v in fields.items())
-    items = "\n".join(
+
+    cards = "\n".join(
         f'<li><button type="button" class="ep" {data(x)}>'
-        f'<span class="d">{e(_date_label(x["date"]))}</span><span class="t">{e(x["title"])}</span>'
-        f'<span class="m">{_mmss(x["seconds"])}</span></button></li>' for x in eps)
+        f'<span class="cal"><b>{e(parts(x["date"])[0])}</b><span>{e(parts(x["date"])[1])}</span><small>{e(parts(x["date"])[2])}</small></span>'
+        f'<span class="t">{e(x["title"])}</span>'
+        f'<span class="m">Commento di {e(x.get("ref", ""))}<br>a cura di <em>{e(x.get("author", ""))}</em></span>'
+        f'<span class="dur">▶ {_mmss(x["seconds"])}</span></button></li>' for x in eps)
+    g, m, a = parts(top["date"])
     img = f'<img id="img" src="{e(top.get("image", ""))}" alt="{e(top.get("caption") or top["title"])}"{"" if top.get("image") else " hidden"}>'
     page = f"""<!doctype html>
 <html lang="it">
@@ -66,70 +77,99 @@ def write_page(eps):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Get up and Walk · in ascolto</title>
+<meta name="description" content="Il Vangelo del giorno e il commento di Get up and Walk, da ascoltare come una preghiera guidata.">
 <link rel="alternate" type="application/rss+xml" title="Get up and Walk · in ascolto" href="feed.xml">
+<link rel="icon" href="logo-ihs.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Literata:ital,opsz@0,7..72;1,7..72&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Source+Sans+3:wght@300;400;600;700&display=swap">
 <style>
-:root{{--bg:#EFF0F4;--surface:#FBFBFD;--ink:#1A2240;--muted:#5A6079;--line:#D5D8E3;--gold:#9A6F17;--lapis:#2B3A78;--on:#F6F2E6;
---fd:"Libre Caslon Display",Georgia,serif;--fr:"Literata",Georgia,serif;--fu:"IBM Plex Sans",system-ui,sans-serif}}
-@media (prefers-color-scheme:dark){{:root{{--bg:#0D1224;--surface:#151B33;--ink:#E9E5D8;--muted:#9EA3BC;--line:#2A3254;--gold:#D6B160;--lapis:#C9A957;--on:#141A31;color-scheme:dark}}}}
+:root{{--blu:#00476B;--grigio:#DCDCDC;--grigio2:#EDEDED;--giallo:#F6B91C;--link:#1B7CBE;--ink:#111;--muted:#4A4A4A;--nero:#202020;
+--ft:"Cinzel","Trajan Pro",Georgia,serif;--fs:"Source Sans 3","Segoe UI",system-ui,sans-serif;color-scheme:light}}
 *{{box-sizing:border-box}}
-body{{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fu);line-height:1.5;
-padding:24px max(16px,env(safe-area-inset-right)) 64px max(16px,env(safe-area-inset-left))}}
-.wrap{{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:28px}}
-.eyebrow{{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}}
-.today{{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:start}}
-@media (max-width:680px){{.today{{grid-template-columns:1fr}}}}
-.today img{{width:100%;border-radius:12px;display:block}}
-.cap{{font-size:13px;color:var(--muted);font-style:italic;margin-top:8px}}
-.info{{display:flex;flex-direction:column;gap:10px;min-width:0}}
-.date{{font-family:var(--fr);font-style:italic;color:var(--muted)}}
-.lit{{font-size:14px;color:var(--muted)}}
-h1{{font-family:var(--fd);font-weight:400;font-size:clamp(32px,6vw,46px);line-height:1.05;margin:0;text-wrap:balance}}
-.by{{color:var(--muted)}}
-audio{{width:100%;margin-top:6px}}
-.actions{{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}}
-a{{color:var(--lapis)}}
-h2{{font-family:var(--fd);font-weight:400;font-size:26px;margin:0 0 8px}}
-ul{{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}}
-.ep{{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;text-align:left;border:0;border-bottom:1px solid var(--line);
-background:none;color:inherit;font:inherit;padding:12px 4px;cursor:pointer}}
-.ep:hover{{background:var(--surface)}}
-.ep.on .t{{color:var(--gold)}}
-.ep .d{{color:var(--muted);font-size:13px;min-width:13ch}}
-.ep .t{{font-family:var(--fr)}}
-.ep .m{{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}}
-@media (max-width:520px){{.ep{{grid-template-columns:1fr auto}}.ep .d{{grid-column:1/-1}}}}
-footer{{font-size:12px;color:var(--muted)}}
+body{{margin:0;background:#fff;color:var(--ink);font-family:var(--fs);line-height:1.45}}
+.in{{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}}
+header.top{{background:var(--blu);color:#fff;padding-top:env(safe-area-inset-top)}}
+header.top .in{{display:flex;align-items:center;gap:22px;padding-block:30px}}
+header.top img{{width:96px;height:96px;flex:none}}
+header.top .nome{{font-family:var(--ft);font-size:clamp(28px,5vw,46px);letter-spacing:.02em;line-height:1;margin:0;font-weight:400}}
+header.top .sotto{{font-weight:300;font-size:clamp(14px,2vw,17px);margin-top:8px;opacity:.95}}
+header.top a{{color:inherit;text-decoration:none;display:flex;align-items:center;gap:22px}}
+@media (max-width:560px){{header.top img{{width:64px;height:64px}}header.top .in,header.top a{{gap:14px}}}}
+.banda{{background:var(--grigio)}}
+.banda .in{{padding-block:12px;font-family:var(--ft);font-size:18px;letter-spacing:.18em;text-transform:uppercase;color:var(--nero)}}
+main .in{{padding-block:32px 48px;display:flex;flex-direction:column;gap:40px}}
+.oggi{{background:var(--grigio);padding:24px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;align-items:start}}
+@media (max-width:820px){{.oggi{{grid-template-columns:1fr;gap:24px;padding:16px}}}}
+.oggi img{{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;max-width:100%}}
+.cap{{font-size:13px;color:var(--muted);margin-top:6px}}
+.info{{display:flex;flex-direction:column;align-items:flex-start;gap:14px;min-width:0}}
+.cal{{background:var(--giallo);color:var(--nero);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:300;line-height:1.1}}
+.info .cal{{width:168px;height:148px}}
+.info .cal b{{font-size:56px;font-weight:300}}
+.info .cal span{{font-size:22px}}
+.info .cal small{{font-size:15px;margin-top:4px}}
+.lit{{font-size:15px;color:var(--muted)}}
+h1{{font-size:clamp(28px,4vw,36px);font-weight:700;margin:0;line-height:1.1;text-wrap:balance}}
+.by{{font-size:16px}}
+.by em{{font-style:normal;color:var(--link)}}
+audio{{width:100%;max-width:520px}}
+.azioni{{display:flex;gap:12px;flex-wrap:wrap}}
+.btn{{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;font-size:15px;text-decoration:none;color:#fff;border:0}}
+.btn.blu{{background:var(--link)}}
+.btn.nero{{background:var(--nero)}}
+.btn:hover{{filter:brightness(1.1)}}
+h2{{font-family:var(--ft);font-weight:400;font-size:22px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 14px}}
+.giorni{{list-style:none;margin:0;padding:0 0 10px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,250px);gap:20px;
+overflow-x:auto;scroll-snap-type:x mandatory}}
+.giorni li{{scroll-snap-align:start;display:flex}}
+.ep{{width:100%;background:var(--grigio);border:0;padding:12px 12px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
+.ep .cal{{height:112px}}
+.ep .cal b{{font-size:40px;font-weight:300}}
+.ep .cal span{{font-size:17px}}
+.ep .cal small{{font-size:14px}}
+.ep .t{{font-weight:700;font-size:20px;line-height:1.15}}
+.ep .m{{font-size:14px;color:var(--muted)}}
+.ep .m em{{font-style:normal;color:var(--link)}}
+.ep .dur{{margin-top:auto;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}}
+.ep:hover{{background:var(--grigio2)}}
+.ep.on{{box-shadow:inset 0 -4px 0 var(--blu)}}
+.ep.on .dur{{color:var(--blu);font-weight:600}}
+footer{{background:var(--blu);color:#fff;font-size:13px}}
+footer .in{{padding-block:18px calc(18px + env(safe-area-inset-bottom))}}
+footer a{{color:#fff}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="eyebrow">Get up and Walk · in ascolto</div>
-  <section class="today">
+<header class="top"><div class="in"><a href="https://getupandwalk.gesuiti.it/" target="_blank" rel="noopener">
+  <img src="logo-ihs.png" alt="">
+  <div><p class="nome">GET UP AND WALK</p><div class="sotto">il vangelo quotidiano commentato secondo il metodo della spiritualità ignaziana</div></div>
+</a></div></header>
+<div class="banda"><div class="in">in ascolto</div></div>
+<main><div class="in">
+  <section class="oggi">
     <div>{img}<div class="cap" id="cap">{e(top.get("caption", ""))}</div></div>
     <div class="info">
-      <div class="date" id="date">{e(_date_label(top["date"]))}</div>
+      <div class="cal" id="cal"><b id="cg">{e(g)}</b><span id="cm">{e(m)}</span><small id="ca">{e(a)}</small></div>
       <div class="lit" id="lit">{e(top.get("liturgia", ""))}</div>
       <h1 id="title">{e(top["title"])}</h1>
-      <div class="by" id="by">Commento di {e(top.get("ref", ""))}, a cura di {e(top.get("author", ""))}</div>
+      <div class="by">commento di <span id="ref">{e(top.get("ref", ""))}</span>, a cura di <em id="author">{e(top.get("author", ""))}</em></div>
       <audio id="player" controls preload="none" src="{e(top["audio"])}"></audio>
-      <div class="actions">
-        <a id="dl" href="{e(top["audio"])}">Scarica l'MP3</a>
-        <a id="post" href="{e(top["post"])}" target="_blank" rel="noopener">Leggi il post</a>
-        <a href="feed.xml">Feed podcast</a>
+      <div class="azioni">
+        <a class="btn blu" id="post" href="{e(top["post"])}" target="_blank" rel="noopener">Vai alla preghiera&nbsp;›</a>
+        <a class="btn nero" id="dl" href="{e(top["audio"])}" download>Scarica l'audio</a>
       </div>
     </div>
   </section>
-  {"<section><h2>Tutti i giorni</h2><ul>" + items + "</ul></section>" if rest else ""}
-  <footer>Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci generate al computer<span id="voci" hidden></span>.</footer>
-</div>
+  {"<section><h2>Gli ultimi giorni</h2><ul class='giorni'>" + cards + "</ul></section>" if len(eps) > 1 else ""}
+</div></main>
+<footer><div class="in">Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci generate al computer<span id="voci" hidden></span></div></footer>
 <script>
 const $=id=>document.getElementById(id);
 function show(b,play){{
   const d=b.dataset;
-  ['title','date','lit','by','cap'].forEach(k=>$(k).textContent=d[k]);
-  $('voci').textContent=d.voci?' ('+d.voci+')':'';
+  $('title').textContent=d.title;$('lit').textContent=d.lit;$('ref').textContent=d.ref;$('author').textContent=d.author;
+  $('cap').textContent=d.cap;$('cg').textContent=d.g;$('cm').textContent=d.m;$('ca').textContent=d.a;
   const img=$('img');if(img){{img.hidden=!d.img;if(d.img){{img.src=d.img;img.alt=d.cap||d.title}}}}
   $('dl').href=d.src;$('post').href=d.post;
   document.querySelectorAll('.ep').forEach(x=>x.classList.toggle('on',x===b));

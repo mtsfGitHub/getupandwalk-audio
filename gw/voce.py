@@ -147,7 +147,7 @@ class EdgeEngine:
         if self._orig_ssml is None:
             self._orig_ssml = ec.mkssml
         voice = self._resolve(voice)
-        text = _plain(text.replace(" ⟦pausa⟧ ", " "))
+        text = _plain(text.replace(" ⟦pausa⟧ ", " ").replace("⟦unito⟧", ""))
         rate = f"{round((speed - 1) * 100):+d}%"
         last, plain = None, False
         for attempt in range(4):
@@ -409,7 +409,7 @@ SIBILANT = ()      # voci con le "s" troppo taglienti (nessuna, con Azure: il fi
 
 def _breaks(ssml_text, ms=550):
     """⟦pausa⟧ → un breve respiro dentro la stessa lettura (solo Azure)."""
-    return ssml_text.replace("⟦pausa⟧", f"<break time='{ms}ms'/>")
+    return ssml_text.replace("⟦pausa⟧", f"<break time='{ms}ms'/>").replace(" ⟦unito⟧", "<break strength='none'/>")
 
 
 def _deess(a, name):

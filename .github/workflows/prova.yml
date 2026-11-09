@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   prova:
@@ -16,11 +17,14 @@ jobs:
         with:
           python-version: "3.11"
       - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
-      - run: pip install edge-tts==7.3.1 numpy scipy pyyaml requests beautifulsoup4
+      - run: pip install edge-tts==7.3.1 numpy scipy pyyaml requests beautifulsoup4 soundfile
       - run: python prova_pronuncia.py
-      - name: Pubblica la prova
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+      - name: Mettila tra le prove
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete prova-pronuncia -y --cleanup-tag 2>/dev/null || true
-          gh release create prova-pronuncia out/prova-pronuncia.mp3 --title "Prova pronuncia" --notes "Varianti di pronuncia" --prerelease
+          gh release upload campioni-azure out/prova-*.mp3 --clobber
+          gh workflow run sito.yml

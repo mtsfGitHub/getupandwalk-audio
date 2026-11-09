@@ -55,6 +55,8 @@ def export(day):
     fix = Path(f"correzioni/{day}.yaml")
     if fix.exists():
         values.update(yaml.safe_load(fix.read_text("utf-8")) or {})
+    from gw.autore import apply as voices_for_author
+    author_g = voices_for_author(model, post.author, values.get("voce_autore"))
     fill = lambda t, extra=None: re.sub(r"\{(\w+)\}", lambda m: str(dict(values, **(extra or {})).get(m.group(1), m.group(0))), str(t))
     sections = []
     for sec in model["scaletta"]:
@@ -117,7 +119,10 @@ def export(day):
         sections.append(out)
     key = f"{post.title}|{post.ref}".lower()
     prog = {"key": key, "edited": True, "sections": sections}
-    return {"raw": raw_text(post), "prog": prog, "base": prog, "day": day}
+    from build import _person
+    voci = {"struct": _person(model["voci"]["struttura"]), "content": _person(model["voci"]["contenuti"]),
+            "autore": post.author, "genere": author_g}
+    return {"raw": raw_text(post), "prog": prog, "base": prog, "day": day, "voci": voci}
 
 
 class Block(str):
@@ -302,6 +307,10 @@ def convert(it, notes):
     else:
         value = text
     el = {who: value}
+    for f, k in (("mvol", "volume_musica"), ("ramp", "sfumatura"), ("rin", "sfumatura_entrata"),
+                 ("rout", "sfumatura_uscita")):
+        if it.get(f) is not None:          # la musica che cambia mentre la voce parla
+            el[k] = it[f]
     if abs(float(it.get("rateMul", 1)) - 1) > 0.001:
         el["velocita"] = round(float(it["rateMul"]), 2)
     if it.get("nlp") is not None:

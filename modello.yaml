@@ -2,16 +2,13 @@
 # Si può modificare direttamente da GitHub (icona della matita): la mattina dopo l'audio segue il nuovo modello.
 #
 # Ogni sezione ha un elenco di elementi:
-#   M: "testo"          → lo legge la voce della struttura (maschile, vedi "voci" qui sotto)
-#   F: "testo"          → lo legge la voce dei contenuti (femminile)
-#   MF: "testo"         → le due voci insieme, in coro (ogni riga va a tempo)
+#   M: "testo"          → lo legge la voce della STRUTTURA (vedi "voci": chi sia dipende dall'autore del giorno)
+#   F: "testo"          → lo legge la voce dei CONTENUTI (la stessa voce che legge il commento)
 #   M|F: "testo"        → (dentro per_ogni_domanda) le voci si alternano: la prima M, la seconda F, …
-#   coro_piccolo / coro_grande: "testo" → le voci elencate qui sotto in "voci", tutte insieme
-#   crescendo: [2, 4, 8, 12, 20] → (accanto a un coro) quante voci a ogni riga: il coro si allarga
 #   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
 #   pausa: 10           → secondi di pausa, con la musica
 #   musica: 8           → secondi di sola musica
-#   pausa_a_capo: 3     → (accanto a M o F) secondi di pausa tra un paragrafo e l'altro di quel testo
+#   pausa_a_capo: 3.5   → (accanto a M o F) secondi di pausa a ogni cambio di paragrafo di quel testo
 #   pausa_punto: 1.5    → (accanto a M o F) secondi di respiro dopo ogni punto, anche dentro il paragrafo
 #   volume_musica: 0.5  → (accanto a pausa o musica) volume della musica in quel momento
 #   sfumatura: 8        → (accanto a pausa o musica) secondi per abbassare e rialzare la musica
@@ -26,8 +23,11 @@
 #                         (intonazione continua, come una preghiera; senza, ogni riga è una frase a sé)
 #
 # Dentro i testi:
-#   [pausa] = 2 secondi di silenzio, [pausa 4] = 4 secondi, [pausa breve] = 1, [pausa media] = 2, [pausa lunga] = 3,5;
-#   andare a capo = piccola pausa.
+#   [pausa] = 2 secondi di silenzio, [pausa 4] = 4 secondi, [0,3] = tre decimi di secondo,
+#   [pausa breve] = 1, [pausa media] = 2, [pausa lunga] = 3,5.
+#   Nel Vangelo e nel commento: riga vuota = cambio di paragrafo (pausa_a_capo); a capo semplice = 1,2 secondi.
+#   Nei testi fissi: ogni a capo = pausa_a_capo dell'elemento (o 1,2 secondi).
+#   Due parole da leggere unite: col trattino (Padre-mio).
 #   Le parti tra graffe si riempiono ogni giorno dal post:
 #   {giorno} {liturgia} {titolo} {autore} {evangelista} {vangelo} {commento}
 #   {citazione} {citazione_fonte} {citazione_fonte_letta} {domanda} {mi_preparo_post} {immagino_post} {ringrazio_post}
@@ -37,35 +37,11 @@
 
 voci:
   # azure: = voci di Azure (vedi la pagina "campioni" del sito); se Azure non risponde si usano Giuseppe e Isabella di Edge
-  struttura: azure:it-IT-Isabella:DragonLatestNeural   # voce della struttura (titoli, istruzioni, domande alternate); dal 9 novembre è Isabella (prima Giuseppe)
-  contenuti: azure:it-IT-GiuseppeMultilingualNeural   # voce dei contenuti (citazione, Vangelo, commento); dal 9 novembre è Giuseppe (prima Isabella)
-  coro_piccolo:                          # chi recita la prima parte del Padre nostro
-    - edge:it-IT-GiuseppeNeural
-    - edge:it-IT-IsabellaNeural
-    - edge:it-IT-DiegoNeural
-    - edge:it-IT-ElsaNeural
-  coro_grande:                           # il Padre nostro: italiani e voci di altri paesi che parlano italiano (in quest'ordine entrano)
-    - azure:it-IT-Alessio:DragonLatestNeural
-    - azure:it-IT-Isabella:DragonLatestNeural
-    - edge:it-IT-GiuseppeNeural
-    - edge:it-IT-IsabellaNeural
-    - azure:it-IT-FabiolaNeural
-    - azure:it-IT-MarcelloMultilingualNeural
-    - edge:it-IT-DiegoNeural
-    - edge:it-IT-ElsaNeural
-    - edge:en-US-AndrewMultilingualNeural
-    - edge:en-US-AvaMultilingualNeural
-    - edge:en-US-BrianMultilingualNeural
-    - edge:en-US-EmmaMultilingualNeural
-    - edge:de-DE-FlorianMultilingualNeural
-    - edge:de-DE-SeraphinaMultilingualNeural
-    - edge:fr-FR-RemyMultilingualNeural
-    - edge:fr-FR-VivienneMultilingualNeural
-    - im_nicola
-    - if_sara
-    - em_alex
-    - ef_dora
-  riserva: im_nicola                     # se le voci di Edge non rispondono: Nicola (Kokoro), e arriva una mail
+  struttura: azure:it-IT-Isabella:DragonLatestNeural   # voce della struttura (istruzioni, titoli, Padre nostro escluso) quando l'autore è un uomo
+  contenuti: azure:it-IT-GiuseppeMultilingualNeural   # voce dei contenuti (citazione, Vangelo, commento, Padre nostro) quando l'autore è un uomo
+  secondo_autore: true   # se il commento è di una donna, le due voci si scambiano in tutta la preghiera
+  autori: {}             # per correggere il riconoscimento, per esempio {"Andrea Rossi": M}
+  riserva: im_nicola     # se Azure non risponde si usano Giuseppe e Isabella di Edge; se anche Edge tace, Nicola (Kokoro); arriva una mail
   velocita: 1.0             # velocità generale
 
 pause:
@@ -189,9 +165,9 @@ scaletta:
         volume_musica: 0.5
         sfumatura_entrata: 8
       - M: "Concludiamo la nostra preghiera, unendoci a quella del Figlio."
-        velocita: 0.82
         volume_musica: 0
         sfumatura_entrata: 5
+        velocita: 0.82
       - pausa: 4
         fondo: nessuna
       - F: |-
@@ -206,7 +182,7 @@ scaletta:
           ma liberaci dal male. Amen.
         velocita: 0.88
         di_seguito: true
-        fondo: nessuna
         morbido: true
         tono: -5
         volume_voce: 0.7
+        fondo: nessuna

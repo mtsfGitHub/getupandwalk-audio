@@ -89,6 +89,10 @@ def main():
         corr = yaml.safe_load(fix.read_text("utf-8")) or {}
         values.update(corr)
         print("Correzioni del giorno: " + ", ".join(corr))
+    from gw.autore import apply as voices_for_author
+    g = voices_for_author(model, post.author, values.get("voce_autore"))
+    print(f"Autore: {post.author} ({'donna' if g == 'F' else 'uomo'}) → commento letto da "
+          f"{model['voci']['contenuti']}, struttura {model['voci']['struttura']}")
     events = build_events(model, values)
     current = None
     for ev in events:

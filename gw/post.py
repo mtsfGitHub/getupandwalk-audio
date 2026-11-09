@@ -41,6 +41,7 @@ class Post:
     title: str = ""
     ref: str = ""
     author: str = ""
+    author_url: str = ""
     image: str = ""
     caption: str = ""
     quote_lines: list = field(default_factory=list)
@@ -120,6 +121,10 @@ def parse_post(html, day, url):
         if m:
             post.ref = m.group(1).strip().rstrip(",")
             post.author = re.split(r"\s{2,}| \| ", m.group(2).strip())[0]
+    link = (el.find("a", href=re.compile(r"/author/")) if el is not None else None) \
+        or soup.find("a", href=re.compile(r"getupandwalk\.gesuiti\.it/author/"))
+    if link is not None:
+        post.author_url = link["href"]
     meta = soup.find("meta", attrs={"name": "author"})
     if meta and meta.get("content"):
         post.author = meta["content"].strip()

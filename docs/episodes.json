@@ -11,7 +11,8 @@
   "audio": "https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-09/getupandwalk-2026-11-09.mp3",
   "seconds": 679,
   "bytes": 10860892,
-  "voci": "Isabella e Giuseppe, Microsoft Azure"
+  "voci": "Isabella e Giuseppe, Microsoft Azure",
+  "author_url": "https://getupandwalk.gesuiti.it/author/marcoruggiero/"
  },
  {
   "date": "2026-11-08",
@@ -25,7 +26,8 @@
   "audio": "https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-08/getupandwalk-2026-11-08.mp3",
   "seconds": 668,
   "bytes": 10684547,
-  "voci": "Giuseppe e Isabella, Microsoft Azure"
+  "voci": "Giuseppe e Isabella, Microsoft Azure",
+  "author_url": "https://getupandwalk.gesuiti.it/author/mouniraabdelhamidserra/"
  },
  {
   "date": "2026-11-07",
@@ -39,6 +41,7 @@
   "audio": "https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3",
   "seconds": 617,
   "bytes": 9877448,
-  "voci": "Giuseppe e Isabella, Microsoft Azure"
+  "voci": "Giuseppe e Isabella, Microsoft Azure",
+  "author_url": "https://getupandwalk.gesuiti.it/author/giuseppelamalfa/"
  }
 ]

@@ -153,7 +153,7 @@ def main():
         (posts / f"{tag}.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), "utf-8")
         sito.save_episode({
             "date": tag, "title": post.title, "ref": post.ref, "author": post.author,
-            "image": post.image, "caption": post.caption, "liturgia": liturgia[:1].upper() + liturgia[1:],
+            "author_url": getattr(post, "author_url", ""), "image": post.image, "caption": post.caption, "liturgia": liturgia[:1].upper() + liturgia[1:],
             "post": post.url, "audio": sito.asset_url(tag, filename),
             "seconds": round(secs), "bytes": mp3.stat().st_size, "voci": voices_label(model, voice),
         })

@@ -39,6 +39,8 @@ main .in{padding-block:32px 48px;display:flex;flex-direction:column;gap:28px}
 h1{font-size:clamp(28px,4vw,36px);font-weight:700;margin:0;line-height:1.1;text-wrap:balance}
 .by{font-size:16px}
 .by em{font-style:normal;color:var(--link)}
+.aut{color:var(--link);text-decoration:none}
+.aut:hover{text-decoration:underline}
 audio{width:100%;max-width:520px}
 .azioni{display:flex;gap:12px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;font-size:15px;text-decoration:none;color:#fff;border:0}
@@ -50,7 +52,7 @@ h2{font-family:var(--ft);font-weight:400;font-size:22px;letter-spacing:.12em;tex
 overflow-x:auto;scroll-snap-type:x mandatory}
 .giorni li{scroll-snap-align:start;display:flex}
 .giorni li[hidden]{display:none!important}
-.ep{width:100%;background:var(--grigio);border:0;padding:12px 12px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+.ep{width:100%;background:var(--grigio);border:0;box-sizing:border-box;padding:12px 12px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;
 display:flex;flex-direction:column;gap:12px;outline-offset:3px}
 .ep .cal{height:112px}
 .ep .cal b{font-size:40px;font-weight:300}
@@ -119,7 +121,7 @@ footer a{color:#fff}
       <div class="testo">
         <div class="lit" id="lit">Festa della Dedicazione della Basilica Lateranense</div>
         <h1 id="title">Tempio vivo</h1>
-        <div class="by">commento di <span id="ref" class="nw">Gv 2,13-22</span><span class="sep">, </span>a cura di <em id="author">Marco Ruggiero</em></div>
+        <div class="by">commento di <span id="ref" class="nw">Gv 2,13-22</span><span class="sep">, </span>a cura di <a id="author" class="aut" href="https://getupandwalk.gesuiti.it/author/marcoruggiero/" target="_blank" rel="noopener">Marco Ruggiero</a></div>
       </div>
       <audio id="player" controls preload="none" src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-09/getupandwalk-2026-11-09.mp3"></audio>
       <div class="azioni">
@@ -128,16 +130,16 @@ footer a{color:#fff}
       </div>
     </div>
   </section>
-  <section aria-label='Gli ultimi giorni'><ul class='giorni' id='giorni'><li hidden><button type="button" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-09/getupandwalk-2026-11-09.mp3" data-title="Tempio vivo" data-date="lunedì 9 novembre 2026" data-lit="Festa della Dedicazione della Basilica Lateranense" data-ref="Gv 2,13-22" data-author="Marco Ruggiero" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/han-shang-698LrKZFmQU-unsplash.jpg" data-cap="Foto di han shang su Unsplash" data-post="https://getupandwalk.gesuiti.it/2026/11/09/tempio-vivo/" data-voci="Isabella e Giuseppe, Microsoft Azure" data-g="9" data-m="Novembre" data-a="2026" data-dur="11:19"><span class="cal"><b>9</b><span>Novembre</span><small>2026</small></span><span class="t">Tempio vivo</span><span class="m">Commento di <span class="nw">Gv 2,13-22</span><br>a cura di <em>Marco Ruggiero</em></span><span class="dur">▶ 11:19</span></button></li>
-<li><button type="button" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-08/getupandwalk-2026-11-08.mp3" data-title="Quando l’alba è ancora buio" data-date="domenica 8 novembre 2026" data-lit="Trentaduesima domenica del Tempo Ordinario" data-ref="Mt 25,1-13" data-author="Mounira Abdelhamid Serra" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/8.png" data-cap="© Immagine realizzata con ChatGPT. Tutti i diritti riservati. È vietata la riproduzione o la diffusione senza autorizzazione dell’autrice." data-post="https://getupandwalk.gesuiti.it/2026/11/08/quando-lalba-e-ancora-buio/" data-voci="Giuseppe e Isabella, Microsoft Azure" data-g="8" data-m="Novembre" data-a="2026" data-dur="11:08"><span class="cal"><b>8</b><span>Novembre</span><small>2026</small></span><span class="t">Quando l’alba è ancora buio</span><span class="m">Commento di <span class="nw">Mt 25,1-13</span><br>a cura di <em>Mounira Abdelhamid Serra</em></span><span class="dur">▶ 11:08</span></button></li>
-<li><button type="button" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3" data-title="Con tutte le forze" data-date="sabato 7 novembre 2026" data-lit="Sabato della trentunesima settimana del Tempo Ordinario" data-ref="Lc 16,9-15" data-author="Giuseppe Amalfa SJ" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/07.11_Roma-Chiesa-del-Gesu-Volta-Baciccio-10.jpg" data-cap="Antonio Raggi, Leonardo Reti, Volta della chiesa del Gesù di Roma, sec. XVII" data-post="https://getupandwalk.gesuiti.it/2026/11/07/con-tutte-le-forze/" data-voci="Giuseppe e Isabella, Microsoft Azure" data-g="7" data-m="Novembre" data-a="2026" data-dur="10:17"><span class="cal"><b>7</b><span>Novembre</span><small>2026</small></span><span class="t">Con tutte le forze</span><span class="m">Commento di <span class="nw">Lc 16,9-15</span><br>a cura di <em>Giuseppe Amalfa SJ</em></span><span class="dur">▶ 10:17</span></button></li></ul></section>
+  <section aria-label='Gli ultimi giorni'><ul class='giorni' id='giorni'><li hidden><div role="button" tabindex="0" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-09/getupandwalk-2026-11-09.mp3" data-title="Tempio vivo" data-date="lunedì 9 novembre 2026" data-lit="Festa della Dedicazione della Basilica Lateranense" data-ref="Gv 2,13-22" data-author="Marco Ruggiero" data-aurl="https://getupandwalk.gesuiti.it/author/marcoruggiero/" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/han-shang-698LrKZFmQU-unsplash.jpg" data-cap="Foto di han shang su Unsplash" data-post="https://getupandwalk.gesuiti.it/2026/11/09/tempio-vivo/" data-voci="Isabella e Giuseppe, Microsoft Azure" data-g="9" data-m="Novembre" data-a="2026" data-dur="11:19"><span class="cal"><b>9</b><span>Novembre</span><small>2026</small></span><span class="t">Tempio vivo</span><span class="m">Commento di <span class="nw">Gv 2,13-22</span><br>a cura di <a class="aut" href="https://getupandwalk.gesuiti.it/author/marcoruggiero/" target="_blank" rel="noopener">Marco Ruggiero</a></span><span class="dur">▶ 11:19</span></div></li>
+<li><div role="button" tabindex="0" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-08/getupandwalk-2026-11-08.mp3" data-title="Quando l’alba è ancora buio" data-date="domenica 8 novembre 2026" data-lit="Trentaduesima domenica del Tempo Ordinario" data-ref="Mt 25,1-13" data-author="Mounira Abdelhamid Serra" data-aurl="https://getupandwalk.gesuiti.it/author/mouniraabdelhamidserra/" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/8.png" data-cap="© Immagine realizzata con ChatGPT. Tutti i diritti riservati. È vietata la riproduzione o la diffusione senza autorizzazione dell’autrice." data-post="https://getupandwalk.gesuiti.it/2026/11/08/quando-lalba-e-ancora-buio/" data-voci="Giuseppe e Isabella, Microsoft Azure" data-g="8" data-m="Novembre" data-a="2026" data-dur="11:08"><span class="cal"><b>8</b><span>Novembre</span><small>2026</small></span><span class="t">Quando l’alba è ancora buio</span><span class="m">Commento di <span class="nw">Mt 25,1-13</span><br>a cura di <a class="aut" href="https://getupandwalk.gesuiti.it/author/mouniraabdelhamidserra/" target="_blank" rel="noopener">Mounira Abdelhamid Serra</a></span><span class="dur">▶ 11:08</span></div></li>
+<li><div role="button" tabindex="0" class="ep" data-src="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-07/getupandwalk-2026-11-07.mp3" data-title="Con tutte le forze" data-date="sabato 7 novembre 2026" data-lit="Sabato della trentunesima settimana del Tempo Ordinario" data-ref="Lc 16,9-15" data-author="Giuseppe Amalfa SJ" data-aurl="https://getupandwalk.gesuiti.it/author/giuseppelamalfa/" data-img="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/07.11_Roma-Chiesa-del-Gesu-Volta-Baciccio-10.jpg" data-cap="Antonio Raggi, Leonardo Reti, Volta della chiesa del Gesù di Roma, sec. XVII" data-post="https://getupandwalk.gesuiti.it/2026/11/07/con-tutte-le-forze/" data-voci="Giuseppe e Isabella, Microsoft Azure" data-g="7" data-m="Novembre" data-a="2026" data-dur="10:17"><span class="cal"><b>7</b><span>Novembre</span><small>2026</small></span><span class="t">Con tutte le forze</span><span class="m">Commento di <span class="nw">Lc 16,9-15</span><br>a cura di <a class="aut" href="https://getupandwalk.gesuiti.it/author/giuseppelamalfa/" target="_blank" rel="noopener">Giuseppe Amalfa SJ</a></span><span class="dur">▶ 10:17</span></div></li></ul></section>
 </div></main>
 <footer><div class="in">Testi: <a href="https://getupandwalk.gesuiti.it/">getupandwalk.gesuiti.it</a> · Voci generate al computer<span id="voci" hidden></span></div></footer>
 <script>
 const $=id=>document.getElementById(id);
 function show(b,play){
   const d=b.dataset;
-  $('title').textContent=d.title;$('lit').textContent=d.lit;$('ref').textContent=d.ref;$('author').textContent=d.author;
+  $('title').textContent=d.title;$('lit').textContent=d.lit;$('ref').textContent=d.ref;$('author').textContent=d.author;$('author').href=d.aurl||'#';
   $('cap').textContent=d.cap;$('cg').textContent=d.g;$('cm').textContent=d.m;$('ca').textContent=d.a;
   const img=$('img');if(img){img.hidden=!d.img;if(d.img){img.src=d.img;img.alt=d.cap||d.title}}
   $('dl').href=d.src;$('post').href=d.post;
@@ -145,7 +147,10 @@ function show(b,play){
   const p=$('player');if(p.getAttribute('src')!==d.src){p.src=d.src;p.load()}
   if(play){p.play().catch(()=>{});window.scrollTo({top:0,behavior:'smooth'})}
 }
-document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>show(b,true)));
+document.querySelectorAll('.ep').forEach(b=>{
+  b.addEventListener('click',ev=>{if(ev.target.closest('a'))return;show(b,true)});
+  b.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();show(b,true)}});
+});
 const first=document.querySelector('.ep');if(first){first.classList.add('on');first.parentElement.hidden=true}
 const altri=$('altri');if(altri)altri.addEventListener('click',()=>{$('giorni').classList.add('tutti');altri.remove()});
 </script>

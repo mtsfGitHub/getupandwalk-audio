@@ -29,8 +29,8 @@ def load_post(day):
     d = json.loads(Path(f"docs/posts/{day}.json").read_text("utf-8"))
     from datetime import date
     post = Post(day=date.fromisoformat(d["day"]), url=d["url"])
-    for k in ("title", "ref", "author", "image", "caption", "quote_lines", "quote_source"):
-        setattr(post, k, d[k])
+    for k in ("title", "ref", "author", "author_url", "image", "caption", "quote_lines", "quote_source"):
+        setattr(post, k, d.get(k, ""))
     post.sections = [Section(**s) for s in d["sections"]]
     return post
 

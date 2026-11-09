@@ -45,6 +45,14 @@ def _mmss(secs):
     return f"{secs // 60}:{secs % 60:02d}"
 
 
+def _author(x):
+    name = html.escape(x.get("author", ""))
+    url = x.get("author_url", "")
+    if not url:
+        return f'<em>{name}</em>'
+    return f'<a class="aut" href="{html.escape(url)}" target="_blank" rel="noopener">{name}</a>'
+
+
 def write_page(eps):
     e = html.escape
     if not eps:
@@ -58,17 +66,17 @@ def write_page(eps):
     def data(x):
         g, m, a = parts(x["date"])
         fields = {"src": x["audio"], "title": x["title"], "date": _date_label(x["date"]), "lit": x.get("liturgia", ""),
-                  "ref": x.get("ref", ""), "author": x.get("author", ""), "img": x.get("image", ""),
+                  "ref": x.get("ref", ""), "author": x.get("author", ""), "aurl": x.get("author_url", ""), "img": x.get("image", ""),
                   "cap": x.get("caption", ""), "post": x["post"], "voci": x.get("voci", ""),
                   "g": g, "m": m, "a": a, "dur": _mmss(x["seconds"])}
         return " ".join(f'data-{k}="{e(v)}"' for k, v in fields.items())
 
     cards = "\n".join(
-        f'<li{" hidden" if x is top else ""}><button type="button" class="ep" {data(x)}>'
+        f'<li{" hidden" if x is top else ""}><div role="button" tabindex="0" class="ep" {data(x)}>'
         f'<span class="cal"><b>{e(parts(x["date"])[0])}</b><span>{e(parts(x["date"])[1])}</span><small>{e(parts(x["date"])[2])}</small></span>'
         f'<span class="t">{e(x["title"])}</span>'
-        f'<span class="m">Commento di <span class="nw">{e(x.get("ref", ""))}</span><br>a cura di <em>{e(x.get("author", ""))}</em></span>'
-        f'<span class="dur">▶ {_mmss(x["seconds"])}</span></button></li>' for x in eps)
+        f'<span class="m">Commento di <span class="nw">{e(x.get("ref", ""))}</span><br>a cura di {_author(x)}</span>'
+        f'<span class="dur">▶ {_mmss(x["seconds"])}</span></div></li>' for x in eps)
     g, m, a = parts(top["date"])
     img = f'<img id="img" src="{e(top.get("image", ""))}" alt="{e(top.get("caption") or top["title"])}"{"" if top.get("image") else " hidden"}>'
     page = f"""<!doctype html>
@@ -112,6 +120,8 @@ main .in{{padding-block:32px 48px;display:flex;flex-direction:column;gap:28px}}
 h1{{font-size:clamp(28px,4vw,36px);font-weight:700;margin:0;line-height:1.1;text-wrap:balance}}
 .by{{font-size:16px}}
 .by em{{font-style:normal;color:var(--link)}}
+.aut{{color:var(--link);text-decoration:none}}
+.aut:hover{{text-decoration:underline}}
 audio{{width:100%;max-width:520px}}
 .azioni{{display:flex;gap:12px;flex-wrap:wrap}}
 .btn{{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;font-size:15px;text-decoration:none;color:#fff;border:0}}
@@ -123,7 +133,7 @@ h2{{font-family:var(--ft);font-weight:400;font-size:22px;letter-spacing:.12em;te
 overflow-x:auto;scroll-snap-type:x mandatory}}
 .giorni li{{scroll-snap-align:start;display:flex}}
 .giorni li[hidden]{{display:none!important}}
-.ep{{width:100%;background:var(--grigio);border:0;padding:12px 12px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+.ep{{width:100%;background:var(--grigio);border:0;box-sizing:border-box;padding:12px 12px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;
 display:flex;flex-direction:column;gap:12px;outline-offset:3px}}
 .ep .cal{{height:112px}}
 .ep .cal b{{font-size:40px;font-weight:300}}
@@ -192,7 +202,7 @@ footer a{{color:#fff}}
       <div class="testo">
         <div class="lit" id="lit">{e(top.get("liturgia", ""))}</div>
         <h1 id="title">{e(top["title"])}</h1>
-        <div class="by">commento di <span id="ref" class="nw">{e(top.get("ref", ""))}</span><span class="sep">, </span>a cura di <em id="author">{e(top.get("author", ""))}</em></div>
+        <div class="by">commento di <span id="ref" class="nw">{e(top.get("ref", ""))}</span><span class="sep">, </span>a cura di <a id="author" class="aut" href="{e(top.get("author_url") or "#")}" target="_blank" rel="noopener">{e(top.get("author", ""))}</a></div>
       </div>
       <audio id="player" controls preload="none" src="{e(top["audio"])}"></audio>
       <div class="azioni">
@@ -208,7 +218,7 @@ footer a{{color:#fff}}
 const $=id=>document.getElementById(id);
 function show(b,play){{
   const d=b.dataset;
-  $('title').textContent=d.title;$('lit').textContent=d.lit;$('ref').textContent=d.ref;$('author').textContent=d.author;
+  $('title').textContent=d.title;$('lit').textContent=d.lit;$('ref').textContent=d.ref;$('author').textContent=d.author;$('author').href=d.aurl||'#';
   $('cap').textContent=d.cap;$('cg').textContent=d.g;$('cm').textContent=d.m;$('ca').textContent=d.a;
   const img=$('img');if(img){{img.hidden=!d.img;if(d.img){{img.src=d.img;img.alt=d.cap||d.title}}}}
   $('dl').href=d.src;$('post').href=d.post;
@@ -216,7 +226,10 @@ function show(b,play){{
   const p=$('player');if(p.getAttribute('src')!==d.src){{p.src=d.src;p.load()}}
   if(play){{p.play().catch(()=>{{}});window.scrollTo({{top:0,behavior:'smooth'}})}}
 }}
-document.querySelectorAll('.ep').forEach(b=>b.addEventListener('click',()=>show(b,true)));
+document.querySelectorAll('.ep').forEach(b=>{{
+  b.addEventListener('click',ev=>{{if(ev.target.closest('a'))return;show(b,true)}});
+  b.addEventListener('keydown',ev=>{{if(ev.key==='Enter'||ev.key===' '){{ev.preventDefault();show(b,true)}}}});
+}});
 const first=document.querySelector('.ep');if(first){{first.classList.add('on');first.parentElement.hidden=true}}
 const altri=$('altri');if(altri)altri.addEventListener('click',()=>{{$('giorni').classList.add('tutti');altri.remove()}});
 </script>

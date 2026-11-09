@@ -1,0 +1,216 @@
+# PROVA solo per il 9 novembre: modifiche del pannello non ancora definitive + voci scambiate.
+# Il modello della preghiera audio di Get up and Walk.
+# Si può modificare direttamente da GitHub (icona della matita): la mattina dopo l'audio segue il nuovo modello.
+#
+# Ogni sezione ha un elenco di elementi:
+#   M: "testo"          → lo legge la voce della struttura (maschile, vedi "voci" qui sotto)
+#   F: "testo"          → lo legge la voce dei contenuti (femminile)
+#   MF: "testo"         → le due voci insieme, in coro (ogni riga va a tempo)
+#   M|F: "testo"        → (dentro per_ogni_domanda) le voci si alternano: la prima M, la seconda F, …
+#   coro_piccolo / coro_grande: "testo" → le voci elencate qui sotto in "voci", tutte insieme
+#   crescendo: [2, 4, 8, 12, 20] → (accanto a un coro) quante voci a ogni riga: il coro si allarga
+#   velocita: 0.92      → (facoltativo, accanto a M o F) più lento di 1 = più lento
+#   pausa: 10           → secondi di pausa, con la musica
+#   musica: 8           → secondi di sola musica
+#   pausa_a_capo: 3     → (accanto a M o F) secondi di pausa tra un paragrafo e l'altro di quel testo
+#   pausa_punto: 1.5    → (accanto a M o F) secondi di respiro dopo ogni punto, anche dentro il paragrafo
+#   volume_musica: 0.5  → (accanto a pausa o musica) volume della musica in quel momento
+#   sfumatura: 8        → (accanto a pausa o musica) secondi per abbassare e rialzare la musica
+#   sfumatura_entrata / sfumatura_uscita → come sopra, ma solo in entrata o solo in uscita
+#   fondo: nessuna      → (accanto a un elemento o a una sezione) quale musica di fondo:
+#                         campane, accordo, liuto (la pavana), giorno (una musica nuova ogni giorno) oppure nessuna
+#   per_ogni_domanda:   → ripete gli elementi indicati per ogni domanda del post
+#   tono: -5            → (accanto a M o F) voce un po' più grave (in percentuale); +5 più acuta
+#   morbido: true       → (accanto a M o F) voce ammorbidita, meno squillante
+#   volume_voce: 0.8    → (accanto a M o F) voce più bassa delle altre (1 = uguale)
+#   di_seguito: true    → (accanto a M o F) tutto il testo in una sola lettura, con un respiro a fine riga
+#                         (intonazione continua, come una preghiera; senza, ogni riga è una frase a sé)
+#
+# Dentro i testi:
+#   [pausa] = 2 secondi di silenzio, [pausa 4] = 4 secondi, [pausa breve] = 1, [pausa media] = 2, [pausa lunga] = 3,5;
+#   andare a capo = piccola pausa.
+#   Le parti tra graffe si riempiono ogni giorno dal post:
+#   {giorno} {liturgia} {titolo} {autore} {evangelista} {vangelo} {commento}
+#   {citazione} {citazione_fonte} {citazione_fonte_letta} {domanda} {mi_preparo_post} {immagino_post} {ringrazio_post}
+#
+# "se:" fa saltare la sezione quando quel giorno il post non ha quella parte
+#   (citazione, vangelo, commento, domande).
+
+voci:
+  # azure: = voci di Azure (vedi la pagina "campioni" del sito); se Azure non risponde si usano Giuseppe e Isabella di Edge
+  struttura: azure:it-IT-Isabella:DragonLatestNeural   # PROVA DEL 9 NOVEMBRE: voci scambiate   # voce maschile (tutte le parti maschili); provato anche: azure:it-IT-Alessio:DragonLatestNeural
+  contenuti: azure:it-IT-GiuseppeMultilingualNeural   # PROVA DEL 9 NOVEMBRE: voci scambiate   # voce femminile (citazione, Vangelo, commento, domande); in prova: azure:it-IT-FabiolaNeural
+  coro_piccolo:                          # chi recita la prima parte del Padre nostro
+    - edge:it-IT-GiuseppeNeural
+    - edge:it-IT-IsabellaNeural
+    - edge:it-IT-DiegoNeural
+    - edge:it-IT-ElsaNeural
+  coro_grande:                           # il Padre nostro: italiani e voci di altri paesi che parlano italiano (in quest'ordine entrano)
+    - azure:it-IT-Alessio:DragonLatestNeural
+    - azure:it-IT-Isabella:DragonLatestNeural
+    - edge:it-IT-GiuseppeNeural
+    - edge:it-IT-IsabellaNeural
+    - azure:it-IT-FabiolaNeural
+    - azure:it-IT-MarcelloMultilingualNeural
+    - edge:it-IT-DiegoNeural
+    - edge:it-IT-ElsaNeural
+    - edge:en-US-AndrewMultilingualNeural
+    - edge:en-US-AvaMultilingualNeural
+    - edge:en-US-BrianMultilingualNeural
+    - edge:en-US-EmmaMultilingualNeural
+    - edge:de-DE-FlorianMultilingualNeural
+    - edge:de-DE-SeraphinaMultilingualNeural
+    - edge:fr-FR-RemyMultilingualNeural
+    - edge:fr-FR-VivienneMultilingualNeural
+    - im_nicola
+    - if_sara
+    - em_alex
+    - ef_dora
+  riserva: im_nicola                     # se le voci di Edge non rispondono: Nicola (Kokoro), e arriva una mail
+  velocita: 1.0             # velocità generale
+
+pause:
+  a_capo: 1.2               # a ogni a capo e tra una battuta e l'altra
+  due_punti: 1.0            # dopo i due punti
+  punto_e_virgola: 1.0      # dopo il punto e virgola
+  punto_esclamativo: 0.7    # dopo il punto esclamativo, dove c'è il respiro dopo i punti
+  punto_interrogativo: 1.2  # dopo il punto di domanda, dove c'è il respiro dopo i punti
+
+# Parole che la voce pronuncia male: a sinistra come sono scritte, a destra come vanno lette
+# (con l'accento, oppure a pezzi separati da | che la voce dice e il programma incolla).
+# Valgono per tutti i giorni. Esempio (tolto il #):
+#   compratevene: "comprà|tevene"
+pronuncia:
+  # ⟦ipa:…|parola⟧ = pronuncia esatta in alfabeto fonetico (solo voci di Azure; con Edge si legge la parola normale)
+  compratevene: "⟦ipa:komˈpratevene|compratevene⟧"
+
+# Parti fisse (Padre nostro, "Mi preparo", introduzioni…) generate una volta sola e riusate ogni giorno:
+# da mettere a true solo quando la preghiera è definitiva.
+parti_fisse: false
+
+musica:
+  volume: 0.45              # 0 = niente musica, 1 = piena
+  sotto_la_voce: true       # musica bassa anche mentre la voce legge
+  aria: -62                 # "aria di stanza" quasi impercettibile tra le frasi (dB); -99 = silenzio assoluto
+  fondo: giorno             # musica di fondo se la sezione non dice altro: campane, accordo, liuto, giorno, nessuna
+
+scaletta:
+  - sezione: Apertura
+    fondo: campane
+    elementi:
+      - musica: 8
+      - M: "Oggi è {giorno}, [pausa breve] {liturgia}."
+      - pausa: 7
+
+  - sezione: Citazione
+    se: citazione
+    fondo: accordo
+    elementi:
+      - M: "Una citazione di {citazione_fonte_letta}"
+        velocita: 0.92
+      - pausa: 5
+      - F: "{citazione}"
+        velocita: 0.92
+      - musica: 8
+
+  - sezione: Mi preparo
+    fondo: accordo
+    elementi:
+      - M: "Mi preparo."
+        velocita: 0.92
+      - pausa: 5
+      - F: |-
+          Chiudo gli occhi, [pausa breve]
+          libero la mente da preoccupazioni e pensieri [pausa lunga] 
+          mi concentro sul momento presente,
+          [pausa lunga]
+          Esprimo interiormente il mio desiderio di stare alla presenza del Signore.
+        velocita: 0.92
+      - pausa: 4
+
+  - sezione: Entro nel testo
+    se: vangelo
+    fondo: accordo
+    elementi:
+      - M: "Ascolta questo passaggio dal Vangelo secondo san {evangelista}."
+        fondo: nessuna
+      - pausa: 5
+        fondo: nessuna
+      - F: "{vangelo}"
+        velocita: 0.92
+        pausa_a_capo: 3.5
+        pausa_punto: 2
+        fondo: nessuna
+      - pausa: 10
+        sfumatura_entrata: 9
+        fondo: giorno
+
+  - sezione: Mi lascio ispirare
+    se: commento
+    elementi:
+      - M: "Mi lascio ispirare."
+        velocita: 0.82
+      - pausa: 5
+      - F: "{commento}"
+        velocita: 0.92
+        pausa_a_capo: 3.5
+        pausa_punto: 2
+      - pausa: 10
+      - per_ogni_domanda:
+          - M|F: "{domanda}"
+            velocita: 0.82
+          - pausa: 10
+      - pausa: 5
+
+  - sezione: Riascolto il Vangelo
+    se: vangelo
+    elementi:
+      - F: |-
+          Nel riascoltare il Vangelo, provo a visualizzare la scena [pausa lunga]  il luogo in cui avviene  [pausa media] i personaggi principali  [pausa media] le parole che si scambiano: il tono delle voci: i gesti. [pausa media] 
+          Lascio affiorare il mio sentire, senza censure, senza giudizi. [pausa media]
+          Quale parola o frase [pausa 0.5] cattura la mia attenzione in modo particolare?
+        velocita: 0.82
+      - pausa: 5
+        sfumatura_uscita: 5
+      - M: "{vangelo}"
+        velocita: 0.82
+        pausa_a_capo: 3.5
+        pausa_punto: 2
+        fondo: nessuna
+      - pausa: 11
+        sfumatura_entrata: 9
+
+  - sezione: Ringrazio
+    elementi:
+      - M: |-
+          Ritorno su qualcosa che si è mosso in me.
+          Ne posso parlare con il Signore. Come un amico parla con un amico.
+        velocita: 0.92
+      - pausa: 60
+        volume_musica: 0.5
+        sfumatura: 8
+      - F: "Concludiamo la nostra preghiera unendoci a quella del Figlio."
+        velocita: 0.82
+      - pausa: 5
+        sfumatura_uscita: 4
+      - M: |-
+          Padre nostro che sei nei cieli,
+          sia santificato il tuo nome,
+          venga il tuo regno,
+          sia fatta la tua volontà, come in cielo così in terra.
+          Dacci oggi il nostro pane quotidiano,
+          e rimetti a noi i nostri debiti
+          come anche noi li rimettiamo ai nostri debitori,
+          e non abbandonarci alla tentazione,
+          ma liberaci dal male. Amen.
+        velocita: 0.88
+        di_seguito: true
+        morbido: true
+        tono: -5
+        volume_voce: 0.7
+
+  - sezione: Chiusura
+    elementi:
+      - musica: 10
+        volume_musica: 0.28
+        sfumatura_uscita: 10

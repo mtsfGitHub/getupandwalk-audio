@@ -15,6 +15,10 @@ on:
         description: "Data AAAA-MM-GG (vuoto = oggi)"
         required: false
         default: ""
+      modello:
+        description: "Modello da usare (per una prova), vuoto = modello.yaml"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -80,7 +84,7 @@ jobs:
           AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
         run: |
           set +e
-          python build.py --data "${{ github.event.inputs.data }}"
+          python build.py --data "${{ github.event.inputs.data }}" --modello "${{ github.event.inputs.modello || 'modello.yaml' }}"
           rc=$?
           if [ $rc -eq 3 ] && { [ "${{ github.event_name }}" = "schedule" ] || [ -z "${{ github.event.inputs.data }}" ]; } && [ "$(date +%H)" -lt 5 ]; then
             echo "Il post di oggi non è ancora uscito: ci riprova il prossimo avvio."

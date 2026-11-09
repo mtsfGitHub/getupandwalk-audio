@@ -54,10 +54,11 @@ def main():
     ap.add_argument("--no-sito", action="store_true", help="non aggiornare la pagina e il feed")
     ap.add_argument("--contenuti", default="", help="prova con un'altra voce femminile (es. azure:it-IT-FabiolaNeural)")
     ap.add_argument("--struttura", default="", help="prova con un'altra voce maschile")
+    ap.add_argument("--modello", default="modello.yaml", help="un altro modello, per una prova")
     args = ap.parse_args()
 
     day = date.fromisoformat(args.data) if args.data.strip() else datetime.now(ZoneInfo("Europe/Rome")).date()
-    model = yaml.safe_load(Path("modello.yaml").read_text("utf-8"))
+    model = yaml.safe_load(Path(args.modello or "modello.yaml").read_text("utf-8"))
     for role in ("contenuti", "struttura"):          # prova con un'altra voce: niente parti fisse
         if getattr(args, role):
             model["voci"][role] = getattr(args, role)

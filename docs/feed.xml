@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Tue, 10 Nov 2026 23:37:11 +0000</lastBuildDate>
+  <lastBuildDate>Wed, 11 Nov 2026 23:37:15 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/11.11_jametlene-reskp-Uw4RIhZJ2C4-unsplash.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/12.11.1000195614.jpg"/>
+  <item>
+    <title>giovedì 12 novembre 2026 · Accorgersi</title>
+    <description>Giovedì della trentaduesima settimana del Tempo Ordinario. Commento di Lc 17,20-25, a cura di Ester Antonia Cozzolino.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/12/accorgersi/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-12</guid>
+    <pubDate>Thu, 12 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-12/getupandwalk-2026-11-12.mp3" length="9386330" type="audio/mpeg"/>
+    <itunes:duration>587</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/12.11.1000195614.jpg"/>
+  </item>
   <item>
     <title>mercoledì 11 novembre 2026 · Se la pelle nuova non basta</title>
     <description>Mercoledì della trentaduesima settimana del Tempo Ordinario. Commento di Lc 17,11-19, a cura di Lorena Armiento s.a..</description>

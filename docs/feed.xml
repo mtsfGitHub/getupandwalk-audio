@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Thu, 12 Nov 2026 23:38:19 +0000</lastBuildDate>
+  <lastBuildDate>Fri, 13 Nov 2026 23:37:57 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/13.11_prabir-kashyap-szPxqGFNS6Y-unsplash.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/14.11.IMG_8807.jpg"/>
+  <item>
+    <title>sabato 14 novembre 2026 · Senza stancarsi</title>
+    <description>Sabato della trentaduesima settimana del Tempo Ordinario. Commento di Lc 18,1-8, a cura di Matteo Suffritti SJ.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/14/senza-stancarsi/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-14</guid>
+    <pubDate>Sat, 14 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-14/getupandwalk-2026-11-14.mp3" length="10740946" type="audio/mpeg"/>
+    <itunes:duration>671</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/14.11.IMG_8807.jpg"/>
+  </item>
   <item>
     <title>venerdì 13 novembre 2026 · Brulicare</title>
     <description>Venerdì della trentaduesima settimana del Tempo Ordinario. Commento di Lc 17,26-37, a cura di Giovanni Baisi.</description>

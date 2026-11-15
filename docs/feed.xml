@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Sat, 14 Nov 2026 23:39:06 +0000</lastBuildDate>
+  <lastBuildDate>Sun, 15 Nov 2026 23:37:23 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/15.11_julietta-watson-1VT2qoBtc-k-unsplash.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/16.jpg"/>
+  <item>
+    <title>lunedì 16 novembre 2026 · Vita trasformata</title>
+    <description>Lunedì della trentatreesima settimana del Tempo Ordinario. Commento di Lc 18,35-43, a cura di Lino Dan SJ.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/16/vita-trasformata/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-16</guid>
+    <pubDate>Mon, 16 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-16/getupandwalk-2026-11-16.mp3" length="9953931" type="audio/mpeg"/>
+    <itunes:duration>622</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/16.jpg"/>
+  </item>
   <item>
     <title>domenica 15 novembre 2026 · Giochiamo insieme?</title>
     <description>Trentatreesima domenica del Tempo Ordinario. Commento di Mt 25,14-30, a cura di Caterina Bruno.</description>

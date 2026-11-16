@@ -9,6 +9,7 @@ it-IT-ElsaNeural
 it-IT-FabiolaNeural
 it-IT-FiammaNeural
 it-IT-GianniNeural
+it-IT-Giuseppe:DragonHDV3Neural
 it-IT-GiuseppeMultilingualNeural
 it-IT-GiuseppeNeural
 it-IT-Grant:MAI-Voice-2.1
@@ -18,6 +19,7 @@ it-IT-Harper:MAI-Voice-2.1-Flash
 it-IT-ImeldaNeural
 it-IT-IrmaNeural
 it-IT-Isabella:DragonHDLatestNeural
+it-IT-Isabella:DragonHDV3Neural
 it-IT-Isabella:DragonLatestNeural
 it-IT-IsabellaMultilingualNeural
 it-IT-IsabellaNeural

@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Sun, 15 Nov 2026 23:37:23 +0000</lastBuildDate>
+  <lastBuildDate>Mon, 16 Nov 2026 23:37:15 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/16.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/17.11_engin-akyurt-oi5mMSVFzk-unsplash.jpg"/>
+  <item>
+    <title>martedì 17 novembre 2026 · Dal basso</title>
+    <description>Martedì della trentatreesima settimana del Tempo Ordinario. Commento di Lc 19,1-10, a cura di Andrea Piccolo SJ.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/17/dal-basso/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-17</guid>
+    <pubDate>Tue, 17 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-17/getupandwalk-2026-11-17.mp3" length="11908712" type="audio/mpeg"/>
+    <itunes:duration>744</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/17.11_engin-akyurt-oi5mMSVFzk-unsplash.jpg"/>
+  </item>
   <item>
     <title>lunedì 16 novembre 2026 · Vita trasformata</title>
     <description>Lunedì della trentatreesima settimana del Tempo Ordinario. Commento di Lc 18,35-43, a cura di Lino Dan SJ.</description>

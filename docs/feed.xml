@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Mon, 16 Nov 2026 23:37:15 +0000</lastBuildDate>
+  <lastBuildDate>Tue, 17 Nov 2026 23:37:51 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/17.11_engin-akyurt-oi5mMSVFzk-unsplash.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/18.11_18-novembre-2026.jpg"/>
+  <item>
+    <title>mercoledì 18 novembre 2026 · Riscoprirsi figli amati</title>
+    <description>Mercoledì della trentatreesima settimana del Tempo Ordinario. Commento di Lc 19,11-28, a cura di Alessandro Di Mauro SJ.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/18/riscoprirsi-figli-amati/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-18</guid>
+    <pubDate>Wed, 18 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-18/getupandwalk-2026-11-18.mp3" length="12986238" type="audio/mpeg"/>
+    <itunes:duration>812</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/18.11_18-novembre-2026.jpg"/>
+  </item>
   <item>
     <title>martedì 17 novembre 2026 · Dal basso</title>
     <description>Martedì della trentatreesima settimana del Tempo Ordinario. Commento di Lc 19,1-10, a cura di Andrea Piccolo SJ.</description>

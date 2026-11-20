@@ -5,11 +5,21 @@
   <link>https://mtsfgithub.github.io/getupandwalk-audio/</link>
   <description>Il Vangelo del giorno commentato secondo la spiritualità ignaziana, da ascoltare.</description>
   <language>it</language>
-  <lastBuildDate>Wed, 18 Nov 2026 23:36:24 +0000</lastBuildDate>
+  <lastBuildDate>Fri, 20 Nov 2026 07:42:42 +0000</lastBuildDate>
   <itunes:author>Get up and Walk</itunes:author>
   <itunes:explicit>false</itunes:explicit>
   <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity"/></itunes:category>
-  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/19.11.mayank-dhanawade-HuF1VgHHoWI-unsplash.jpg"/>
+  <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/20.jpg"/>
+  <item>
+    <title>venerdì 20 novembre 2026 · Comprare Dio</title>
+    <description>Venerdì della trentatreesima settimana del Tempo Ordinario. Commento di Lc 19,45-48, a cura di Chiara Selvatici.</description>
+    <link>https://getupandwalk.gesuiti.it/2026/11/20/comprare-dio/</link>
+    <guid isPermaLink="false">getupandwalk-2026-11-20</guid>
+    <pubDate>Fri, 20 Nov 2026 05:00:00 +0000</pubDate>
+    <enclosure url="https://github.com/mtsfGitHub/getupandwalk-audio/releases/download/2026-11-20/getupandwalk-2026-11-20.mp3" length="7979483" type="audio/mpeg"/>
+    <itunes:duration>499</itunes:duration>
+    <itunes:image href="https://d1c233nw6edifh.cloudfront.net/wp-content/uploads/sites/52/2026/11/20.jpg"/>
+  </item>
   <item>
     <title>giovedì 19 novembre 2026 · Un pianto liberatorio</title>
     <description>Giovedì della trentatreesima settimana del Tempo Ordinario. Commento di Lc 19,41-44, a cura di Marco Passalacqua.</description>
